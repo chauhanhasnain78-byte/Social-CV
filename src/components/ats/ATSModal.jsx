@@ -73,7 +73,7 @@ function TipCard({ tip }) {
 
 export function ATSModal({ result, onClose }) {
   const overlayRef = useRef(null);
-  const { resume, loadResume } = useResumeStore();
+  const { resume, loadResume, fontSize, setFontSize } = useResumeStore();
 
   const [enhancing, setEnhancing] = useState(false);
   const [enhanced, setEnhanced] = useState(false);
@@ -95,6 +95,34 @@ export function ATSModal({ result, onClose }) {
     await new Promise((r) => setTimeout(r, 1200));
     const { enhanced: enhancedResume, changes: changeLog } = enhanceResumeWithAI(resume, result);
     loadResume(enhancedResume);
+
+    // ── Auto-fit to A4 ──────────────────────────────────────────────────────
+    // After content is enhanced, check if the CV still has empty space below.
+    // If it does, gradually increase the font size to fill the A4 page.
+    await new Promise((r) => setTimeout(r, 300)); // wait for DOM to re-render
+    const previewEl = document.getElementById('resume-preview');
+    const A4_HEIGHT_PX = 1123; // 297mm at 96dpi
+    if (previewEl) {
+      const sizeMap = { sm: 14, md: 16, lg: 18 };
+      let currentPx = sizeMap[fontSize] || parseInt(fontSize) || 16;
+      // Step up font size in 0.5px increments until CV fills the A4 or we hit 20px
+      while (currentPx < 20) {
+        const nextPx = currentPx + 0.5;
+        previewEl.style.fontSize = `${nextPx}px`;
+        await new Promise((r) => setTimeout(r, 30));
+        const contentHeight = previewEl.scrollHeight;
+        if (contentHeight >= A4_HEIGHT_PX * 0.97) {
+          // Good fit — slightly under full so we don't push onto page 2
+          break;
+        }
+        currentPx = nextPx;
+      }
+      // Persist the new font size back to the store
+      setFontSize(`${currentPx}`);
+      changeLog.push(`✅ Auto-fitted CV to A4 page (font size adjusted to ${currentPx}px)`);
+    }
+    // ────────────────────────────────────────────────────────────────────────
+
     setChanges(changeLog);
     setEnhanced(true);
     setEnhancing(false);
