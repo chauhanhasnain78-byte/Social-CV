@@ -32,7 +32,10 @@ const slideVariants = {
 };
 
 export default function App() {
-  const [showLogin, setShowLogin] = useState(false);
+  const [showLogin, setShowLogin] = useState(() => {
+    // Agar URL '/' nahi hai, toh seedha app routes show karo (Landing page skip)
+    return typeof window !== 'undefined' && window.location.pathname !== '/';
+  });
   const [isSplashDone, setIsSplashDone] = useState(false);
 
   useEffect(() => {
