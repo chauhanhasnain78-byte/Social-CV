@@ -59,7 +59,7 @@ export default function EditorPage() {
     }
   };
 
-  const TopBar = () => (
+  const renderTopBar = () => (
     <motion.header
       initial={{ y: -10, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
@@ -179,7 +179,7 @@ export default function EditorPage() {
   if (editorPhase === 'wizard') {
     return (
       <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: '#FAFAFA', overflow: 'hidden' }}>
-        <TopBar />
+        {renderTopBar()}
         <div className="scrollbar-thin" style={{ flex: 1, overflowY: 'auto', padding: '0 24px 60px' }}>
           <div style={{ maxWidth: 760, margin: '0 auto' }}>
             <StepperBar />
@@ -193,7 +193,7 @@ export default function EditorPage() {
   // Canvas Phase
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: '#FDFCFF', overflow: 'hidden' }}>
-      <TopBar />
+      {renderTopBar()}
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
         {/* Live Preview Area */}
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', background: '#F3F4F6' }}>
