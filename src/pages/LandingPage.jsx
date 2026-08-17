@@ -208,6 +208,8 @@ const Reveal = ({ children, delay = 0, style = {} }) => (
 export default function LandingPage({ onGetStarted }) {
   const [activeIdx, setActiveIdx] = useState(0);
   const [stats, setStats] = useState({ totalResumes: 0, highestAtsScore: 0, ratingSum: 0, totalRatings: 0 });
+  const [showPrivacy, setShowPrivacy] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -271,8 +273,8 @@ export default function LandingPage({ onGetStarted }) {
 
         {/* Nav links */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <button className="btn-ghost-light" style={{ fontSize: '0.875rem' }}>Templates</button>
-          <button className="btn-ghost-light" style={{ fontSize: '0.875rem' }}>Features</button>
+          <button onClick={() => document.getElementById('templates-section')?.scrollIntoView({ behavior: 'smooth' })} className="btn-ghost-light" style={{ fontSize: '0.875rem' }}>Templates</button>
+          <button onClick={() => document.getElementById('features-section')?.scrollIntoView({ behavior: 'smooth' })} className="btn-ghost-light" style={{ fontSize: '0.875rem' }}>Features</button>
           <button className="btn-ghost-light" onClick={handleActionClick} style={{ fontSize: '0.875rem' }}>Login</button>
           <motion.button
             className="btn-brand"
@@ -426,7 +428,7 @@ export default function LandingPage({ onGetStarted }) {
       </section>
 
       {/* ── TEMPLATES SHOWCASE ────────────────────────── */}
-      <section style={{ padding: '100px 40px', maxWidth: 1280, margin: '0 auto' }}>
+      <section id="templates-section" style={{ padding: '100px 40px', maxWidth: 1280, margin: '0 auto' }}>
         <Reveal style={{ textAlign: 'center', marginBottom: 60 }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 16px', background: 'rgba(108,71,255,0.08)', borderRadius: 999, marginBottom: 20, border: '1px solid rgba(108,71,255,0.18)' }}>
             <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#6C47FF' }}>✦ 6 PREMIUM TEMPLATES</span>
@@ -499,7 +501,7 @@ export default function LandingPage({ onGetStarted }) {
       </section>
 
       {/* ── FEATURES GRID ─────────────────────────────── */}
-      <section style={{ padding: '80px 40px', background: '#F8F8FC' }}>
+      <section id="features-section" style={{ padding: '80px 40px', background: '#F8F8FC' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <Reveal style={{ textAlign: 'center', marginBottom: 60 }}>
             <h2 className="font-display" style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.6rem)', fontWeight: 800, letterSpacing: '-0.04em', color: '#0D0D0F', marginBottom: 14 }}>
@@ -598,11 +600,91 @@ export default function LandingPage({ onGetStarted }) {
           </span>
           <div style={{ display: 'flex', gap: 20 }}>
             {['Privacy', 'Terms', 'Contact'].map((l) => (
-              <button key={l} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.82rem', color: '#6B7280', fontFamily: 'Inter' }}>{l}</button>
+              <button 
+                key={l} 
+                onClick={() => {
+                  if (l === 'Privacy') setShowPrivacy(true);
+                  if (l === 'Terms') setShowTerms(true);
+                }}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.82rem', color: '#6B7280', fontFamily: 'Inter' }}
+              >
+                {l}
+              </button>
             ))}
           </div>
         </div>
       </footer>
+
+      {/* ── MODALS ────────────────────────────────────── */}
+      <AnimatePresence>
+        {showPrivacy && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            style={{
+              position: 'fixed', inset: 0, zIndex: 9999,
+              background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(8px)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24,
+            }}
+            onClick={() => setShowPrivacy(false)}
+          >
+            <motion.div
+              initial={{ y: 20, scale: 0.95 }} animate={{ y: 0, scale: 1 }} exit={{ y: 10, opacity: 0 }}
+              style={{
+                background: '#fff', borderRadius: 24, width: '100%', maxWidth: 600,
+                maxHeight: '80vh', display: 'flex', flexDirection: 'column',
+                boxShadow: '0 24px 60px rgba(0,0,0,0.2)',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div style={{ padding: '24px 32px', borderBottom: '1px solid rgba(0,0,0,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0D0D0F' }}>Privacy Policy</h3>
+                <button onClick={() => setShowPrivacy(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.5rem', color: '#9CA3AF' }}>&times;</button>
+              </div>
+              <div className="scrollbar-thin" style={{ padding: '32px', overflowY: 'auto', fontSize: '0.9rem', color: '#4B5563', lineHeight: 1.7, display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <p><strong>1. Data Collection:</strong> Social-CV stores your resume data securely using Firebase. We only collect the information you voluntarily enter into your resume.</p>
+                <p><strong>2. Data Usage:</strong> Your data is used exclusively to generate your resume PDF and maintain your session. We do not sell, rent, or share your personal information with third parties.</p>
+                <p><strong>3. Public Link:</strong> If you use the "Public Share Link" feature, anyone with the link can view your resume. You can disable this at any time by deleting the resume.</p>
+                <p><strong>4. Local Storage:</strong> We use browser localStorage to autosave your progress so you never lose your work.</p>
+                <p><strong>5. Analytics:</strong> We track anonymous usage statistics to improve our service, but these contain no personally identifiable information.</p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+
+        {showTerms && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            style={{
+              position: 'fixed', inset: 0, zIndex: 9999,
+              background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(8px)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24,
+            }}
+            onClick={() => setShowTerms(false)}
+          >
+            <motion.div
+              initial={{ y: 20, scale: 0.95 }} animate={{ y: 0, scale: 1 }} exit={{ y: 10, opacity: 0 }}
+              style={{
+                background: '#fff', borderRadius: 24, width: '100%', maxWidth: 600,
+                maxHeight: '80vh', display: 'flex', flexDirection: 'column',
+                boxShadow: '0 24px 60px rgba(0,0,0,0.2)',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div style={{ padding: '24px 32px', borderBottom: '1px solid rgba(0,0,0,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0D0D0F' }}>Terms of Service</h3>
+                <button onClick={() => setShowTerms(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.5rem', color: '#9CA3AF' }}>&times;</button>
+              </div>
+              <div className="scrollbar-thin" style={{ padding: '32px', overflowY: 'auto', fontSize: '0.9rem', color: '#4B5563', lineHeight: 1.7, display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <p><strong>1. Free Service:</strong> Social-CV is provided as a free tool for students and professionals. There are no hidden fees for the core resume builder features.</p>
+                <p><strong>2. User Content:</strong> You are solely responsible for the accuracy and legality of the content you include in your resume. Social-CV is not responsible for verifying your employment history, education, or skills.</p>
+                <p><strong>3. ATS Scoring:</strong> Our built-in ATS checker provides guidance based on common industry patterns. However, we do not guarantee that a high score will result in a job interview or offer.</p>
+                <p><strong>4. Service Availability:</strong> While we strive for 100% uptime, Social-CV is provided "as-is". We are not liable for any lost data, so we recommend downloading your PDF frequently.</p>
+                <p><strong>5. Fair Use:</strong> Please do not abuse the platform, attempt to hack the database, or use our service to generate malicious content.</p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
