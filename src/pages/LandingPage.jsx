@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, CheckCircle, Star, Zap, FileText, Users, Download, Shield, Sparkles, ChevronRight } from 'lucide-react';
+import { ArrowRight, CheckCircle, Star, Zap, FileText, Users, Download, Shield, Sparkles, ChevronRight, MapPin, Mail, Phone, MessageCircle } from 'lucide-react';
 import { TEMPLATES } from '@/templates/templateMeta';
 import { subscribeToStats } from '@/services/statsService';
 import { useAuth } from '@/context/AuthContext';
@@ -210,6 +210,7 @@ export default function LandingPage({ onGetStarted }) {
   const [stats, setStats] = useState({ totalResumes: 0, highestAtsScore: 0, ratingSum: 0, totalRatings: 0 });
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
+  const [showContact, setShowContact] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -605,6 +606,7 @@ export default function LandingPage({ onGetStarted }) {
                 onClick={() => {
                   if (l === 'Privacy') setShowPrivacy(true);
                   if (l === 'Terms') setShowTerms(true);
+                  if (l === 'Contact') setShowContact(true);
                 }}
                 style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.82rem', color: '#6B7280', fontFamily: 'Inter' }}
               >
@@ -680,6 +682,76 @@ export default function LandingPage({ onGetStarted }) {
                 <p><strong>3. ATS Scoring:</strong> Our built-in ATS checker provides guidance based on common industry patterns. However, we do not guarantee that a high score will result in a job interview or offer.</p>
                 <p><strong>4. Service Availability:</strong> While we strive for 100% uptime, Social-CV is provided "as-is". We are not liable for any lost data, so we recommend downloading your PDF frequently.</p>
                 <p><strong>5. Fair Use:</strong> Please do not abuse the platform, attempt to hack the database, or use our service to generate malicious content.</p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+
+        {showContact && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            style={{
+              position: 'fixed', inset: 0, zIndex: 9999,
+              background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(8px)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24,
+            }}
+            onClick={() => setShowContact(false)}
+          >
+            <motion.div
+              initial={{ y: 20, scale: 0.95 }} animate={{ y: 0, scale: 1 }} exit={{ y: 10, opacity: 0 }}
+              style={{
+                background: '#fff', borderRadius: 24, width: '100%', maxWidth: 500,
+                maxHeight: '80vh', display: 'flex', flexDirection: 'column',
+                boxShadow: '0 24px 60px rgba(0,0,0,0.2)',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div style={{ padding: '24px 32px', borderBottom: '1px solid rgba(0,0,0,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0D0D0F' }}>Contact Us</h3>
+                <button onClick={() => setShowContact(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.5rem', color: '#9CA3AF' }}>&times;</button>
+              </div>
+              <div className="scrollbar-thin" style={{ padding: '32px', overflowY: 'auto', fontSize: '0.95rem', color: '#4B5563', lineHeight: 1.6, display: 'flex', flexDirection: 'column', gap: 20 }}>
+                
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
+                  <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(108,71,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <Mail size={18} style={{ color: '#6C47FF' }} />
+                  </div>
+                  <div>
+                    <h4 style={{ fontSize: '0.85rem', fontWeight: 700, color: '#0D0D0F', marginBottom: 2 }}>Email Address</h4>
+                    <a href="mailto:chauhanhasnain78@gmail.com" style={{ color: '#6C47FF', textDecoration: 'none', fontWeight: 500 }}>chauhanhasnain78@gmail.com</a>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
+                  <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(16,185,129,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <Phone size={18} style={{ color: '#10b981' }} />
+                  </div>
+                  <div>
+                    <h4 style={{ fontSize: '0.85rem', fontWeight: 700, color: '#0D0D0F', marginBottom: 2 }}>Phone Number</h4>
+                    <a href="tel:+918355966364" style={{ color: '#10b981', textDecoration: 'none', fontWeight: 500 }}>+91 83559 66364</a>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
+                  <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(37,211,102,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <MessageCircle size={18} style={{ color: '#25D366' }} />
+                  </div>
+                  <div>
+                    <h4 style={{ fontSize: '0.85rem', fontWeight: 700, color: '#0D0D0F', marginBottom: 2 }}>WhatsApp</h4>
+                    <a href="https://wa.me/918355966364" target="_blank" rel="noopener noreferrer" style={{ color: '#25D366', textDecoration: 'none', fontWeight: 500 }}>+91 83559 66364</a>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
+                  <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(255,107,53,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <MapPin size={18} style={{ color: '#FF6B35' }} />
+                  </div>
+                  <div>
+                    <h4 style={{ fontSize: '0.85rem', fontWeight: 700, color: '#0D0D0F', marginBottom: 2 }}>Office Address</h4>
+                    <p style={{ margin: 0 }}>Nav India Enterprises, ground floor, Patni Chawl, 81-Morland Rd, Mohammed Shahid Marg, Mumbai Central, Maharashtra 400008</p>
+                  </div>
+                </div>
+
               </div>
             </motion.div>
           </motion.div>
