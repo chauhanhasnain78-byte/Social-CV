@@ -97,10 +97,21 @@ export async function exportResumePDF(filename = 'resume') {
   await new Promise((r) => setTimeout(r, 800));
 
   printWindow.focus();
-  printWindow.print();
 
-  // Close the print window after a short delay
-  setTimeout(() => printWindow.close(), 1000);
+  // Wait for the user to close the print dialog (either Save or Cancel)
+  await new Promise((resolve) => {
+    // onafterprint fires when the dialog is closed
+    printWindow.onafterprint = () => {
+      resolve();
+    };
+    printWindow.print();
+    
+    // Fallback just in case onafterprint doesn't fire in some older browsers
+    setTimeout(resolve, 120000); 
+  });
+
+  // Close the hidden window now that printing is done
+  printWindow.close();
 }
 
 /**
