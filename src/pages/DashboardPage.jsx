@@ -129,7 +129,7 @@ export default function DashboardPage() {
     <div style={{ minHeight: '100vh', background: '#FDFCFF' }}>
 
       {/* ── Navbar ── */}
-      <nav style={{
+      <nav className="dashboard-nav" style={{
         position: 'sticky', top: 0, zIndex: 50,
         background: 'rgba(253,252,255,0.9)', backdropFilter: 'blur(20px)',
         borderBottom: '1px solid rgba(0,0,0,0.07)',
@@ -161,7 +161,7 @@ export default function DashboardPage() {
         </div>
       </nav>
 
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '48px 40px' }}>
+      <div className="dashboard-pad" style={{ maxWidth: 1100, margin: '0 auto', padding: '48px 40px' }}>
 
         {/* ── Page header ── */}
         <motion.div
@@ -251,7 +251,7 @@ export default function DashboardPage() {
         </div>
 
         {/* ── Template grid ── */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 22 }}>
+        <div className="dashboard-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 22 }}>
           {filtered.map((tmpl, idx) => (
             <TemplateCard
               key={tmpl.id}

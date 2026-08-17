@@ -304,3 +304,105 @@ body {
 
 /* ── GPU hints ── */
 [data-page-layer] { will-change: transform, opacity; backface-visibility: hidden; }
+
+/* ═══════════════════════════════════════════════════════
+   RESPONSIVE MEDIA QUERIES
+   Mobile  : < 768px
+   Tablet  : 768px – 1023px
+   Desktop : 1024px+
+   ═══════════════════════════════════════════════════════ */
+
+/* ── Mobile (< 768px) ── */
+@media (max-width: 767px) {
+  /* Landing Navbar */
+  .landing-nav-links { display: none !important; }
+  .landing-nav { padding: 0 16px !important; }
+
+  /* Landing Hero */
+  .landing-hero {
+    flex-direction: column !important;
+    padding: 32px 20px 48px !important;
+    gap: 40px !important;
+    min-height: auto !important;
+    align-items: flex-start !important;
+  }
+  .landing-hero-left { max-width: 100% !important; }
+  .landing-hero-right { width: 100% !important; align-items: center !important; }
+
+  /* Stats bar */
+  .landing-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 24px !important;
+  }
+
+  /* Templates & Features grids */
+  .landing-templates-grid,
+  .landing-features-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Section padding */
+  .landing-section-pad {
+    padding: 60px 20px !important;
+  }
+
+  /* Footer */
+  .landing-footer-inner {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 16px !important;
+  }
+
+  /* Auth page */
+  .auth-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .auth-brand-panel { display: none !important; }
+  .auth-card-panel { padding: 28px 20px !important; }
+
+  /* Dashboard */
+  .dashboard-grid {
+    grid-template-columns: repeat(1, 1fr) !important;
+  }
+  .dashboard-pad { padding: 24px 16px !important; }
+  .dashboard-nav { padding: 0 16px !important; }
+  .dashboard-public-link {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+
+  /* Editor */
+  .editor-topbar { padding: 0 12px !important; }
+  .editor-topbar-center { display: none !important; }
+}
+
+/* ── Tablet (768px – 1023px) ── */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .landing-hero {
+    flex-direction: column !important;
+    padding: 48px 32px !important;
+    gap: 48px !important;
+    min-height: auto !important;
+  }
+  .landing-hero-left { max-width: 100% !important; }
+
+  .landing-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .landing-templates-grid,
+  .landing-features-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .landing-section-pad { padding: 70px 32px !important; }
+  .landing-nav { padding: 0 24px !important; }
+
+  .auth-grid { grid-template-columns: 1fr !important; }
+  .auth-brand-panel { display: none !important; }
+
+  .dashboard-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .dashboard-pad { padding: 32px 24px !important; }
+  .dashboard-nav { padding: 0 24px !important; }
+}
+

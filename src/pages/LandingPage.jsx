@@ -252,7 +252,7 @@ export default function LandingPage({ onGetStarted }) {
     <div style={{ background: '#FDFCFF', color: '#0D0D0F', overflowX: 'hidden' }}>
 
       {/* ── NAVBAR ────────────────────────────────────── */}
-      <nav style={{
+      <nav className="landing-nav" style={{
         position: 'sticky', top: 0, zIndex: 100,
         background: 'rgba(253,252,255,0.85)',
         backdropFilter: 'blur(20px)',
@@ -273,8 +273,7 @@ export default function LandingPage({ onGetStarted }) {
         </div>
 
         {/* Nav links */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <button onClick={() => document.getElementById('templates-section')?.scrollIntoView({ behavior: 'smooth' })} className="btn-ghost-light" style={{ fontSize: '0.875rem' }}>Templates</button>
+        <div className="landing-nav-links" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>`n          <button onClick={() => document.getElementById('templates-section')?.scrollIntoView({ behavior: 'smooth' })} className="btn-ghost-light" style={{ fontSize: '0.875rem' }}>Templates</button>
           <button onClick={() => document.getElementById('features-section')?.scrollIntoView({ behavior: 'smooth' })} className="btn-ghost-light" style={{ fontSize: '0.875rem' }}>Features</button>
           <button className="btn-ghost-light" onClick={handleActionClick} style={{ fontSize: '0.875rem' }}>Login</button>
           <motion.button
@@ -290,15 +289,14 @@ export default function LandingPage({ onGetStarted }) {
       </nav>
 
       {/* ── HERO ─────────────────────────────────────── */}
-      <section style={{
-        minHeight: 'calc(100vh - 64px)',
+      <section className="landing-hero" style={{`n        minHeight: 'calc(100vh - 64px)',
         display: 'flex', alignItems: 'center',
         padding: '60px 40px',
         maxWidth: 1280, margin: '0 auto',
         gap: 80,
       }}>
         {/* Left copy */}
-        <div style={{ flex: 1, maxWidth: 580 }}>
+        <div className="landing-hero-left" style={{ flex: 1, maxWidth: 580 }}>
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
@@ -376,9 +374,7 @@ export default function LandingPage({ onGetStarted }) {
         </div>
 
         {/* Right: Template carousel */}
-        <motion.div
-          initial={{ opacity: 0, x: 40 }}
-          animate={{ opacity: 1, x: 0 }}
+        <motion.div`n          className="landing-hero-right"`n          initial={{ opacity: 0, x: 40 }}`n          animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.65, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
           style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 28 }}
         >
@@ -419,8 +415,7 @@ export default function LandingPage({ onGetStarted }) {
       </section>
 
       {/* ── STATS BAR ─────────────────────────────────── */}
-      <section style={{ background: '#0D0D0F', padding: '52px 40px' }}>
-        <div style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 20 }}>
+      <section style={{ background: '#0D0D0F', padding: '52px 40px' }}>`n        <div className="landing-stats-grid" style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 20 }}>
           <StatCard value={stats.totalResumes} label="Resumes Created" suffix="+" decimals={0} />
           <StatCard value={6} label="Premium Templates" suffix="" decimals={0} />
           <StatCard value={stats.highestAtsScore} label="Highest ATS Score" suffix="%" decimals={0} />
@@ -429,7 +424,7 @@ export default function LandingPage({ onGetStarted }) {
       </section>
 
       {/* ── TEMPLATES SHOWCASE ────────────────────────── */}
-      <section id="templates-section" style={{ padding: '100px 40px', maxWidth: 1280, margin: '0 auto' }}>
+      <section id="templates-section" className="landing-section-pad" style={{ padding: '100px 40px', maxWidth: 1280, margin: '0 auto' }}>
         <Reveal style={{ textAlign: 'center', marginBottom: 60 }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 16px', background: 'rgba(108,71,255,0.08)', borderRadius: 999, marginBottom: 20, border: '1px solid rgba(108,71,255,0.18)' }}>
             <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#6C47FF' }}>✦ 6 PREMIUM TEMPLATES</span>
@@ -442,7 +437,7 @@ export default function LandingPage({ onGetStarted }) {
           </p>
         </Reveal>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
+        <div className="landing-templates-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
           {TEMPLATES.map((tmpl, i) => (
             <Reveal key={tmpl.id} delay={i * 0.08}>
               <motion.div
@@ -502,7 +497,7 @@ export default function LandingPage({ onGetStarted }) {
       </section>
 
       {/* ── FEATURES GRID ─────────────────────────────── */}
-      <section id="features-section" style={{ padding: '80px 40px', background: '#F8F8FC' }}>
+      <section id="features-section" className="landing-section-pad" style={{ padding: '80px 40px', background: '#F8F8FC' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <Reveal style={{ textAlign: 'center', marginBottom: 60 }}>
             <h2 className="font-display" style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.6rem)', fontWeight: 800, letterSpacing: '-0.04em', color: '#0D0D0F', marginBottom: 14 }}>
@@ -513,7 +508,7 @@ export default function LandingPage({ onGetStarted }) {
             </p>
           </Reveal>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
+          <div className="landing-features-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
             {features.map((feat, i) => (
               <Reveal key={feat.title} delay={i * 0.07}>
                 <motion.div
@@ -587,7 +582,7 @@ export default function LandingPage({ onGetStarted }) {
 
       {/* ── FOOTER ────────────────────────────────────── */}
       <footer style={{ borderTop: '1px solid rgba(0,0,0,0.07)', padding: '32px 40px' }}>
-        <div style={{ maxWidth: 1280, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
+        <div className="landing-footer-inner" style={{ maxWidth: 1280, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <div style={{ width: 26, height: 26, borderRadius: 8, background: 'linear-gradient(135deg,#6C47FF,#4A2FD9)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <FileText size={13} color="#fff" />

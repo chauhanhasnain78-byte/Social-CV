@@ -60,8 +60,7 @@ export default function EditorPage() {
   };
 
   const renderTopBar = () => (
-    <motion.header
-      initial={{ y: -10, opacity: 0 }}
+    <motion.header`n      className="editor-topbar"`n      initial={{ y: -10, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.35 }}
       style={{
@@ -100,7 +99,7 @@ export default function EditorPage() {
       </div>
 
       {templateMeta && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 12px', background: '#F3F0FF', borderRadius: 999, marginLeft: 4, border: '1px solid rgba(108,71,255,0.15)' }}>
+        <div className="editor-topbar-center" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 12px', background: '#F3F0FF', borderRadius: 999, marginLeft: 4, border: '1px solid rgba(108,71,255,0.15)' }}>
           <LayoutTemplate size={12} style={{ color: '#6C47FF' }} />
           <span style={{ fontSize: '0.75rem', color: '#6C47FF', fontWeight: 600 }}>{templateMeta.name}</span>
           {templateMeta.hasPhoto ? (

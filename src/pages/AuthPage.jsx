@@ -49,10 +49,11 @@ export default function AuthPage({ onBack }) {
       )}
 
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px 24px', position: 'relative', zIndex: 1 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 72, maxWidth: 1000, width: '100%', alignItems: 'center' }}>
+        <div className="auth-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 72, maxWidth: 1000, width: '100%', alignItems: 'center' }}>
 
           {/* ── Left: Brand hero ── */}
           <motion.div
+            className="auth-brand-panel"
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
