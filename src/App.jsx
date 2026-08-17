@@ -36,14 +36,18 @@ export default function App() {
     // Agar URL '/' nahi hai, toh seedha app routes show karo (Landing page skip)
     return typeof window !== 'undefined' && window.location.pathname !== '/';
   });
-  const [isSplashDone, setIsSplashDone] = useState(false);
+
+  // Splash sirf '/' par dikhe — kisi bhi dusre page par refresh karne par skip karo
+  const isOnRootPath = typeof window !== 'undefined' && window.location.pathname === '/';
+  const [isSplashDone, setIsSplashDone] = useState(!isOnRootPath);
 
   useEffect(() => {
+    if (!isOnRootPath) return; // splash already skip ho gaya
     const timer = setTimeout(() => {
       setIsSplashDone(true);
-    }, 2500); // 2.5 seconds
+    }, 2500); // 2.5 seconds only on landing
     return () => clearTimeout(timer);
-  }, []);
+  }, [isOnRootPath]);
 
   return (
     <BrowserRouter>
