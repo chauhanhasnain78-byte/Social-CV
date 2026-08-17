@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, CheckCircle, Star, Zap, FileText, Users, Download, Shield, Sparkles, ChevronRight } from 'lucide-react';
 import { TEMPLATES } from '@/templates/templateMeta';
 import { subscribeToStats } from '@/services/statsService';
+import { useAuth } from '@/context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 // ── Animated counter hook ────────────────────────────────────────────────────
 function useCounter(target, duration = 1800) {
@@ -206,6 +208,17 @@ const Reveal = ({ children, delay = 0, style = {} }) => (
 export default function LandingPage({ onGetStarted }) {
   const [activeIdx, setActiveIdx] = useState(0);
   const [stats, setStats] = useState({ totalResumes: 0, highestAtsScore: 0, ratingSum: 0, totalRatings: 0 });
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleActionClick = () => {
+    if (user) {
+      navigate('/editor');
+    } else {
+      navigate('/auth');
+    }
+    onGetStarted();
+  };
 
   // Auto-advance carousel
   useEffect(() => {
@@ -260,13 +273,13 @@ export default function LandingPage({ onGetStarted }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <button className="btn-ghost-light" style={{ fontSize: '0.875rem' }}>Templates</button>
           <button className="btn-ghost-light" style={{ fontSize: '0.875rem' }}>Features</button>
-          <button className="btn-ghost-light" onClick={onGetStarted} style={{ fontSize: '0.875rem' }}>Login</button>
+          <button className="btn-ghost-light" onClick={handleActionClick} style={{ fontSize: '0.875rem' }}>Login</button>
           <motion.button
             className="btn-brand"
             style={{ padding: '9px 20px', fontSize: '0.85rem' }}
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.97 }}
-            onClick={onGetStarted}
+            onClick={handleActionClick}
           >
             Get Started Free
           </motion.button>
@@ -319,7 +332,7 @@ export default function LandingPage({ onGetStarted }) {
                 style={{ fontSize: '1rem', padding: '14px 32px' }}
                 whileHover={{ scale: 1.05, boxShadow: '0 16px 48px rgba(108,71,255,0.4)' }}
                 whileTap={{ scale: 0.97 }}
-                onClick={onGetStarted}
+                onClick={handleActionClick}
               >
                 Create My Resume <ArrowRight size={18} />
               </motion.button>
@@ -328,7 +341,7 @@ export default function LandingPage({ onGetStarted }) {
                 style={{ fontSize: '1rem', padding: '14px 28px' }}
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
-                onClick={onGetStarted}
+                onClick={handleActionClick}
               >
                 Browse Templates
               </motion.button>
@@ -439,7 +452,7 @@ export default function LandingPage({ onGetStarted }) {
                   cursor: 'pointer',
                   background: '#fff',
                 }}
-                onClick={onGetStarted}
+                onClick={handleActionClick}
               >
                 {/* Color preview gradient */}
                 <div style={{ height: 120, background: tmpl.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
@@ -466,7 +479,7 @@ export default function LandingPage({ onGetStarted }) {
                   </div>
                   <p style={{ fontSize: '0.82rem', color: '#6B7280', lineHeight: 1.6 }}>{tmpl.desc}</p>
                   <button
-                    onClick={onGetStarted}
+                    onClick={handleActionClick}
                     style={{
                       marginTop: 16, padding: '8px 16px',
                       background: '#0D0D0F', color: '#fff',
@@ -544,7 +557,7 @@ export default function LandingPage({ onGetStarted }) {
               It's completely free.
             </p>
             <motion.button
-              onClick={onGetStarted}
+              onClick={handleActionClick}
               style={{
                 padding: '16px 42px', borderRadius: 999,
                 background: '#fff', color: '#6C47FF',

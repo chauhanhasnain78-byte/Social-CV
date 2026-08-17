@@ -6,6 +6,8 @@ import { Zap, Shield, Star, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { LoginForm  } from '@/components/auth/LoginForm';
 import { SignupForm } from '@/components/auth/SignupForm';
 import { useAuth } from '@/context/AuthContext';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const PERKS = [
   { icon: Zap,    label: 'Live Preview',        desc: 'Every edit reflected in real-time' },
@@ -18,8 +20,15 @@ const SOCIAL_PROOF = ['10K+ CVs created', 'Free forever', 'No credit card'];
 export default function AuthPage({ onBack }) {
   const { user, loading } = useAuth();
   const [tab, setTab] = useState('login');
+  const navigate = useNavigate();
 
-  if (!loading && user) return <Navigate to="/dashboard" replace />;
+  // Jab login successful ho, toh seedha Landing Page par wapas le jao
+  useEffect(() => {
+    if (!loading && user) {
+      if (onBack) onBack();
+      navigate('/');
+    }
+  }, [user, loading, navigate, onBack]);
 
   return (
     <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #F8F6FF 0%, #FDFCFF 50%, #FFF8F6 100%)', display: 'flex', flexDirection: 'column' }}>
