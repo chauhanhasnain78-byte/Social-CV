@@ -60,7 +60,9 @@ export default function EditorPage() {
   };
 
   const renderTopBar = () => (
-    <motion.header`n      className="editor-topbar"`n      initial={{ y: -10, opacity: 0 }}
+    <motion.header
+      className="editor-topbar"
+      initial={{ y: -10, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.35 }}
       style={{

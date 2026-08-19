@@ -273,7 +273,8 @@ export default function LandingPage({ onGetStarted }) {
         </div>
 
         {/* Nav links */}
-        <div className="landing-nav-links" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>`n          <button onClick={() => document.getElementById('templates-section')?.scrollIntoView({ behavior: 'smooth' })} className="btn-ghost-light" style={{ fontSize: '0.875rem' }}>Templates</button>
+        <div className="landing-nav-links" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <button onClick={() => document.getElementById('templates-section')?.scrollIntoView({ behavior: 'smooth' })} className="btn-ghost-light" style={{ fontSize: '0.875rem' }}>Templates</button>
           <button onClick={() => document.getElementById('features-section')?.scrollIntoView({ behavior: 'smooth' })} className="btn-ghost-light" style={{ fontSize: '0.875rem' }}>Features</button>
           <button className="btn-ghost-light" onClick={handleActionClick} style={{ fontSize: '0.875rem' }}>Login</button>
           <motion.button
@@ -289,7 +290,8 @@ export default function LandingPage({ onGetStarted }) {
       </nav>
 
       {/* ── HERO ─────────────────────────────────────── */}
-      <section className="landing-hero" style={{`n        minHeight: 'calc(100vh - 64px)',
+      <section className="landing-hero" style={{
+        minHeight: 'calc(100vh - 64px)',
         display: 'flex', alignItems: 'center',
         padding: '60px 40px',
         maxWidth: 1280, margin: '0 auto',
@@ -374,7 +376,10 @@ export default function LandingPage({ onGetStarted }) {
         </div>
 
         {/* Right: Template carousel */}
-        <motion.div`n          className="landing-hero-right"`n          initial={{ opacity: 0, x: 40 }}`n          animate={{ opacity: 1, x: 0 }}
+        <motion.div
+          className="landing-hero-right"
+          initial={{ opacity: 0, x: 40 }}
+          animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.65, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
           style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 28 }}
         >
@@ -415,7 +420,8 @@ export default function LandingPage({ onGetStarted }) {
       </section>
 
       {/* ── STATS BAR ─────────────────────────────────── */}
-      <section style={{ background: '#0D0D0F', padding: '52px 40px' }}>`n        <div className="landing-stats-grid" style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 20 }}>
+      <section style={{ background: '#0D0D0F', padding: '52px 40px' }}>
+        <div className="landing-stats-grid" style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 20 }}>
           <StatCard value={stats.totalResumes} label="Resumes Created" suffix="+" decimals={0} />
           <StatCard value={6} label="Premium Templates" suffix="" decimals={0} />
           <StatCard value={stats.highestAtsScore} label="Highest ATS Score" suffix="%" decimals={0} />
