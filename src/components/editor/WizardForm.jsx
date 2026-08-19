@@ -540,6 +540,179 @@ function SmartPhoneField({ value, onChange }) {
     </div>
   );
 }
+// -- Smart Location Field -----------------------------------------------------
+function SmartLocationField({ value, onChange }) {
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [error, setError] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const wrapperRef = useRef(null);
+
+  const COMMON_LOCATIONS = [
+    // India
+    'Mumbai, India', 'Delhi, India', 'Bangalore, India', 'Hyderabad, India',
+    'Pune, India', 'Chennai, India', 'Kolkata, India', 'Ahmedabad, India',
+    'Surat, India', 'Jaipur, India', 'Lucknow, India', 'Kanpur, India',
+    'Nagpur, India', 'Indore, India', 'Bhopal, India', 'Vadodara, India',
+    // Global Hubs
+    'Dubai, UAE', 'London, UK', 'New York, USA', 'San Francisco, USA',
+    'Toronto, Canada', 'Sydney, Australia', 'Singapore', 'Berlin, Germany',
+    // Neighbors
+    'Karachi, Pakistan', 'Lahore, Pakistan', 'Islamabad, Pakistan',
+    'Dhaka, Bangladesh', 'Colombo, Sri Lanka', 'Kathmandu, Nepal'
+  ];
+
+  const toTitleCase = (str) => {
+    return str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase());
+  };
+
+  const handleBlur = () => {
+    setTimeout(() => {
+      setShowDropdown(false);
+      setActiveIndex(-1);
+    }, 200);
+    // Basic validation: at least 3 characters
+    if (value && value.trim().length < 3) {
+      setError(true);
+    } else {
+      setError(false);
+    }
+  };
+
+  const handleChange = (e) => {
+    // Auto-capitalize while typing
+    const val = toTitleCase(e.target.value);
+    onChange(val);
+    setError(false);
+    setActiveIndex(-1);
+    
+    if (val.trim() !== '') {
+      setShowDropdown(true);
+    } else {
+      setShowDropdown(false);
+    }
+  };
+
+  const handleSelect = (suggestion) => {
+    onChange(suggestion);
+    setShowDropdown(false);
+    setActiveIndex(-1);
+    setError(false);
+    document.getElementById('field-location')?.focus();
+  };
+
+  let suggestions = [];
+  if (value && value.trim() !== '') {
+    const q = value.toLowerCase();
+    suggestions = COMMON_LOCATIONS.filter(loc => loc.toLowerCase().includes(q) && loc !== value);
+  } else if (!value || value.trim() === '') {
+    // Show top picks if empty
+    suggestions = COMMON_LOCATIONS.slice(0, 5);
+  }
+
+  const handleKeyDown = (e) => {
+    if (!showDropdown || suggestions.length === 0) return;
+    
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActiveIndex(prev => (prev < suggestions.length - 1 ? prev + 1 : prev));
+      const el = document.getElementById('loc-sugg-' + (activeIndex + 1));
+      if (el) el.scrollIntoView({ block: 'nearest' });
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActiveIndex(prev => (prev > 0 ? prev - 1 : -1));
+      const el = document.getElementById('loc-sugg-' + (activeIndex - 1));
+      if (el) el.scrollIntoView({ block: 'nearest' });
+    } else if (e.key === 'Enter' || e.key === 'Tab') {
+      if (activeIndex >= 0 && activeIndex < suggestions.length) {
+        e.preventDefault();
+        handleSelect(suggestions[activeIndex]);
+      }
+    } else if (e.key === 'Escape') {
+      setShowDropdown(false);
+      setActiveIndex(-1);
+    }
+  };
+
+  return (
+    <div style={{ position: 'relative' }} ref={wrapperRef}>
+      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5, letterSpacing: '0.02em' }}>Location</label>
+      <div style={{ position: 'relative' }}>
+        <MapPin size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: error ? '#EF4444' : '#9CA3AF' }} />
+        <input
+          id="field-location"
+          type="text"
+          placeholder="City, Country"
+          value={value || ''}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          onFocus={() => {
+            setShowDropdown(true);
+          }}
+          onBlur={handleBlur}
+          style={{
+            width: '100%', padding: '9px 12px', paddingLeft: '2.3rem',
+            border: error ? "1.5px solid #EF4444" : "1.5px solid rgba(0,0,0,0.1)",
+            borderRadius: 10, fontSize: '0.85rem', fontFamily: 'Inter, sans-serif',
+            color: '#0D0D0F', background: error ? '#FEF2F2' : '#FAFAFA',
+            outline: 'none', transition: 'border-color 0.2s, box-shadow 0.2s', boxSizing: 'border-box',
+          }}
+        />
+        {/* Ghost hint for format if empty */}
+        {!value && (
+           <div style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#D1D5DB', fontSize: '0.75rem', fontFamily: 'Inter, sans-serif' }}>
+             e.g. Mumbai, India
+           </div>
+        )}
+      </div>
+      {error && (
+        <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#EF4444', fontSize: '0.68rem', marginTop: 6, fontWeight: 500 }}>
+          <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#EF4444' }} />
+          Location name is too short
+        </span>
+      )}
+      
+      {showDropdown && suggestions.length > 0 && (
+        <div className="scrollbar-thin" style={{
+          position: 'absolute', top: '100%', left: 0, right: 0,
+          background: '#fff', border: '1px solid rgba(0,0,0,0.08)',
+          borderRadius: 12, marginTop: 6, boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)',
+          zIndex: 50, overflowY: 'auto', maxHeight: 220, padding: '4px'
+        }}>
+          <div style={{ padding: '8px 10px 4px', fontSize: '0.65rem', fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.05em', position: 'sticky', top: 0, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(4px)' }}>
+            Suggested Cities
+          </div>
+          {suggestions.map((sugg, i) => {
+            const parts = sugg.split(', ');
+            const city = parts[0];
+            const country = parts[1] || '';
+            return (
+              <div
+                id={'loc-sugg-' + i}
+                key={i}
+                onClick={() => handleSelect(sugg)}
+                onMouseDown={(e) => e.preventDefault()}
+                style={{
+                  padding: '10px 12px', fontSize: '0.82rem', color: i === activeIndex ? '#6C47FF' : '#374151',
+                  background: i === activeIndex ? '#F3F0FF' : 'transparent',
+                  borderRadius: 8, cursor: 'pointer', fontFamily: 'Inter, sans-serif',
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  transition: 'background 0.15s, color 0.15s'
+                }}
+                onMouseEnter={() => setActiveIndex(i)}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <MapPin size={14} style={{ color: i === activeIndex ? '#8B71FF' : '#9CA3AF' }} />
+                  <span style={{ fontWeight: 600 }}>{city}</span>
+                </div>
+                <span style={{ color: '#9CA3AF', fontSize: '0.75rem' }}>{country}</span>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
 export function WizardForm() {
   const {
     resume, updatePersonal,
@@ -591,7 +764,7 @@ export function WizardForm() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
               <SmartEmailField value={personal.email} onChange={(val) => updatePersonal('email', val)} />
               <SmartPhoneField value={personal.phone} onChange={(val) => updatePersonal('phone', val)} />
-              <Field label="Location" icon={MapPin}  name="location" value={personal.location} onChange={(e) => updatePersonal('location', e.target.value)} placeholder="Karachi, Pakistan" />
+              <SmartLocationField value={personal.location} onChange={(val) => updatePersonal('location', val)} />
               <Field label="Website"  icon={Globe}   name="website"  value={personal.website}  onChange={(e) => updatePersonal('website', e.target.value)}  placeholder="yoursite.com" />
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
