@@ -794,10 +794,16 @@ export function WizardForm() {
               <Field label="LinkedIn" icon={Link2}   name="linkedin" value={personal.linkedin} onChange={(e) => updatePersonal('linkedin', e.target.value)} placeholder="linkedin.com/in/you" />
               <Field label="GitHub"   icon={GitFork} name="github"   value={personal.github}   onChange={(e) => updatePersonal('github', e.target.value)}   placeholder="github.com/you" />
             </div>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5 }}>Professional Summary</label>
+            <div style={{ position: 'relative' }}>
+              <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5 }}>
+                <span>Professional Summary</span>
+                <span style={{ color: (personal.summary || '').length >= 500 ? '#EF4444' : '#9CA3AF' }}>
+                  {(personal.summary || '').length}/500
+                </span>
+              </label>
               <textarea
                 id="field-summary" rows={4}
+                maxLength={500}
                 placeholder="Brief professional overview highlighting your top skills and career goals..."
                 value={personal.summary || ''}
                 onChange={(e) => updatePersonal('summary', e.target.value)}
