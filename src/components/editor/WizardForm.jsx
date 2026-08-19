@@ -149,6 +149,122 @@ function EntryCard({ idx, label, onRemove, children }) {
 }
 
 // ── Main WizardForm (LIGHT) ──────────────────────────────────────────────────
+// -- Smart Email Field --------------------------------------------------------
+function SmartEmailField({ value, onChange }) {
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [error, setError] = useState(false);
+  const wrapperRef = useRef(null);
+
+  const COMMON_DOMAINS = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'yahoo.in', 'rediffmail.com'];
+
+  const validateEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  const handleBlur = (e) => {
+    setTimeout(() => setShowDropdown(false), 200);
+    if (value && !validateEmail(value)) {
+      setError(true);
+    } else {
+      setError(false);
+    }
+  };
+
+  const handleChange = (e) => {
+    const val = e.target.value;
+    onChange(val);
+    setError(false);
+    if (val && !val.includes(' ')) {
+      setShowDropdown(true);
+    } else {
+      setShowDropdown(false);
+    }
+  };
+
+  const handleSelect = (suggestion) => {
+    onChange(suggestion);
+    setShowDropdown(false);
+    if (!validateEmail(suggestion)) {
+      setError(true);
+    } else {
+      setError(false);
+    }
+  };
+
+  let suggestions = [];
+  if (value && !value.includes(' ')) {
+    const parts = value.split('@');
+    const prefix = parts[0];
+    const domainQuery = parts[1] || '';
+
+    if (parts.length <= 2 && prefix.length > 0) {
+      suggestions = COMMON_DOMAINS
+        .filter(d => d.startsWith(domainQuery))
+        .map(d => prefix + '@' + d)
+        .filter(s => s !== value);
+    }
+  }
+
+  return (
+    <div style={{ position: 'relative' }} ref={wrapperRef}>
+      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5, letterSpacing: '0.02em' }}>Email</label>
+      <div style={{ position: 'relative' }}>
+        <Mail size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: error ? '#EF4444' : '#9CA3AF' }} />
+        <input
+          id="field-email"
+          type="email"
+          placeholder="you@email.com"
+          value={value || ''}
+          onChange={handleChange}
+          onFocus={() => {
+            if (value && !value.includes(' ')) setShowDropdown(true);
+          }}
+          onBlur={handleBlur}
+          style={{
+            width: '100%', padding: '9px 12px', paddingLeft: '2.3rem',
+            border: error ? "1.5px solid #EF4444" : "1.5px solid rgba(0,0,0,0.1)",
+            borderRadius: 10, fontSize: '0.85rem', fontFamily: 'Inter, sans-serif',
+            color: '#0D0D0F', background: error ? '#FEF2F2' : '#FAFAFA',
+            outline: 'none', transition: 'border-color 0.2s, box-shadow 0.2s', boxSizing: 'border-box',
+          }}
+        />
+      </div>
+      {error && (
+        <span style={{ display: 'block', color: '#EF4444', fontSize: '0.65rem', marginTop: 4, fontWeight: 500 }}>
+          Please enter a valid full email address (e.g., name@gmail.com)
+        </span>
+      )}
+      
+      {showDropdown && suggestions.length > 0 && (
+        <div style={{
+          position: 'absolute', top: '100%', left: 0, right: 0,
+          background: '#fff', border: '1px solid rgba(0,0,0,0.1)',
+          borderRadius: 10, marginTop: 4, boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+          zIndex: 50, overflow: 'hidden'
+        }}>
+          {suggestions.map((sugg, i) => (
+            <div
+              key={i}
+              onClick={() => handleSelect(sugg)}
+              onMouseDown={(e) => e.preventDefault()}
+              style={{
+                padding: '8px 12px', fontSize: '0.82rem', color: '#374151',
+                cursor: 'pointer', fontFamily: 'Inter, sans-serif',
+                borderBottom: i < suggestions.length - 1 ? '1px solid rgba(0,0,0,0.05)' : 'none',
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.background = '#F3F4F6'}
+              onMouseLeave={(e) => e.currentTarget.style.background = '#fff'}
+            >
+              {sugg}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function WizardForm() {
   const {
     resume, updatePersonal,
@@ -198,7 +314,7 @@ export function WizardForm() {
             <Field label="Full Name"  icon={User}    name="name"     value={personal.name}     onChange={(e) => updatePersonal('name', e.target.value)}     placeholder="Hasnain Chauhan" />
             <Field label="Job Title"  icon={FileText} name="title"    value={personal.title}    onChange={(e) => updatePersonal('title', e.target.value)}    placeholder="Full Stack Developer" />
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-              <Field label="Email"    icon={Mail}    name="email"    value={personal.email}    onChange={(e) => updatePersonal('email', e.target.value)}    placeholder="you@email.com" type="email" />
+              <SmartEmailField value={personal.email} onChange={(val) => updatePersonal('email', val)} />
               <Field label="Phone"    icon={Phone}   name="phone"    value={personal.phone}    onChange={(e) => updatePersonal('phone', e.target.value)}    placeholder="+92 300 0000000" />
               <Field label="Location" icon={MapPin}  name="location" value={personal.location} onChange={(e) => updatePersonal('location', e.target.value)} placeholder="Karachi, Pakistan" />
               <Field label="Website"  icon={Globe}   name="website"  value={personal.website}  onChange={(e) => updatePersonal('website', e.target.value)}  placeholder="yoursite.com" />
