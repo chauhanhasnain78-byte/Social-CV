@@ -540,81 +540,106 @@ function SmartPhoneField({ value, onChange }) {
     </div>
   );
 }
-// -- Smart Location Field -----------------------------------------------------
+// -- Smart Location Field (API Driven) ----------------------------------------
 function SmartLocationField({ value, onChange }) {
   const [showDropdown, setShowDropdown] = useState(false);
   const [error, setError] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
+  const [loading, setLoading] = useState(false);
+  const [apiSuggestions, setApiSuggestions] = useState([]);
   const wrapperRef = useRef(null);
 
-  const COMMON_LOCATIONS = [
-    // India
-    'Mumbai, India', 'Delhi, India', 'Bangalore, India', 'Hyderabad, India',
-    'Pune, India', 'Chennai, India', 'Kolkata, India', 'Ahmedabad, India',
-    'Surat, India', 'Jaipur, India', 'Lucknow, India', 'Kanpur, India',
-    'Nagpur, India', 'Indore, India', 'Bhopal, India', 'Vadodara, India',
-    // Global Hubs
-    'Dubai, UAE', 'London, UK', 'New York, USA', 'San Francisco, USA',
-    'Toronto, Canada', 'Sydney, Australia', 'Singapore', 'Berlin, Germany',
-    // Neighbors
-    'Karachi, Pakistan', 'Lahore, Pakistan', 'Islamabad, Pakistan',
-    'Dhaka, Bangladesh', 'Colombo, Sri Lanka', 'Kathmandu, Nepal'
-  ];
+  // Fetch real-time cities from open source Photon API (OpenStreetMap)
+  useEffect(() => {
+    // Only search if user typed at least 2 chars and dropdown is active
+    if (!value || value.trim().length < 2 || !showDropdown) {
+      setApiSuggestions([]);
+      return;
+    }
 
-  const toTitleCase = (str) => {
-    return str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase());
-  };
+    const timer = setTimeout(async () => {
+      setLoading(true);
+      try {
+        // layer=city restricts results to cities, towns, etc.
+        const res = await fetch('https://photon.komoot.io/api/?q=' + encodeURIComponent(value) + '&layer=city&limit=5');
+        const data = await res.json();
+        
+        const results = [];
+        if (data && data.features) {
+          data.features.forEach(f => {
+            const p = f.properties;
+            let fullName = p.name;
+            if (p.state && p.state !== p.name) fullName += ', ' + p.state;
+            if (p.country) fullName += ', ' + p.country;
+            
+            // avoid exact duplicates
+            if (!results.find(r => r.full === fullName)) {
+              results.push({
+                city: p.name,
+                state: p.state || '',
+                country: p.country || '',
+                full: fullName
+              });
+            }
+          });
+        }
+        setApiSuggestions(results);
+      } catch (err) {
+        console.error('Location fetch error:', err);
+      }
+      setLoading(false);
+    }, 400); // 400ms debounce so we don't spam API
+
+    return () => clearTimeout(timer);
+  }, [value, showDropdown]);
 
   const handleBlur = () => {
     setTimeout(() => {
       setShowDropdown(false);
       setActiveIndex(-1);
     }, 200);
-    // Basic validation: at least 3 characters
-    if (value && value.trim().length < 3) {
+    if (value && value.trim().length < 2) {
       setError(true);
     } else {
       setError(false);
     }
   };
 
+  const toTitleCase = (str) => {
+    return str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase());
+  };
+
   const handleChange = (e) => {
-    // Auto-capitalize while typing
     const val = toTitleCase(e.target.value);
     onChange(val);
     setError(false);
     setActiveIndex(-1);
-    
-    if (val.trim() !== '') {
-      setShowDropdown(true);
-    } else {
-      setShowDropdown(false);
-    }
+    if (val.trim() !== '') setShowDropdown(true);
+    else setShowDropdown(false);
   };
 
   const handleSelect = (suggestion) => {
-    onChange(suggestion);
+    onChange(suggestion.full);
     setShowDropdown(false);
     setActiveIndex(-1);
     setError(false);
     document.getElementById('field-location')?.focus();
   };
 
-  let suggestions = [];
-  if (value && value.trim() !== '') {
-    const q = value.toLowerCase();
-    suggestions = COMMON_LOCATIONS.filter(loc => loc.toLowerCase().includes(q) && loc !== value);
-  } else if (!value || value.trim() === '') {
-    // Show top picks if empty
-    suggestions = COMMON_LOCATIONS.slice(0, 5);
-  }
+  // If no API results yet, show fallback defaults for empty state
+  const fallbackSuggestions = !value ? [
+    { city: 'Mumbai', state: 'Maharashtra', country: 'India', full: 'Mumbai, Maharashtra, India' },
+    { city: 'Delhi', state: '', country: 'India', full: 'Delhi, India' },
+    { city: 'Bangalore', state: 'Karnataka', country: 'India', full: 'Bangalore, Karnataka, India' }
+  ] : [];
+
+  const displaySuggestions = value && value.trim().length >= 2 ? apiSuggestions : fallbackSuggestions;
 
   const handleKeyDown = (e) => {
-    if (!showDropdown || suggestions.length === 0) return;
-    
+    if (!showDropdown || displaySuggestions.length === 0) return;
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      setActiveIndex(prev => (prev < suggestions.length - 1 ? prev + 1 : prev));
+      setActiveIndex(prev => (prev < displaySuggestions.length - 1 ? prev + 1 : prev));
       const el = document.getElementById('loc-sugg-' + (activeIndex + 1));
       if (el) el.scrollIntoView({ block: 'nearest' });
     } else if (e.key === 'ArrowUp') {
@@ -623,9 +648,9 @@ function SmartLocationField({ value, onChange }) {
       const el = document.getElementById('loc-sugg-' + (activeIndex - 1));
       if (el) el.scrollIntoView({ block: 'nearest' });
     } else if (e.key === 'Enter' || e.key === 'Tab') {
-      if (activeIndex >= 0 && activeIndex < suggestions.length) {
+      if (activeIndex >= 0 && activeIndex < displaySuggestions.length) {
         e.preventDefault();
-        handleSelect(suggestions[activeIndex]);
+        handleSelect(displaySuggestions[activeIndex]);
       }
     } else if (e.key === 'Escape') {
       setShowDropdown(false);
@@ -641,7 +666,7 @@ function SmartLocationField({ value, onChange }) {
         <input
           id="field-location"
           type="text"
-          placeholder="City, Country"
+          placeholder="e.g. Bhopal"
           value={value || ''}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
@@ -657,11 +682,12 @@ function SmartLocationField({ value, onChange }) {
             outline: 'none', transition: 'border-color 0.2s, box-shadow 0.2s', boxSizing: 'border-box',
           }}
         />
-        {/* Ghost hint for format if empty */}
-        {!value && (
-           <div style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#D1D5DB', fontSize: '0.75rem', fontFamily: 'Inter, sans-serif' }}>
-             e.g. Mumbai, India
-           </div>
+        {/* Loading spinner */}
+        {loading && value && (
+          <div style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)' }}>
+            <div style={{ width: 14, height: 14, border: '2px solid #E5E7EB', borderTopColor: '#8B71FF', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+            <style>{'@keyframes spin { 100% { transform: rotate(360deg); } }'}</style>
+          </div>
         )}
       </div>
       {error && (
@@ -671,7 +697,7 @@ function SmartLocationField({ value, onChange }) {
         </span>
       )}
       
-      {showDropdown && suggestions.length > 0 && (
+      {showDropdown && displaySuggestions.length > 0 && (
         <div className="scrollbar-thin" style={{
           position: 'absolute', top: '100%', left: 0, right: 0,
           background: '#fff', border: '1px solid rgba(0,0,0,0.08)',
@@ -679,35 +705,32 @@ function SmartLocationField({ value, onChange }) {
           zIndex: 50, overflowY: 'auto', maxHeight: 220, padding: '4px'
         }}>
           <div style={{ padding: '8px 10px 4px', fontSize: '0.65rem', fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.05em', position: 'sticky', top: 0, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(4px)' }}>
-            Suggested Cities
+            {value ? 'Search Results' : 'Suggested Cities'}
           </div>
-          {suggestions.map((sugg, i) => {
-            const parts = sugg.split(', ');
-            const city = parts[0];
-            const country = parts[1] || '';
-            return (
-              <div
-                id={'loc-sugg-' + i}
-                key={i}
-                onClick={() => handleSelect(sugg)}
-                onMouseDown={(e) => e.preventDefault()}
-                style={{
-                  padding: '10px 12px', fontSize: '0.82rem', color: i === activeIndex ? '#6C47FF' : '#374151',
-                  background: i === activeIndex ? '#F3F0FF' : 'transparent',
-                  borderRadius: 8, cursor: 'pointer', fontFamily: 'Inter, sans-serif',
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  transition: 'background 0.15s, color 0.15s'
-                }}
-                onMouseEnter={() => setActiveIndex(i)}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <MapPin size={14} style={{ color: i === activeIndex ? '#8B71FF' : '#9CA3AF' }} />
-                  <span style={{ fontWeight: 600 }}>{city}</span>
-                </div>
-                <span style={{ color: '#9CA3AF', fontSize: '0.75rem' }}>{country}</span>
+          {displaySuggestions.map((sugg, i) => (
+            <div
+              id={'loc-sugg-' + i}
+              key={i}
+              onClick={() => handleSelect(sugg)}
+              onMouseDown={(e) => e.preventDefault()}
+              style={{
+                padding: '10px 12px', fontSize: '0.82rem', color: i === activeIndex ? '#6C47FF' : '#374151',
+                background: i === activeIndex ? '#F3F0FF' : 'transparent',
+                borderRadius: 8, cursor: 'pointer', fontFamily: 'Inter, sans-serif',
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                transition: 'background 0.15s, color 0.15s'
+              }}
+              onMouseEnter={() => setActiveIndex(i)}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <MapPin size={14} style={{ color: i === activeIndex ? '#8B71FF' : '#9CA3AF' }} />
+                <span style={{ fontWeight: 600 }}>{sugg.city}</span>
               </div>
-            );
-          })}
+              <span style={{ color: '#9CA3AF', fontSize: '0.75rem', textAlign: 'right', flex: 1, marginLeft: 10, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {sugg.state ? sugg.state + ', ' : ''}{sugg.country}
+              </span>
+            </div>
+          ))}
         </div>
       )}
     </div>
