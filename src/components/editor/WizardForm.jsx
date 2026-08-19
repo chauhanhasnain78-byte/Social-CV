@@ -1,4 +1,4 @@
-﻿import { useState, useRef } from 'react';
+﻿import { useState, useRef, useEffect } from 'react';
 import { useResumeStore } from '@/store/resumeStore';
 import {
   User, Mail, Phone, MapPin, Link2, FileText,
