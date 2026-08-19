@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+﻿import { useState, useRef } from 'react';
 import { useResumeStore } from '@/store/resumeStore';
 import {
   User, Mail, Phone, MapPin, Link2, FileText,
@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { TEMPLATES } from '@/templates/templateMeta';
 
-// ── Reusable input field (LIGHT) ────────────────────────────────────────────
+// â”€â”€ Reusable input field (LIGHT) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function Field({ label, icon: Icon, value, onChange, placeholder, type = 'text', name }) {
   return (
     <div>
@@ -39,7 +39,7 @@ function Field({ label, icon: Icon, value, onChange, placeholder, type = 'text',
   );
 }
 
-// ── Photo Upload (LIGHT) ─────────────────────────────────────────────────────
+// â”€â”€ Photo Upload (LIGHT) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function PhotoUpload() {
   const { resume, updatePhoto } = useResumeStore();
   const fileRef = useRef(null);
@@ -72,7 +72,7 @@ function PhotoUpload() {
           <>
             <img src={resume.personal.photo} alt="Profile" style={{ height: '100%', width: 'auto', maxWidth: '35%', objectFit: 'cover', borderRadius: 10 }} />
             <div style={{ flex: 1 }}>
-              <p style={{ fontSize: '0.8rem', fontWeight: 600, color: '#6C47FF', marginBottom: 8 }}>Photo uploaded ✓</p>
+              <p style={{ fontSize: '0.8rem', fontWeight: 600, color: '#6C47FF', marginBottom: 8 }}>Photo uploaded âœ“</p>
               <div style={{ display: 'flex', gap: 6 }}>
                 <button
                   onClick={(e) => { e.stopPropagation(); fileRef.current?.click(); }}
@@ -96,7 +96,7 @@ function PhotoUpload() {
             </div>
             <div>
               <p style={{ fontSize: '0.82rem', fontWeight: 600, color: '#374151', marginBottom: 2 }}>Upload your photo</p>
-              <p style={{ fontSize: '0.7rem', color: '#9CA3AF' }}>JPG, PNG · Max 5MB</p>
+              <p style={{ fontSize: '0.7rem', color: '#9CA3AF' }}>JPG, PNG Â· Max 5MB</p>
             </div>
           </>
         )}
@@ -106,7 +106,7 @@ function PhotoUpload() {
   );
 }
 
-// ── "Add" button ─────────────────────────────────────────────────────────────
+// â”€â”€ "Add" button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function AddButton({ onClick, label }) {
   return (
     <button
@@ -128,7 +128,7 @@ function AddButton({ onClick, label }) {
   );
 }
 
-// ── Entry card wrapper ───────────────────────────────────────────────────────
+// â”€â”€ Entry card wrapper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function EntryCard({ idx, label, onRemove, children }) {
   return (
     <div style={{
@@ -148,7 +148,7 @@ function EntryCard({ idx, label, onRemove, children }) {
   );
 }
 
-// ── Main WizardForm (LIGHT) ──────────────────────────────────────────────────
+// â”€â”€ Main WizardForm (LIGHT) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // -- Smart Email Field --------------------------------------------------------
 function SmartEmailField({ value, onChange }) {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -335,11 +335,37 @@ function SmartPhoneField({ value, onChange }) {
 
   const COUNTRY_CODES = [
     { code: '+91', name: 'India' },
-    { code: '+1', name: 'US/Canada' },
-    { code: '+44', name: 'UK' },
+    { code: '+1', name: 'US / Canada' },
+    { code: '+44', name: 'United Kingdom' },
     { code: '+61', name: 'Australia' },
-    { code: '+971', name: 'UAE' },
-    { code: '+92', name: 'Pakistan' }
+    { code: '+971', name: 'United Arab Emirates' },
+    { code: '+92', name: 'Pakistan' },
+    { code: '+93', name: 'Afghanistan' },
+    { code: '+880', name: 'Bangladesh' },
+    { code: '+86', name: 'China' },
+    { code: '+33', name: 'France' },
+    { code: '+49', name: 'Germany' },
+    { code: '+62', name: 'Indonesia' },
+    { code: '+39', name: 'Italy' },
+    { code: '+81', name: 'Japan' },
+    { code: '+60', name: 'Malaysia' },
+    { code: '+977', name: 'Nepal' },
+    { code: '+64', name: 'New Zealand' },
+    { code: '+63', name: 'Philippines' },
+    { code: '+7', name: 'Russia' },
+    { code: '+966', name: 'Saudi Arabia' },
+    { code: '+65', name: 'Singapore' },
+    { code: '+27', name: 'South Africa' },
+    { code: '+82', name: 'South Korea' },
+    { code: '+34', name: 'Spain' },
+    { code: '+94', name: 'Sri Lanka' },
+    { code: '+46', name: 'Sweden' },
+    { code: '+41', name: 'Switzerland' },
+    { code: '+90', name: 'Turkey' },
+    { code: '+256', name: 'Uganda' },
+    { code: '+380', name: 'Ukraine' },
+    { code: '+84', name: 'Vietnam' },
+    { code: '+263', name: 'Zimbabwe' },
   ];
 
   const validatePhone = (phone) => {
@@ -359,15 +385,44 @@ function SmartPhoneField({ value, onChange }) {
     }
   };
 
+  const formatPhone = (val) => {
+    if (!val) return '';
+    if (!val.startsWith('+') && /[a-zA-Z]/.test(val)) return val;
+
+    let clean = val.replace(/[^\d\s+]/g, '');
+
+    const spaceIndex = clean.indexOf(' ');
+    if (spaceIndex !== -1) {
+      const code = clean.slice(0, spaceIndex);
+      let rest = clean.slice(spaceIndex + 1).replace(/\D/g, '');
+      
+      if (rest.length > 5) {
+        rest = rest.slice(0, 5) + ' ' + rest.slice(5, 10);
+      }
+      return code + ' ' + rest;
+    }
+    return clean;
+  };
+
   const handleChange = (e) => {
-    // Only allow numbers, spaces, +, -, (, )
-    const val = e.target.value.replace(/[^\d\s+\-()]/g, '');
+    let val = e.target.value;
+    
+    if (!val.startsWith('+') && /[a-zA-Z]/.test(val)) {
+      onChange(val);
+      setShowDropdown(true);
+      setError(false);
+      setActiveIndex(-1);
+      return;
+    }
+
+    val = formatPhone(val);
     onChange(val);
     setError(false);
     setActiveIndex(-1);
     
-    // Show dropdown if user types '+'
-    if (val.startsWith('+') && !val.includes(' ')) {
+    if (val && !val.includes(' ')) {
+      setShowDropdown(true);
+    } else if (!val) {
       setShowDropdown(true);
     } else {
       setShowDropdown(false);
@@ -383,11 +438,13 @@ function SmartPhoneField({ value, onChange }) {
   };
 
   let suggestions = [];
-  if (value && value.startsWith('+') && !value.includes(' ')) {
-    suggestions = COUNTRY_CODES.filter(c => c.code.startsWith(value) && c.code !== value);
-    if (suggestions.length === 0 && value === '+') {
-      suggestions = COUNTRY_CODES;
-    }
+  if (value && !value.startsWith('+') && /[a-zA-Z]/.test(value)) {
+    const q = value.toLowerCase();
+    suggestions = COUNTRY_CODES.filter(c => c.name.toLowerCase().includes(q) || c.code.includes(q));
+  } else if (value && value.startsWith('+') && !value.includes(' ')) {
+    suggestions = COUNTRY_CODES.filter(c => c.code.startsWith(value));
+  } else if (!value || value.trim() === '') {
+    suggestions = COUNTRY_CODES;
   }
 
   const handleKeyDown = (e) => {
@@ -396,9 +453,13 @@ function SmartPhoneField({ value, onChange }) {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
       setActiveIndex(prev => (prev < suggestions.length - 1 ? prev + 1 : prev));
+      const el = document.getElementById('phone-sugg-' + (activeIndex + 1));
+      if (el) el.scrollIntoView({ block: 'nearest' });
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
       setActiveIndex(prev => (prev > 0 ? prev - 1 : -1));
+      const el = document.getElementById('phone-sugg-' + (activeIndex - 1));
+      if (el) el.scrollIntoView({ block: 'nearest' });
     } else if (e.key === 'Enter' || e.key === 'Tab') {
       if (activeIndex >= 0 && activeIndex < suggestions.length) {
         e.preventDefault();
@@ -417,13 +478,13 @@ function SmartPhoneField({ value, onChange }) {
         <Phone size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: error ? '#EF4444' : '#9CA3AF' }} />
         <input
           id="field-phone"
-          type="tel"
-          placeholder="+91 00000 00000"
+          type="text"
+          placeholder="India or +91"
           value={value || ''}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           onFocus={() => {
-            if (value && value.startsWith('+') && !value.includes(' ')) setShowDropdown(true);
+            setShowDropdown(true);
           }}
           onBlur={handleBlur}
           style={{
@@ -434,12 +495,6 @@ function SmartPhoneField({ value, onChange }) {
             outline: 'none', transition: 'border-color 0.2s, box-shadow 0.2s', boxSizing: 'border-box',
           }}
         />
-        {activeIndex === -1 && suggestions.length > 0 && (
-          <div style={{ position: 'absolute', left: '2.3rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#9CA3AF', fontSize: '0.85rem', fontFamily: 'Inter, sans-serif' }}>
-            <span style={{ opacity: 0 }}>{value}</span>
-            <span>{suggestions[0].code.slice(value.length)}</span>
-          </div>
-        )}
       </div>
       {error && (
         <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#EF4444', fontSize: '0.68rem', marginTop: 6, fontWeight: 500 }}>
@@ -449,22 +504,23 @@ function SmartPhoneField({ value, onChange }) {
       )}
       
       {showDropdown && suggestions.length > 0 && (
-        <div style={{
+        <div className="scrollbar-thin" style={{
           position: 'absolute', top: '100%', left: 0, right: 0,
           background: '#fff', border: '1px solid rgba(0,0,0,0.08)',
           borderRadius: 12, marginTop: 6, boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)',
-          zIndex: 50, overflow: 'hidden', padding: '4px'
+          zIndex: 50, overflowY: 'auto', maxHeight: 220, padding: '4px'
         }}>
-          <div style={{ padding: '6px 10px', fontSize: '0.65rem', fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            Country Codes
+          <div style={{ padding: '8px 10px 4px', fontSize: '0.65rem', fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.05em', position: 'sticky', top: 0, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(4px)' }}>
+            Select Country Code
           </div>
           {suggestions.map((sugg, i) => (
              <div
+              id={'phone-sugg-' + i}
               key={i}
               onClick={() => handleSelect(sugg)}
               onMouseDown={(e) => e.preventDefault()}
               style={{
-                padding: '8px 10px', fontSize: '0.82rem', color: i === activeIndex ? '#6C47FF' : '#374151',
+                padding: '10px 12px', fontSize: '0.82rem', color: i === activeIndex ? '#6C47FF' : '#374151',
                 background: i === activeIndex ? '#F3F0FF' : 'transparent',
                 borderRadius: 8, cursor: 'pointer', fontFamily: 'Inter, sans-serif',
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -472,8 +528,11 @@ function SmartPhoneField({ value, onChange }) {
               }}
               onMouseEnter={() => setActiveIndex(i)}
             >
-              <span style={{ fontWeight: 600 }}>{sugg.code}</span>
-              <span style={{ color: '#9CA3AF', fontSize: '0.75rem' }}>{sugg.name}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: '0.9rem' }}>{sugg.name === 'India' ? '🇮🇳' : sugg.name === 'US / Canada' ? '🇺🇸' : sugg.name === 'United Kingdom' ? '🇬🇧' : sugg.name === 'Pakistan' ? '🇵🇰' : sugg.name === 'Australia' ? '🇦🇺' : sugg.name === 'United Arab Emirates' ? '🇦🇪' : '🌍'}</span>
+                <span style={{ fontWeight: 500 }}>{sugg.name}</span>
+              </div>
+              <span style={{ fontWeight: 700, color: i === activeIndex ? '#6C47FF' : '#9CA3AF' }}>{sugg.code}</span>
             </div>
           ))}
         </div>
