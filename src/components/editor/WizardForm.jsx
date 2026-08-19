@@ -153,17 +153,30 @@ function EntryCard({ idx, label, onRemove, children }) {
 function SmartEmailField({ value, onChange }) {
   const [showDropdown, setShowDropdown] = useState(false);
   const [error, setError] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
   const wrapperRef = useRef(null);
 
-  const COMMON_DOMAINS = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'yahoo.in', 'rediffmail.com'];
+  const COMMON_DOMAINS = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'yahoo.in', 'rediffmail.com', 'icloud.com'];
+
+  // Common typos map
+  const TYPO_MAP = {
+    'gmai.com': 'gmail.com', 'gamil.com': 'gmail.com', 'gmail.co': 'gmail.com', 'gmail.con': 'gmail.com',
+    'yahoo.co': 'yahoo.com', 'yaho.com': 'yahoo.com',
+    'outlok.com': 'outlook.com',
+    'hotmail.co': 'hotmail.com'
+  };
 
   const validateEmail = (email) => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Stricter regex for email
+    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return regex.test(email);
   };
 
   const handleBlur = (e) => {
-    setTimeout(() => setShowDropdown(false), 200);
+    setTimeout(() => {
+      setShowDropdown(false);
+      setActiveIndex(-1);
+    }, 200);
     if (value && !validateEmail(value)) {
       setError(true);
     } else {
@@ -172,10 +185,12 @@ function SmartEmailField({ value, onChange }) {
   };
 
   const handleChange = (e) => {
-    const val = e.target.value;
+    // Auto trim spaces and convert to lowercase for practicality
+    const val = e.target.value.replace(/\s/g, '').toLowerCase();
     onChange(val);
     setError(false);
-    if (val && !val.includes(' ')) {
+    setActiveIndex(-1);
+    if (val) {
       setShowDropdown(true);
     } else {
       setShowDropdown(false);
@@ -185,6 +200,7 @@ function SmartEmailField({ value, onChange }) {
   const handleSelect = (suggestion) => {
     onChange(suggestion);
     setShowDropdown(false);
+    setActiveIndex(-1);
     if (!validateEmail(suggestion)) {
       setError(true);
     } else {
@@ -193,18 +209,50 @@ function SmartEmailField({ value, onChange }) {
   };
 
   let suggestions = [];
-  if (value && !value.includes(' ')) {
+  if (value) {
     const parts = value.split('@');
     const prefix = parts[0];
     const domainQuery = parts[1] || '';
 
     if (parts.length <= 2 && prefix.length > 0) {
-      suggestions = COMMON_DOMAINS
-        .filter(d => d.startsWith(domainQuery))
-        .map(d => prefix + '@' + d)
-        .filter(s => s !== value);
+      // 1. Check for typos
+      if (parts.length === 2 && TYPO_MAP[domainQuery]) {
+        suggestions.push(prefix + '@' + TYPO_MAP[domainQuery]);
+      }
+      
+      // 2. Normal autocomplete
+      const matches = COMMON_DOMAINS
+        .filter(d => d.startsWith(domainQuery) && d !== domainQuery)
+        .map(d => prefix + '@' + d);
+        
+      suggestions = [...new Set([...suggestions, ...matches])].filter(s => s !== value);
+      
+      // If user hasn't typed '@' yet, show top 3 domains
+      if (parts.length === 1) {
+        suggestions = COMMON_DOMAINS.slice(0, 3).map(d => prefix + '@' + d);
+      }
     }
   }
+
+  const handleKeyDown = (e) => {
+    if (!showDropdown || suggestions.length === 0) return;
+    
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActiveIndex(prev => (prev < suggestions.length - 1 ? prev + 1 : prev));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActiveIndex(prev => (prev > 0 ? prev - 1 : -1));
+    } else if (e.key === 'Enter' || e.key === 'Tab') {
+      if (activeIndex >= 0 && activeIndex < suggestions.length) {
+        e.preventDefault();
+        handleSelect(suggestions[activeIndex]);
+      }
+    } else if (e.key === 'Escape') {
+      setShowDropdown(false);
+      setActiveIndex(-1);
+    }
+  };
 
   return (
     <div style={{ position: 'relative' }} ref={wrapperRef}>
@@ -217,8 +265,9 @@ function SmartEmailField({ value, onChange }) {
           placeholder="you@email.com"
           value={value || ''}
           onChange={handleChange}
+          onKeyDown={handleKeyDown}
           onFocus={() => {
-            if (value && !value.includes(' ')) setShowDropdown(true);
+            if (value) setShowDropdown(true);
           }}
           onBlur={handleBlur}
           style={{
@@ -229,34 +278,47 @@ function SmartEmailField({ value, onChange }) {
             outline: 'none', transition: 'border-color 0.2s, box-shadow 0.2s', boxSizing: 'border-box',
           }}
         />
+        {/* Suggestion hint inside input if activeIndex is matched */}
+        {activeIndex === -1 && suggestions.length > 0 && value.includes('@') && suggestions[0].startsWith(value) && (
+          <div style={{ position: 'absolute', left: '2.3rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#9CA3AF', fontSize: '0.85rem', fontFamily: 'Inter, sans-serif' }}>
+            <span style={{ opacity: 0 }}>{value}</span>
+            <span>{suggestions[0].slice(value.length)}</span>
+          </div>
+        )}
       </div>
       {error && (
-        <span style={{ display: 'block', color: '#EF4444', fontSize: '0.65rem', marginTop: 4, fontWeight: 500 }}>
-          Please enter a valid full email address (e.g., name@gmail.com)
+        <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#EF4444', fontSize: '0.68rem', marginTop: 6, fontWeight: 500 }}>
+          <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#EF4444' }} />
+          Please enter a valid email (e.g., name@gmail.com)
         </span>
       )}
       
       {showDropdown && suggestions.length > 0 && (
         <div style={{
           position: 'absolute', top: '100%', left: 0, right: 0,
-          background: '#fff', border: '1px solid rgba(0,0,0,0.1)',
-          borderRadius: 10, marginTop: 4, boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
-          zIndex: 50, overflow: 'hidden'
+          background: '#fff', border: '1px solid rgba(0,0,0,0.08)',
+          borderRadius: 12, marginTop: 6, boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)',
+          zIndex: 50, overflow: 'hidden', padding: '4px'
         }}>
+          <div style={{ padding: '6px 10px', fontSize: '0.65rem', fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            Suggestions
+          </div>
           {suggestions.map((sugg, i) => (
             <div
               key={i}
               onClick={() => handleSelect(sugg)}
               onMouseDown={(e) => e.preventDefault()}
               style={{
-                padding: '8px 12px', fontSize: '0.82rem', color: '#374151',
-                cursor: 'pointer', fontFamily: 'Inter, sans-serif',
-                borderBottom: i < suggestions.length - 1 ? '1px solid rgba(0,0,0,0.05)' : 'none',
+                padding: '8px 10px', fontSize: '0.82rem', color: i === activeIndex ? '#6C47FF' : '#374151',
+                background: i === activeIndex ? '#F3F0FF' : 'transparent',
+                borderRadius: 8, cursor: 'pointer', fontFamily: 'Inter, sans-serif',
+                display: 'flex', alignItems: 'center', gap: 6,
+                transition: 'background 0.15s, color 0.15s'
               }}
-              onMouseEnter={(e) => e.currentTarget.style.background = '#F3F4F6'}
-              onMouseLeave={(e) => e.currentTarget.style.background = '#fff'}
+              onMouseEnter={() => setActiveIndex(i)}
             >
-              {sugg}
+              <span style={{ fontWeight: 500 }}>{sugg.split('@')[0]}</span>
+              <span style={{ color: i === activeIndex ? '#8B71FF' : '#6B7280' }}>@{sugg.split('@')[1]}</span>
             </div>
           ))}
         </div>
@@ -264,7 +326,6 @@ function SmartEmailField({ value, onChange }) {
     </div>
   );
 }
-
 export function WizardForm() {
   const {
     resume, updatePersonal,
