@@ -795,29 +795,33 @@ export function WizardForm() {
               <Field label="GitHub"   icon={GitFork} name="github"   value={personal.github}   onChange={(e) => updatePersonal('github', e.target.value)}   placeholder="github.com/you" />
             </div>
             <div style={{ position: 'relative' }}>
-              <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5 }}>
-                <span>Professional Summary</span>
-                <span style={{ color: (personal.summary || '').length >= 500 ? '#EF4444' : '#9CA3AF' }}>
+              <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5 }}>Professional Summary</label>
+              <div style={{ position: 'relative' }}>
+                <textarea
+                  id="field-summary" rows={4}
+                  maxLength={500}
+                  placeholder="Brief professional overview highlighting your top skills and career goals..."
+                  value={personal.summary || ''}
+                  onChange={(e) => updatePersonal('summary', e.target.value)}
+                  style={{
+                    width: '100%', padding: '10px 12px', paddingBottom: '24px', resize: 'none',
+                    border: '1.5px solid rgba(0,0,0,0.1)', borderRadius: 10,
+                    fontSize: '0.85rem', fontFamily: 'Inter, sans-serif',
+                    color: '#0D0D0F', background: '#FAFAFA',
+                    outline: 'none', boxSizing: 'border-box',
+                    transition: 'border-color 0.2s, box-shadow 0.2s',
+                  }}
+                  onFocus={(e) => { e.target.style.borderColor = '#6C47FF'; e.target.style.boxShadow = '0 0 0 3px rgba(108,71,255,0.1)'; }}
+                  onBlur={(e) => { e.target.style.borderColor = 'rgba(0,0,0,0.1)'; e.target.style.boxShadow = 'none'; }}
+                />
+                <span style={{ 
+                  position: 'absolute', bottom: '8px', right: '12px', 
+                  fontSize: '0.65rem', fontWeight: 500, pointerEvents: 'none',
+                  color: (personal.summary || '').length >= 500 ? '#EF4444' : '#9CA3AF' 
+                }}>
                   {(personal.summary || '').length}/500
                 </span>
-              </label>
-              <textarea
-                id="field-summary" rows={4}
-                maxLength={500}
-                placeholder="Brief professional overview highlighting your top skills and career goals..."
-                value={personal.summary || ''}
-                onChange={(e) => updatePersonal('summary', e.target.value)}
-                style={{
-                  width: '100%', padding: '10px 12px', resize: 'none',
-                  border: '1.5px solid rgba(0,0,0,0.1)', borderRadius: 10,
-                  fontSize: '0.85rem', fontFamily: 'Inter, sans-serif',
-                  color: '#0D0D0F', background: '#FAFAFA',
-                  outline: 'none', boxSizing: 'border-box',
-                  transition: 'border-color 0.2s, box-shadow 0.2s',
-                }}
-                onFocus={(e) => { e.target.style.borderColor = '#6C47FF'; e.target.style.boxShadow = '0 0 0 3px rgba(108,71,255,0.1)'; }}
-                onBlur={(e) => { e.target.style.borderColor = 'rgba(0,0,0,0.1)'; e.target.style.boxShadow = 'none'; }}
-              />
+              </div>
             </div>
           </div>
         )}
