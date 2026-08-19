@@ -326,6 +326,161 @@ function SmartEmailField({ value, onChange }) {
     </div>
   );
 }
+// -- Smart Phone Field --------------------------------------------------------
+function SmartPhoneField({ value, onChange }) {
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [error, setError] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const wrapperRef = useRef(null);
+
+  const COUNTRY_CODES = [
+    { code: '+91', name: 'India' },
+    { code: '+1', name: 'US/Canada' },
+    { code: '+44', name: 'UK' },
+    { code: '+61', name: 'Australia' },
+    { code: '+971', name: 'UAE' },
+    { code: '+92', name: 'Pakistan' }
+  ];
+
+  const validatePhone = (phone) => {
+    const digitsOnly = phone.replace(/\D/g, '');
+    return digitsOnly.length >= 10 && digitsOnly.length <= 15;
+  };
+
+  const handleBlur = () => {
+    setTimeout(() => {
+      setShowDropdown(false);
+      setActiveIndex(-1);
+    }, 200);
+    if (value && !validatePhone(value)) {
+      setError(true);
+    } else {
+      setError(false);
+    }
+  };
+
+  const handleChange = (e) => {
+    // Only allow numbers, spaces, +, -, (, )
+    const val = e.target.value.replace(/[^\d\s+\-()]/g, '');
+    onChange(val);
+    setError(false);
+    setActiveIndex(-1);
+    
+    // Show dropdown if user types '+'
+    if (val.startsWith('+') && !val.includes(' ')) {
+      setShowDropdown(true);
+    } else {
+      setShowDropdown(false);
+    }
+  };
+
+  const handleSelect = (suggestion) => {
+    onChange(suggestion.code + ' ');
+    setShowDropdown(false);
+    setActiveIndex(-1);
+    setError(false);
+    document.getElementById('field-phone')?.focus();
+  };
+
+  let suggestions = [];
+  if (value && value.startsWith('+') && !value.includes(' ')) {
+    suggestions = COUNTRY_CODES.filter(c => c.code.startsWith(value) && c.code !== value);
+    if (suggestions.length === 0 && value === '+') {
+      suggestions = COUNTRY_CODES;
+    }
+  }
+
+  const handleKeyDown = (e) => {
+    if (!showDropdown || suggestions.length === 0) return;
+    
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActiveIndex(prev => (prev < suggestions.length - 1 ? prev + 1 : prev));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActiveIndex(prev => (prev > 0 ? prev - 1 : -1));
+    } else if (e.key === 'Enter' || e.key === 'Tab') {
+      if (activeIndex >= 0 && activeIndex < suggestions.length) {
+        e.preventDefault();
+        handleSelect(suggestions[activeIndex]);
+      }
+    } else if (e.key === 'Escape') {
+      setShowDropdown(false);
+      setActiveIndex(-1);
+    }
+  };
+
+  return (
+    <div style={{ position: 'relative' }} ref={wrapperRef}>
+      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5, letterSpacing: '0.02em' }}>Phone</label>
+      <div style={{ position: 'relative' }}>
+        <Phone size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: error ? '#EF4444' : '#9CA3AF' }} />
+        <input
+          id="field-phone"
+          type="tel"
+          placeholder="+91 00000 00000"
+          value={value || ''}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          onFocus={() => {
+            if (value && value.startsWith('+') && !value.includes(' ')) setShowDropdown(true);
+          }}
+          onBlur={handleBlur}
+          style={{
+            width: '100%', padding: '9px 12px', paddingLeft: '2.3rem',
+            border: error ? "1.5px solid #EF4444" : "1.5px solid rgba(0,0,0,0.1)",
+            borderRadius: 10, fontSize: '0.85rem', fontFamily: 'Inter, sans-serif',
+            color: '#0D0D0F', background: error ? '#FEF2F2' : '#FAFAFA',
+            outline: 'none', transition: 'border-color 0.2s, box-shadow 0.2s', boxSizing: 'border-box',
+          }}
+        />
+        {activeIndex === -1 && suggestions.length > 0 && (
+          <div style={{ position: 'absolute', left: '2.3rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#9CA3AF', fontSize: '0.85rem', fontFamily: 'Inter, sans-serif' }}>
+            <span style={{ opacity: 0 }}>{value}</span>
+            <span>{suggestions[0].code.slice(value.length)}</span>
+          </div>
+        )}
+      </div>
+      {error && (
+        <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#EF4444', fontSize: '0.68rem', marginTop: 6, fontWeight: 500 }}>
+          <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#EF4444' }} />
+          Enter a valid phone number (min 10 digits)
+        </span>
+      )}
+      
+      {showDropdown && suggestions.length > 0 && (
+        <div style={{
+          position: 'absolute', top: '100%', left: 0, right: 0,
+          background: '#fff', border: '1px solid rgba(0,0,0,0.08)',
+          borderRadius: 12, marginTop: 6, boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)',
+          zIndex: 50, overflow: 'hidden', padding: '4px'
+        }}>
+          <div style={{ padding: '6px 10px', fontSize: '0.65rem', fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            Country Codes
+          </div>
+          {suggestions.map((sugg, i) => (
+             <div
+              key={i}
+              onClick={() => handleSelect(sugg)}
+              onMouseDown={(e) => e.preventDefault()}
+              style={{
+                padding: '8px 10px', fontSize: '0.82rem', color: i === activeIndex ? '#6C47FF' : '#374151',
+                background: i === activeIndex ? '#F3F0FF' : 'transparent',
+                borderRadius: 8, cursor: 'pointer', fontFamily: 'Inter, sans-serif',
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                transition: 'background 0.15s, color 0.15s'
+              }}
+              onMouseEnter={() => setActiveIndex(i)}
+            >
+              <span style={{ fontWeight: 600 }}>{sugg.code}</span>
+              <span style={{ color: '#9CA3AF', fontSize: '0.75rem' }}>{sugg.name}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 export function WizardForm() {
   const {
     resume, updatePersonal,
@@ -376,7 +531,7 @@ export function WizardForm() {
             <Field label="Job Title"  icon={FileText} name="title"    value={personal.title}    onChange={(e) => updatePersonal('title', e.target.value)}    placeholder="Full Stack Developer" />
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
               <SmartEmailField value={personal.email} onChange={(val) => updatePersonal('email', val)} />
-              <Field label="Phone"    icon={Phone}   name="phone"    value={personal.phone}    onChange={(e) => updatePersonal('phone', e.target.value)}    placeholder="+92 300 0000000" />
+              <SmartPhoneField value={personal.phone} onChange={(val) => updatePersonal('phone', val)} />
               <Field label="Location" icon={MapPin}  name="location" value={personal.location} onChange={(e) => updatePersonal('location', e.target.value)} placeholder="Karachi, Pakistan" />
               <Field label="Website"  icon={Globe}   name="website"  value={personal.website}  onChange={(e) => updatePersonal('website', e.target.value)}  placeholder="yoursite.com" />
             </div>
