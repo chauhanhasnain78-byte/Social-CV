@@ -950,6 +950,90 @@ function SmartWebsiteField({ value, onChange }) {
   );
 }
 
+// -- Smart Month Field -------------------------------------------------------
+function SmartMonthField({ label, value, onChange, isEndDate, current, onCurrentChange }) {
+  const parseToYYYYMM = (str) => {
+    if (!str || str.toLowerCase() === 'present') return '';
+    if (/^\d{4}-\d{2}$/.test(str)) return str;
+    const d = new Date(str);
+    if (!isNaN(d.getTime())) {
+      const m = ("0" + (d.getMonth() + 1)).slice(-2);
+      return `${d.getFullYear()}-${m}`;
+    }
+    return '';
+  };
+
+  const formatToDisplay = (yyyymm) => {
+    if (!yyyymm) return '';
+    const parts = yyyymm.split("-");
+    if (parts.length === 2) {
+      const date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, 1);
+      if (!isNaN(date.getTime())) {
+        return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+      }
+    }
+    return yyyymm;
+  };
+
+  const internalValue = parseToYYYYMM(value);
+
+  const handleChange = (e) => {
+    const raw = e.target.value;
+    onChange(formatToDisplay(raw));
+  };
+
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }}>
+        <label style={{ fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', letterSpacing: '0.02em' }}>
+          {label}
+        </label>
+        {isEndDate && (
+          <label style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.68rem', color: '#4B5563', cursor: 'pointer' }}>
+            <input 
+              type="checkbox" 
+              checked={current || false} 
+              onChange={(e) => {
+                onCurrentChange(e.target.checked);
+                if (e.target.checked) onChange('Present');
+                else onChange('');
+              }} 
+              style={{ cursor: 'pointer' }}
+            />
+            Currently Working
+          </label>
+        )}
+      </div>
+      <div style={{ position: 'relative' }}>
+        <input
+          type="month"
+          value={internalValue}
+          onChange={handleChange}
+          disabled={isEndDate && current}
+          style={{
+            width: '100%', padding: '9px 12px',
+            border: "1.5px solid rgba(0,0,0,0.1)",
+            borderRadius: 10, fontSize: '0.85rem', fontFamily: 'Inter, sans-serif',
+            color: (isEndDate && current) ? '#9CA3AF' : '#0D0D0F', 
+            background: (isEndDate && current) ? '#F3F4F6' : '#FAFAFA',
+            outline: 'none', transition: 'border-color 0.2s, box-shadow 0.2s, background 0.2s', boxSizing: 'border-box',
+          }}
+          onFocus={(e) => { 
+            if (!(isEndDate && current)) {
+              e.target.style.borderColor = '#6C47FF'; 
+              e.target.style.boxShadow = '0 0 0 3px rgba(108,71,255,0.1)'; 
+            }
+          }}
+          onBlur={(e) => {
+            e.target.style.borderColor = 'rgba(0,0,0,0.1)';
+            e.target.style.boxShadow = 'none';
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
 export function WizardForm() {
   const {
     resume, updatePersonal,
@@ -1066,8 +1150,15 @@ export function WizardForm() {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                   <Field label="Company" name={`exp-company-${exp.id}`} value={exp.company} onChange={(e) => updateExperience(exp.id, 'company', e.target.value)} placeholder="Google" />
                   <Field label="Role"    name={`exp-role-${exp.id}`}    value={exp.role}    onChange={(e) => updateExperience(exp.id, 'role', e.target.value)} placeholder="Software Engineer" />
-                  <Field label="Start Date"   name={`exp-start-${exp.id}`}   value={exp.startDate} onChange={(e) => updateExperience(exp.id, 'startDate', e.target.value)} placeholder="Jan 2022" />
-                  <Field label="End Date"     name={`exp-end-${exp.id}`}     value={exp.endDate}   onChange={(e) => updateExperience(exp.id, 'endDate', e.target.value)}   placeholder="Present" />
+                  <SmartMonthField label="Start Date" value={exp.startDate} onChange={(val) => updateExperience(exp.id, 'startDate', val)} />
+                  <SmartMonthField 
+                    label="End Date" 
+                    value={exp.endDate} 
+                    onChange={(val) => updateExperience(exp.id, 'endDate', val)} 
+                    isEndDate={true} 
+                    current={exp.current} 
+                    onCurrentChange={(checked) => updateExperience(exp.id, 'current', checked)} 
+                  />
                 </div>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5 }}>Bullet Points</label>
