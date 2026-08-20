@@ -1,4 +1,4 @@
-﻿import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useResumeStore } from '@/store/resumeStore';
 import {
   User, Mail, Phone, MapPin, Link2, FileText,
@@ -815,6 +815,162 @@ function SmartLinkedInField({ value, onChange }) {
   );
 }
 
+// -- Smart GitHub Field ------------------------------------------------------
+function SmartGithubField({ value, onChange }) {
+  const [error, setError] = useState(false);
+  const maxLength = 100;
+
+  const formatGithub = (val) => {
+    let url = val.trim();
+    if (!url) return '';
+    if (!url.includes('/') && !url.includes(' ') && !url.includes('github.com')) {
+      return 'github.com/' + url;
+    }
+    url = url.replace(/^(https?:\/\/)?(www\.)?/, '');
+    return url;
+  };
+
+  const handleBlur = (e) => {
+    let val = e.target.value;
+    if (!val) {
+      setError(false);
+      return;
+    }
+    val = formatGithub(val);
+    if (val !== e.target.value) {
+      onChange(val.substring(0, maxLength));
+    }
+    const isValid = /^github\.com\/[a-zA-Z0-9_-]+\/?$/.test(val);
+    setError(!isValid);
+  };
+
+  const handleChange = (e) => {
+    onChange(e.target.value);
+    if (error) setError(false);
+  };
+  
+  const currentLen = (value || '').length;
+  const isLimitReached = currentLen >= maxLength;
+
+  return (
+    <div>
+      <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5, letterSpacing: '0.02em' }}>
+        <span>GitHub</span>
+        <span style={{ color: isLimitReached ? '#EF4444' : '#9CA3AF' }}>
+          {currentLen}/{maxLength}
+        </span>
+      </label>
+      <div style={{ position: 'relative' }}>
+        <GitFork size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: error || isLimitReached ? '#EF4444' : '#9CA3AF' }} />
+        <input
+          type="text"
+          maxLength={maxLength}
+          placeholder="github.com/you"
+          value={value || ''}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          style={{
+            width: '100%', padding: '9px 12px', paddingLeft: '2.3rem',
+            border: error || isLimitReached ? "1.5px solid #EF4444" : "1.5px solid rgba(0,0,0,0.1)",
+            borderRadius: 10, fontSize: '0.85rem', fontFamily: 'Inter, sans-serif',
+            color: '#0D0D0F', background: error || isLimitReached ? '#FEF2F2' : '#FAFAFA',
+            outline: 'none', transition: 'border-color 0.2s, box-shadow 0.2s, background 0.2s', boxSizing: 'border-box',
+          }}
+          onFocus={(e) => { 
+            if (!error && !isLimitReached) {
+              e.target.style.borderColor = '#6C47FF'; 
+              e.target.style.boxShadow = '0 0 0 3px rgba(108,71,255,0.1)'; 
+            }
+          }}
+        />
+      </div>
+      {(error || isLimitReached) && (
+        <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#EF4444', fontSize: '0.68rem', marginTop: 6, fontWeight: 500 }}>
+          <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#EF4444' }} />
+          {isLimitReached ? `Maximum limit reached (${maxLength})` : 'Valid format: github.com/username'}
+        </span>
+      )}
+    </div>
+  );
+}
+
+// -- Smart Website Field -----------------------------------------------------
+function SmartWebsiteField({ value, onChange }) {
+  const [error, setError] = useState(false);
+  const maxLength = 100;
+
+  const formatWebsite = (val) => {
+    let url = val.trim();
+    if (!url) return '';
+    // Strip http/https/www to keep it clean
+    url = url.replace(/^(https?:\/\/)?(www\.)?/, '');
+    return url;
+  };
+
+  const handleBlur = (e) => {
+    let val = e.target.value;
+    if (!val) {
+      setError(false);
+      return;
+    }
+    val = formatWebsite(val);
+    if (val !== e.target.value) {
+      onChange(val.substring(0, maxLength));
+    }
+    const isValid = /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\/.*)?$/.test(val);
+    setError(!isValid);
+  };
+
+  const handleChange = (e) => {
+    onChange(e.target.value);
+    if (error) setError(false);
+  };
+  
+  const currentLen = (value || '').length;
+  const isLimitReached = currentLen >= maxLength;
+
+  return (
+    <div>
+      <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5, letterSpacing: '0.02em' }}>
+        <span>Website</span>
+        <span style={{ color: isLimitReached ? '#EF4444' : '#9CA3AF' }}>
+          {currentLen}/{maxLength}
+        </span>
+      </label>
+      <div style={{ position: 'relative' }}>
+        <Globe size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: error || isLimitReached ? '#EF4444' : '#9CA3AF' }} />
+        <input
+          type="text"
+          maxLength={maxLength}
+          placeholder="yoursite.com"
+          value={value || ''}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          style={{
+            width: '100%', padding: '9px 12px', paddingLeft: '2.3rem',
+            border: error || isLimitReached ? "1.5px solid #EF4444" : "1.5px solid rgba(0,0,0,0.1)",
+            borderRadius: 10, fontSize: '0.85rem', fontFamily: 'Inter, sans-serif',
+            color: '#0D0D0F', background: error || isLimitReached ? '#FEF2F2' : '#FAFAFA',
+            outline: 'none', transition: 'border-color 0.2s, box-shadow 0.2s, background 0.2s', boxSizing: 'border-box',
+          }}
+          onFocus={(e) => { 
+            if (!error && !isLimitReached) {
+              e.target.style.borderColor = '#6C47FF'; 
+              e.target.style.boxShadow = '0 0 0 3px rgba(108,71,255,0.1)'; 
+            }
+          }}
+        />
+      </div>
+      {(error || isLimitReached) && (
+        <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#EF4444', fontSize: '0.68rem', marginTop: 6, fontWeight: 500 }}>
+          <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#EF4444' }} />
+          {isLimitReached ? `Maximum limit reached (${maxLength})` : 'Please enter a valid website (e.g. domain.com)'}
+        </span>
+      )}
+    </div>
+  );
+}
+
 export function WizardForm() {
   const {
     resume, updatePersonal,
@@ -867,11 +1023,11 @@ export function WizardForm() {
               <SmartEmailField value={personal.email} onChange={(val) => updatePersonal('email', val)} />
               <SmartPhoneField value={personal.phone} onChange={(val) => updatePersonal('phone', val)} />
               <SmartLocationField value={personal.location} onChange={(val) => updatePersonal('location', val)} />
-              <Field label="Website"  icon={Globe}   name="website"  value={personal.website}  onChange={(e) => updatePersonal('website', e.target.value)}  placeholder="yoursite.com" />
+              <SmartWebsiteField value={personal.website} onChange={(val) => updatePersonal('website', val)} />
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
               <SmartLinkedInField value={personal.linkedin} onChange={(val) => updatePersonal('linkedin', val)} />
-              <Field label="GitHub"   icon={GitFork} name="github"   value={personal.github}   onChange={(e) => updatePersonal('github', e.target.value)}   placeholder="github.com/you" />
+              <SmartGithubField value={personal.github} onChange={(val) => updatePersonal('github', val)} />
             </div>
             <div style={{ position: 'relative' }}>
               <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5 }}>Professional Summary</label>
