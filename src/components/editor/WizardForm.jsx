@@ -736,6 +736,85 @@ function SmartLocationField({ value, onChange }) {
     </div>
   );
 }
+// -- Smart LinkedIn Field ----------------------------------------------------
+function SmartLinkedInField({ value, onChange }) {
+  const [error, setError] = useState(false);
+  const maxLength = 100;
+
+  const formatLinkedIn = (val) => {
+    let url = val.trim();
+    if (!url) return '';
+    if (!url.includes('/') && !url.includes(' ') && !url.includes('linkedin.com')) {
+      return 'linkedin.com/in/' + url;
+    }
+    url = url.replace(/^(https?:\/\/)?(www\.)?/, '');
+    return url;
+  };
+
+  const handleBlur = (e) => {
+    let val = e.target.value;
+    if (!val) {
+      setError(false);
+      return;
+    }
+    val = formatLinkedIn(val);
+    if (val !== e.target.value) {
+      onChange(val.substring(0, maxLength));
+    }
+    const isValid = /^linkedin\.com\/in\/[a-zA-Z0-9%_-]+\/?$/.test(val);
+    setError(!isValid);
+  };
+
+  const handleChange = (e) => {
+    onChange(e.target.value);
+    if (error) setError(false);
+  };
+  
+  const currentLen = (value || '').length;
+  const isLimitReached = currentLen >= maxLength;
+
+  return (
+    <div>
+      <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5, letterSpacing: '0.02em' }}>
+        <span>LinkedIn</span>
+        <span style={{ color: isLimitReached ? '#EF4444' : '#9CA3AF' }}>
+          {currentLen}/{maxLength}
+        </span>
+      </label>
+      <div style={{ position: 'relative' }}>
+        <Link2 size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: error || isLimitReached ? '#EF4444' : '#9CA3AF' }} />
+        <input
+          type="text"
+          maxLength={maxLength}
+          placeholder="linkedin.com/in/you"
+          value={value || ''}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          style={{
+            width: '100%', padding: '9px 12px', paddingLeft: '2.3rem',
+            border: error || isLimitReached ? "1.5px solid #EF4444" : "1.5px solid rgba(0,0,0,0.1)",
+            borderRadius: 10, fontSize: '0.85rem', fontFamily: 'Inter, sans-serif',
+            color: '#0D0D0F', background: error || isLimitReached ? '#FEF2F2' : '#FAFAFA',
+            outline: 'none', transition: 'border-color 0.2s, box-shadow 0.2s, background 0.2s', boxSizing: 'border-box',
+          }}
+          onFocus={(e) => { 
+            if (!error && !isLimitReached) {
+              e.target.style.borderColor = '#6C47FF'; 
+              e.target.style.boxShadow = '0 0 0 3px rgba(108,71,255,0.1)'; 
+            }
+          }}
+        />
+      </div>
+      {(error || isLimitReached) && (
+        <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#EF4444', fontSize: '0.68rem', marginTop: 6, fontWeight: 500 }}>
+          <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#EF4444' }} />
+          {isLimitReached ? `Maximum limit reached (${maxLength})` : "Valid format: linkedin.com/in/username"}
+        </span>
+      )}
+    </div>
+  );
+}
+
 export function WizardForm() {
   const {
     resume, updatePersonal,
@@ -791,7 +870,7 @@ export function WizardForm() {
               <Field label="Website"  icon={Globe}   name="website"  value={personal.website}  onChange={(e) => updatePersonal('website', e.target.value)}  placeholder="yoursite.com" />
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-              <Field label="LinkedIn" icon={Link2}   name="linkedin" value={personal.linkedin} onChange={(e) => updatePersonal('linkedin', e.target.value)} placeholder="linkedin.com/in/you" />
+              <SmartLinkedInField value={personal.linkedin} onChange={(val) => updatePersonal('linkedin', val)} />
               <Field label="GitHub"   icon={GitFork} name="github"   value={personal.github}   onChange={(e) => updatePersonal('github', e.target.value)}   placeholder="github.com/you" />
             </div>
             <div style={{ position: 'relative' }}>
