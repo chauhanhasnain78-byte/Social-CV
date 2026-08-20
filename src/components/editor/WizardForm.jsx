@@ -805,14 +805,26 @@ export function WizardForm() {
                   onChange={(e) => updatePersonal('summary', e.target.value)}
                   style={{
                     width: '100%', padding: '10px 12px', paddingBottom: '24px', resize: 'none',
-                    border: '1.5px solid rgba(0,0,0,0.1)', borderRadius: 10,
+                    border: (personal.summary || '').length >= 500 ? "1.5px solid #EF4444" : "1.5px solid rgba(0,0,0,0.1)", 
+                    borderRadius: 10,
                     fontSize: '0.85rem', fontFamily: 'Inter, sans-serif',
-                    color: '#0D0D0F', background: '#FAFAFA',
+                    color: '#0D0D0F', 
+                    background: (personal.summary || '').length >= 500 ? '#FEF2F2' : '#FAFAFA',
                     outline: 'none', boxSizing: 'border-box',
-                    transition: 'border-color 0.2s, box-shadow 0.2s',
+                    transition: 'border-color 0.2s, box-shadow 0.2s, background 0.2s',
                   }}
-                  onFocus={(e) => { e.target.style.borderColor = '#6C47FF'; e.target.style.boxShadow = '0 0 0 3px rgba(108,71,255,0.1)'; }}
-                  onBlur={(e) => { e.target.style.borderColor = 'rgba(0,0,0,0.1)'; e.target.style.boxShadow = 'none'; }}
+                  onFocus={(e) => { 
+                    if ((personal.summary || '').length < 500) {
+                      e.target.style.borderColor = '#6C47FF'; 
+                      e.target.style.boxShadow = '0 0 0 3px rgba(108,71,255,0.1)'; 
+                    }
+                  }}
+                  onBlur={(e) => { 
+                    if ((personal.summary || '').length < 500) {
+                      e.target.style.borderColor = 'rgba(0,0,0,0.1)'; 
+                      e.target.style.boxShadow = 'none'; 
+                    }
+                  }}
                 />
                 <span style={{ 
                   position: 'absolute', bottom: '8px', right: '12px', 
@@ -822,6 +834,12 @@ export function WizardForm() {
                   {(personal.summary || '').length}/500
                 </span>
               </div>
+              {(personal.summary || '').length >= 500 && (
+                <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#EF4444', fontSize: '0.68rem', marginTop: 6, fontWeight: 500 }}>
+                  <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#EF4444' }} />
+                  Maximum character limit reached (500)
+                </span>
+              )}
             </div>
           </div>
         )}
