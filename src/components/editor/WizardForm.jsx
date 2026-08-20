@@ -739,7 +739,6 @@ function SmartLocationField({ value, onChange }) {
 // -- Smart LinkedIn Field ----------------------------------------------------
 function SmartLinkedInField({ value, onChange }) {
   const [error, setError] = useState(false);
-  const maxLength = 100;
 
   const formatLinkedIn = (val) => {
     let url = val.trim();
@@ -759,7 +758,7 @@ function SmartLinkedInField({ value, onChange }) {
     }
     val = formatLinkedIn(val);
     if (val !== e.target.value) {
-      onChange(val.substring(0, maxLength));
+      onChange(val);
     }
     const isValid = /^linkedin\.com\/in\/[a-zA-Z0-9%_-]+\/?$/.test(val);
     setError(!isValid);
@@ -770,31 +769,25 @@ function SmartLinkedInField({ value, onChange }) {
     if (error) setError(false);
   };
   
-  const currentLen = (value || '').length;
-  const isLimitReached = currentLen >= maxLength;
 
   return (
     <div>
-      <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5, letterSpacing: '0.02em' }}>
-        <span>LinkedIn</span>
-        <span style={{ color: isLimitReached ? '#EF4444' : '#9CA3AF' }}>
-          {currentLen}/{maxLength}
-        </span>
+      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5, letterSpacing: '0.02em' }}>
+        LinkedIn
       </label>
       <div style={{ position: 'relative' }}>
-        <Link2 size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: error || isLimitReached ? '#EF4444' : '#9CA3AF' }} />
+        <Link2 size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: error ? '#EF4444' : '#9CA3AF' }} />
         <input
           type="text"
-          maxLength={maxLength}
           placeholder="linkedin.com/in/you"
           value={value || ''}
           onChange={handleChange}
           onBlur={handleBlur}
           style={{
             width: '100%', padding: '9px 12px', paddingLeft: '2.3rem',
-            border: error || isLimitReached ? "1.5px solid #EF4444" : "1.5px solid rgba(0,0,0,0.1)",
+            border: error ? "1.5px solid #EF4444" : "1.5px solid rgba(0,0,0,0.1)",
             borderRadius: 10, fontSize: '0.85rem', fontFamily: 'Inter, sans-serif',
-            color: '#0D0D0F', background: error || isLimitReached ? '#FEF2F2' : '#FAFAFA',
+            color: '#0D0D0F', background: error ? '#FEF2F2' : '#FAFAFA',
             outline: 'none', transition: 'border-color 0.2s, box-shadow 0.2s, background 0.2s', boxSizing: 'border-box',
           }}
           onFocus={(e) => { 
@@ -805,10 +798,10 @@ function SmartLinkedInField({ value, onChange }) {
           }}
         />
       </div>
-      {(error || isLimitReached) && (
+      {(error) && (
         <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#EF4444', fontSize: '0.68rem', marginTop: 6, fontWeight: 500 }}>
           <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#EF4444' }} />
-          {isLimitReached ? `Maximum limit reached (${maxLength})` : "Valid format: linkedin.com/in/username"}
+          Valid format: linkedin.com/in/username
         </span>
       )}
     </div>
@@ -818,7 +811,6 @@ function SmartLinkedInField({ value, onChange }) {
 // -- Smart GitHub Field ------------------------------------------------------
 function SmartGithubField({ value, onChange }) {
   const [error, setError] = useState(false);
-  const maxLength = 100;
 
   const formatGithub = (val) => {
     let url = val.trim();
@@ -838,7 +830,7 @@ function SmartGithubField({ value, onChange }) {
     }
     val = formatGithub(val);
     if (val !== e.target.value) {
-      onChange(val.substring(0, maxLength));
+      onChange(val);
     }
     const isValid = /^github\.com\/[a-zA-Z0-9_-]+\/?$/.test(val);
     setError(!isValid);
@@ -849,31 +841,25 @@ function SmartGithubField({ value, onChange }) {
     if (error) setError(false);
   };
   
-  const currentLen = (value || '').length;
-  const isLimitReached = currentLen >= maxLength;
 
   return (
     <div>
-      <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5, letterSpacing: '0.02em' }}>
-        <span>GitHub</span>
-        <span style={{ color: isLimitReached ? '#EF4444' : '#9CA3AF' }}>
-          {currentLen}/{maxLength}
-        </span>
+      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5, letterSpacing: '0.02em' }}>
+        GitHub
       </label>
       <div style={{ position: 'relative' }}>
-        <GitFork size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: error || isLimitReached ? '#EF4444' : '#9CA3AF' }} />
+        <GitFork size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: error ? '#EF4444' : '#9CA3AF' }} />
         <input
           type="text"
-          maxLength={maxLength}
           placeholder="github.com/you"
           value={value || ''}
           onChange={handleChange}
           onBlur={handleBlur}
           style={{
             width: '100%', padding: '9px 12px', paddingLeft: '2.3rem',
-            border: error || isLimitReached ? "1.5px solid #EF4444" : "1.5px solid rgba(0,0,0,0.1)",
+            border: error ? "1.5px solid #EF4444" : "1.5px solid rgba(0,0,0,0.1)",
             borderRadius: 10, fontSize: '0.85rem', fontFamily: 'Inter, sans-serif',
-            color: '#0D0D0F', background: error || isLimitReached ? '#FEF2F2' : '#FAFAFA',
+            color: '#0D0D0F', background: error ? '#FEF2F2' : '#FAFAFA',
             outline: 'none', transition: 'border-color 0.2s, box-shadow 0.2s, background 0.2s', boxSizing: 'border-box',
           }}
           onFocus={(e) => { 
@@ -884,10 +870,10 @@ function SmartGithubField({ value, onChange }) {
           }}
         />
       </div>
-      {(error || isLimitReached) && (
+      {(error) && (
         <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#EF4444', fontSize: '0.68rem', marginTop: 6, fontWeight: 500 }}>
           <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#EF4444' }} />
-          {isLimitReached ? `Maximum limit reached (${maxLength})` : 'Valid format: github.com/username'}
+          Valid format: github.com/username
         </span>
       )}
     </div>
@@ -897,7 +883,6 @@ function SmartGithubField({ value, onChange }) {
 // -- Smart Website Field -----------------------------------------------------
 function SmartWebsiteField({ value, onChange }) {
   const [error, setError] = useState(false);
-  const maxLength = 100;
 
   const formatWebsite = (val) => {
     let url = val.trim();
@@ -915,7 +900,7 @@ function SmartWebsiteField({ value, onChange }) {
     }
     val = formatWebsite(val);
     if (val !== e.target.value) {
-      onChange(val.substring(0, maxLength));
+      onChange(val);
     }
     const isValid = /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\/.*)?$/.test(val);
     setError(!isValid);
@@ -926,31 +911,25 @@ function SmartWebsiteField({ value, onChange }) {
     if (error) setError(false);
   };
   
-  const currentLen = (value || '').length;
-  const isLimitReached = currentLen >= maxLength;
 
   return (
     <div>
-      <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5, letterSpacing: '0.02em' }}>
-        <span>Website</span>
-        <span style={{ color: isLimitReached ? '#EF4444' : '#9CA3AF' }}>
-          {currentLen}/{maxLength}
-        </span>
+      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5, letterSpacing: '0.02em' }}>
+        Website
       </label>
       <div style={{ position: 'relative' }}>
-        <Globe size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: error || isLimitReached ? '#EF4444' : '#9CA3AF' }} />
+        <Globe size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: error ? '#EF4444' : '#9CA3AF' }} />
         <input
           type="text"
-          maxLength={maxLength}
           placeholder="yoursite.com"
           value={value || ''}
           onChange={handleChange}
           onBlur={handleBlur}
           style={{
             width: '100%', padding: '9px 12px', paddingLeft: '2.3rem',
-            border: error || isLimitReached ? "1.5px solid #EF4444" : "1.5px solid rgba(0,0,0,0.1)",
+            border: error ? "1.5px solid #EF4444" : "1.5px solid rgba(0,0,0,0.1)",
             borderRadius: 10, fontSize: '0.85rem', fontFamily: 'Inter, sans-serif',
-            color: '#0D0D0F', background: error || isLimitReached ? '#FEF2F2' : '#FAFAFA',
+            color: '#0D0D0F', background: error ? '#FEF2F2' : '#FAFAFA',
             outline: 'none', transition: 'border-color 0.2s, box-shadow 0.2s, background 0.2s', boxSizing: 'border-box',
           }}
           onFocus={(e) => { 
@@ -961,10 +940,10 @@ function SmartWebsiteField({ value, onChange }) {
           }}
         />
       </div>
-      {(error || isLimitReached) && (
+      {(error) && (
         <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#EF4444', fontSize: '0.68rem', marginTop: 6, fontWeight: 500 }}>
           <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#EF4444' }} />
-          {isLimitReached ? `Maximum limit reached (${maxLength})` : 'Please enter a valid website (e.g. domain.com)'}
+          Please enter a valid website (e.g. domain.com)
         </span>
       )}
     </div>
