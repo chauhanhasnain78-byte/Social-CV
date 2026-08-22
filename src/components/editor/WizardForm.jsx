@@ -1016,7 +1016,7 @@ function SmartDegreeField({ label, value, onChange, placeholder }) {
   };
 
   const handleSelect = (deg) => {
-    onChange(deg.short);
+    onChange(deg.full);
     setShowDropdown(false);
     setActiveIndex(-1);
   };
