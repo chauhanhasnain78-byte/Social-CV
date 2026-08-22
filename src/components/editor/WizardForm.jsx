@@ -1699,20 +1699,47 @@ export function WizardForm() {
                 </div>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5 }}>Description</label>
-                  <textarea rows={3}
-                    placeholder="Brief project description..."
-                    value={proj.description || ''}
-                    onChange={(e) => updateProject(proj.id, 'description', e.target.value)}
-                    style={{
-                      width: '100%', padding: '10px 12px', resize: 'none',
-                      border: '1.5px solid rgba(0,0,0,0.1)', borderRadius: 8,
-                      fontSize: '0.82rem', fontFamily: 'Inter, sans-serif',
-                      color: '#0D0D0F', background: '#fff', outline: 'none',
-                      boxSizing: 'border-box',
-                    }}
-                    onFocus={(e) => { e.target.style.borderColor = '#6C47FF'; }}
-                    onBlur={(e) => { e.target.style.borderColor = 'rgba(0,0,0,0.1)'; }}
-                  />
+                  <div style={{ position: 'relative' }}>
+                    <textarea rows={3}
+                      maxLength={500}
+                      placeholder="Brief project description..."
+                      value={proj.description || ''}
+                      onChange={(e) => updateProject(proj.id, 'description', e.target.value)}
+                      style={{
+                        width: '100%', padding: '10px 12px', paddingBottom: '24px', resize: 'none',
+                        border: (proj.description || '').length >= 500 ? "1.5px solid #EF4444" : "1.5px solid rgba(0,0,0,0.1)",
+                        borderRadius: 8,
+                        fontSize: '0.82rem', fontFamily: 'Inter, sans-serif',
+                        color: '#0D0D0F', 
+                        background: (proj.description || '').length >= 500 ? '#FEF2F2' : '#fff',
+                        outline: 'none', boxSizing: 'border-box',
+                        transition: 'border-color 0.2s, background 0.2s',
+                      }}
+                      onFocus={(e) => { 
+                        if ((proj.description || '').length < 500) {
+                          e.target.style.borderColor = '#6C47FF'; 
+                        }
+                      }}
+                      onBlur={(e) => { 
+                        if ((proj.description || '').length < 500) {
+                          e.target.style.borderColor = 'rgba(0,0,0,0.1)'; 
+                        }
+                      }}
+                    />
+                    <span style={{ 
+                      position: 'absolute', bottom: '8px', right: '12px', 
+                      fontSize: '0.65rem', fontWeight: 500, pointerEvents: 'none',
+                      color: (proj.description || '').length >= 500 ? '#EF4444' : '#9CA3AF' 
+                    }}>
+                      {(proj.description || '').length}/500
+                    </span>
+                  </div>
+                  {(proj.description || '').length >= 500 && (
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#EF4444', fontSize: '0.68rem', marginTop: 6, fontWeight: 500 }}>
+                      <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#EF4444' }} />
+                      Maximum character limit reached (500)
+                    </span>
+                  )}
                 </div>
               </EntryCard>
             ))}
