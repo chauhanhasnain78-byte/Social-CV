@@ -1084,6 +1084,125 @@ function SmartDegreeField({ label, value, onChange, placeholder }) {
   );
 }
 
+// -- Smart Study Field -------------------------------------------------------
+function SmartStudyField({ label, value, degreeValue, onChange, placeholder }) {
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const wrapperRef = useRef(null);
+
+  const getSuggestionsForDegree = (deg) => {
+    if (!deg) return ["Computer Science", "Information Technology", "Mechanical Engineering", "Finance", "Accounting", "Marketing", "Economics"];
+    const d = deg.toLowerCase();
+    if (d.includes('science')) return ["Computer Science", "Information Technology", "Physics", "Chemistry", "Mathematics", "Biology", "Zoology", "Botany", "Biotechnology", "Microbiology", "Statistics", "Data Science"];
+    if (d.includes('commerce')) return ["Accounting", "Finance", "Banking & Insurance", "Taxation", "Financial Markets", "Business Analytics", "Corporate Secretaryship"];
+    if (d.includes('arts')) return ["English Literature", "Economics", "History", "Political Science", "Psychology", "Sociology", "Geography", "Philosophy", "Fine Arts"];
+    if (d.includes('engineering') || d.includes('technology')) return ["Computer Engineering", "Mechanical Engineering", "Civil Engineering", "Electrical Engineering", "Electronics & Communication", "Information Technology", "Aerospace Engineering", "Automobile Engineering"];
+    if (d.includes('business') || d.includes('management')) return ["Marketing", "Human Resources (HR)", "Finance", "Operations", "International Business", "Supply Chain Management", "Retail Management"];
+    if (d.includes('computer')) return ["Software Engineering", "Data Science", "Artificial Intelligence", "Web Development", "Cyber Security", "Cloud Computing"];
+    if (d.includes('medicine') || d.includes('surgery') || d.includes('pharm')) return ["General Medicine", "Pharmacology", "Pharmaceutics", "Anatomy", "Physiology"];
+    
+    // Default fallback
+    return ["Computer Science", "Finance", "Marketing", "Mechanical Engineering", "Economics", "English Literature"];
+  };
+
+  const baseSuggestions = getSuggestionsForDegree(degreeValue);
+  const suggestions = value
+    ? baseSuggestions.filter(s => s.toLowerCase().includes(value.toLowerCase()))
+    : baseSuggestions;
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+        setShowDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleKeyDown = (e) => {
+    if (!showDropdown || suggestions.length === 0) return;
+    
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActiveIndex(prev => (prev < suggestions.length - 1 ? prev + 1 : prev));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActiveIndex(prev => (prev > 0 ? prev - 1 : 0));
+    } else if (e.key === 'Enter' && activeIndex >= 0) {
+      e.preventDefault();
+      handleSelect(suggestions[activeIndex]);
+    }
+  };
+
+  const handleSelect = (field) => {
+    onChange(field);
+    setShowDropdown(false);
+    setActiveIndex(-1);
+  };
+
+  return (
+    <div ref={wrapperRef} style={{ position: 'relative' }}>
+      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5, letterSpacing: '0.02em' }}>
+        {label}
+      </label>
+      <div style={{ position: 'relative' }}>
+        <input
+          type="text"
+          placeholder={placeholder}
+          value={value || ''}
+          onChange={(e) => {
+            onChange(e.target.value);
+            setShowDropdown(true);
+            setActiveIndex(-1);
+          }}
+          onFocus={(e) => { 
+            e.target.style.borderColor = '#6C47FF'; 
+            e.target.style.boxShadow = '0 0 0 3px rgba(108,71,255,0.1)'; 
+            setShowDropdown(true);
+          }}
+          onBlur={(e) => {
+            e.target.style.borderColor = 'rgba(0,0,0,0.1)';
+            e.target.style.boxShadow = 'none';
+          }}
+          onKeyDown={handleKeyDown}
+          style={{
+            width: '100%', padding: '9px 12px',
+            border: "1.5px solid rgba(0,0,0,0.1)",
+            borderRadius: 10, fontSize: '0.85rem', fontFamily: 'Inter, sans-serif',
+            color: '#0D0D0F', background: '#FAFAFA',
+            outline: 'none', transition: 'border-color 0.2s, box-shadow 0.2s', boxSizing: 'border-box',
+          }}
+        />
+      </div>
+
+      {showDropdown && suggestions.length > 0 && (
+        <div style={{
+          position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4,
+          background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8,
+          boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 50, maxHeight: 200, overflowY: 'auto'
+        }}>
+          {suggestions.map((s, idx) => (
+            <div
+              key={idx}
+              onClick={() => handleSelect(s)}
+              onMouseEnter={() => setActiveIndex(idx)}
+              style={{
+                padding: '8px 12px', cursor: 'pointer',
+                background: activeIndex === idx ? '#F3F4F6' : '#fff',
+                borderBottom: idx < suggestions.length - 1 ? '1px solid #F3F4F6' : 'none',
+                display: 'flex', flexDirection: 'column'
+              }}
+            >
+              <span style={{ fontSize: '0.85rem', color: '#111827', fontWeight: 500 }}>{s}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // -- Smart School Field ------------------------------------------------------
 function SmartSchoolField({ label, value, onChange, placeholder }) {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -1504,7 +1623,7 @@ export function WizardForm() {
                 <SmartSchoolField label="School" value={edu.school} onChange={(val) => updateEducation(edu.id, 'school', val)} placeholder="e.g. Mumbai University" />
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                   <SmartDegreeField label="Degree" value={edu.degree} onChange={(val) => updateEducation(edu.id, 'degree', val)} placeholder="B.Sc, B.Com, etc." />
-                  <Field label="Field"  name={`edu-field-${edu.id}`}  value={edu.field}  onChange={(e) => updateEducation(edu.id, 'field',  e.target.value)} placeholder="Computer Science" />
+                  <SmartStudyField label="Field" value={edu.field} degreeValue={edu.degree} onChange={(val) => updateEducation(edu.id, 'field', val)} placeholder="e.g. Computer Science" />
                   <Field label="Start Date"  name={`edu-start-${edu.id}`}  value={edu.startDate} onChange={(e) => updateEducation(edu.id, 'startDate', e.target.value)} placeholder="2020" />
                   <Field label="End Date"    name={`edu-end-${edu.id}`}    value={edu.endDate}   onChange={(e) => updateEducation(edu.id, 'endDate',   e.target.value)} placeholder="2024" />
                 </div>
