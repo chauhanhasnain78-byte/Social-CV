@@ -1,14 +1,16 @@
 import React from 'react';
 import { useResumeStore } from '../../store/resumeStore';
-import { User, Briefcase, GraduationCap, Wrench, FolderGit2 } from 'lucide-react';
+import { User, Briefcase, GraduationCap, Wrench, FolderGit2, Globe } from 'lucide-react';
 
 const steps = [
-  { id: 0, label: 'Personal Info', icon: User },
-  { id: 1, label: 'Work Experience', icon: Briefcase },
-  { id: 2, label: 'Education', icon: GraduationCap },
-  { id: 3, label: 'Skills', icon: Wrench },
-  { id: 4, label: 'Projects', icon: FolderGit2 },
+  { id: 0, label: 'Personal Info',  icon: User },
+  { id: 1, label: 'Experience',     icon: Briefcase },
+  { id: 2, label: 'Education',      icon: GraduationCap },
+  { id: 3, label: 'Skills',         icon: Wrench },
+  { id: 4, label: 'Projects',       icon: FolderGit2 },
+  { id: 5, label: 'Extras',         icon: Globe },
 ];
+
 
 export function StepperBar() {
   const { wizardStep, setWizardStep } = useResumeStore();
@@ -61,7 +63,7 @@ export function StepperBar() {
               </button>
               {index < steps.length - 1 && (
                 <div style={{
-                  width: 40,
+                  width: 24,
                   height: 2,
                   background: isPast ? '#6C47FF' : '#E5E7EB',
                   transition: 'background 0.3s'

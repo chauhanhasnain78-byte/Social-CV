@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  FileText, ChevronLeft, LayoutTemplate, Image, AlignLeft, Edit3, Save, CheckCircle, Loader2
+  FileText, ChevronLeft, LayoutTemplate, Image, AlignLeft, Edit3, Save, CheckCircle, Loader2, Cloud, CloudOff
 } from 'lucide-react';
 import { useResumeStore } from '@/store/resumeStore';
 import { StepperBar } from '@/components/editor/StepperBar';
@@ -15,6 +15,59 @@ import { doc, setDoc } from 'firebase/firestore';
 import { db } from '@/services/firebase';
 import { toast } from '@/components/ui/Toast';
 
+// ── Completeness Calculator ───────────────────────────────────────────────────
+function calcCompleteness(resume) {
+  let score = 0;
+  const max  = 100;
+
+  const p = resume.personal || {};
+  if (p.name)                   score += 10;
+  if (p.title)                  score += 5;
+  if (p.email)                  score += 8;
+  if (p.phone)                  score += 5;
+  if (p.location)               score += 4;
+  if (p.linkedin)               score += 4;
+  if (p.github || p.website)    score += 4;
+  if ((p.summary || '').length > 50)  score += 10;
+
+  if ((resume.experience || []).length > 0)  score += 15;
+  if ((resume.education  || []).length > 0)  score += 12;
+  if ((resume.skills     || []).length >= 3) score += 10;
+  if ((resume.projects   || []).length > 0)  score += 8;
+  if ((resume.languages  || []).length > 0)  score += 3;
+  if ((resume.certifications || []).length > 0) score += 2;
+
+  return Math.min(max, score);
+}
+
+// ── Progress Bar Widget (top of wizard) ──────────────────────────────────────
+function CompletenessBar({ resume }) {
+  const pct = calcCompleteness(resume);
+  const color = pct >= 80 ? '#10b981' : pct >= 50 ? '#6C47FF' : '#eab308';
+
+  return (
+    <div style={{ marginBottom: 12, padding: '10px 16px', background: '#fff', borderRadius: 12, border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+        <span style={{ fontSize: '0.72rem', fontWeight: 600, color: '#6B7280' }}>Resume Completeness</span>
+        <span style={{ fontSize: '0.78rem', fontWeight: 700, color }}>{pct}%</span>
+      </div>
+      <div style={{ height: 6, background: '#F3F4F6', borderRadius: 999, overflow: 'hidden' }}>
+        <div style={{
+          height: '100%', width: `${pct}%`,
+          background: color,
+          borderRadius: 999,
+          transition: 'width 0.4s ease, background 0.4s ease',
+        }} />
+      </div>
+      {pct < 80 && (
+        <p style={{ marginTop: 5, fontSize: '0.65rem', color: '#9CA3AF' }}>
+          {pct < 40 ? '💡 Fill in your basic info to get started' : pct < 70 ? '⚡ Adding experience & skills will boost your ATS score' : '🎯 Almost there — add a summary & links for a complete profile'}
+        </p>
+      )}
+    </div>
+  );
+}
+
 export default function EditorPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -25,38 +78,87 @@ export default function EditorPage() {
   } = useResumeStore();
 
   const [previewScale, setPreviewScale] = useState(0.65);
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
+  const [saving, setSaving]             = useState(false);
+  const [saved, setSaved]               = useState(false);
+  const [autoSaveStatus, setAutoSaveStatus] = useState('idle'); // 'idle' | 'saving' | 'saved' | 'error'
+  const autoSaveTimer = useRef(null);
 
   const templateMeta = TEMPLATES.find((t) => t.id === selectedTemplate);
 
-  const handleSaveTop = async () => {
+  // ── Save function (shared by manual + auto) ────────────────────────────────
+  const saveResume = useCallback(async (silent = false) => {
     if (!user) return;
-    setSaving(true);
+    if (!silent) setSaving(true);
+    else setAutoSaveStatus('saving');
+
     try {
-      localStorage.setItem(`social-cv-resume-${user.uid}`, JSON.stringify({
-        resume, templateId: selectedTemplate, themeColor, fontFamily, sectionOrder, updatedAt: Date.now(),
-      }));
+      const payload = { resume, templateId: selectedTemplate, themeColor, fontFamily, sectionOrder, updatedAt: Date.now() };
+      localStorage.setItem(`social-cv-resume-${user.uid}`, JSON.stringify(payload));
 
       try {
-        const resumeRef = doc(db, 'resumes', user.uid);
-        await setDoc(resumeRef, {
-          resume, templateId: selectedTemplate, themeColor, fontFamily, sectionOrder, updatedAt: Date.now(),
-        }, { merge: true });
+        await setDoc(doc(db, 'resumes', user.uid), payload, { merge: true });
       } catch (dbErr) {
-        console.warn('Firebase save failed, but saved locally:', dbErr);
+        console.warn('Firebase save failed, saved locally:', dbErr);
       }
 
       resetDirty();
-      setSaved(true);
-      toast.success('Resume saved successfully! ✅');
-      setTimeout(() => setSaved(false), 3000);
+      if (!silent) {
+        setSaved(true);
+        toast.success('Resume saved successfully! ✅');
+        setTimeout(() => setSaved(false), 3000);
+      } else {
+        setAutoSaveStatus('saved');
+        setTimeout(() => setAutoSaveStatus('idle'), 3000);
+      }
     } catch (err) {
       console.error(err);
-      toast.error(`Save failed: ${err.message || 'Please try again.'}`);
+      if (!silent) toast.error(`Save failed: ${err.message || 'Please try again.'}`);
+      else setAutoSaveStatus('error');
     } finally {
-      setSaving(false);
+      if (!silent) setSaving(false);
     }
+  }, [user, resume, selectedTemplate, themeColor, fontFamily, sectionOrder, resetDirty]);
+
+  // ── Auto-save: 30s debounce when isDirty ──────────────────────────────────
+  useEffect(() => {
+    if (!isDirty || !user) return;
+    if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
+    autoSaveTimer.current = setTimeout(() => {
+      saveResume(true); // silent auto-save
+    }, 30_000); // 30 seconds
+
+    return () => { if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current); };
+  }, [isDirty, resume, user, saveResume]);
+
+  // ── Keyboard shortcut: Ctrl+S ────────────────────────────────────────────
+  useEffect(() => {
+    const handler = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        saveResume(false);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [saveResume]);
+
+  const renderAutoSaveIndicator = () => {
+    if (autoSaveStatus === 'saving') return (
+      <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.68rem', color: '#6B7280' }}>
+        <Loader2 size={11} style={{ animation: 'spin 1s linear infinite' }} /> Auto-saving…
+      </div>
+    );
+    if (autoSaveStatus === 'saved') return (
+      <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.68rem', color: '#10b981' }}>
+        <Cloud size={11} /> Auto-saved
+      </div>
+    );
+    if (autoSaveStatus === 'error') return (
+      <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.68rem', color: '#EF4444' }}>
+        <CloudOff size={11} /> Auto-save failed
+      </div>
+    );
+    return null;
   };
 
   const renderTopBar = () => (
@@ -77,12 +179,12 @@ export default function EditorPage() {
     >
       <button
         onClick={() => navigate('/dashboard')}
+        aria-label="Back to Dashboard"
         style={{
           display: 'flex', alignItems: 'center', gap: 5, fontSize: '0.82rem',
           background: 'none', border: 'none', cursor: 'pointer',
           color: '#6B7280', fontWeight: 500, fontFamily: 'Inter',
-          padding: '6px 10px', borderRadius: 8,
-          transition: 'all 0.15s',
+          padding: '6px 10px', borderRadius: 8, transition: 'all 0.15s',
         }}
         onMouseEnter={(e) => { e.currentTarget.style.background = '#F3F4F6'; e.currentTarget.style.color = '#0D0D0F'; }}
         onMouseLeave={(e) => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = '#6B7280'; }}
@@ -93,11 +195,7 @@ export default function EditorPage() {
       <div style={{ width: 1, height: 20, background: 'rgba(0,0,0,0.08)', margin: '0 4px' }} />
 
       <div style={{ display: 'flex', alignItems: 'center' }}>
-        <img
-          src="/logo.png"
-          alt="Social-CV"
-          style={{ height: 42, width: 'auto', objectFit: 'contain' }}
-        />
+        <img src="/logo.png" alt="Social-CV" style={{ height: 42, width: 'auto', objectFit: 'contain' }} />
       </div>
 
       {templateMeta && (
@@ -112,35 +210,41 @@ export default function EditorPage() {
         </div>
       )}
 
-      {isDirty && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 10px', background: '#FFFBEB', borderRadius: 999, border: '1px solid rgba(234,179,8,0.25)' }}>
-          <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#eab308' }} />
-          <span style={{ fontSize: '0.7rem', color: '#b45309', fontWeight: 600 }}>Unsaved changes</span>
-        </div>
-      )}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 4 }}>
+        {isDirty && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 10px', background: '#FFFBEB', borderRadius: 999, border: '1px solid rgba(234,179,8,0.25)' }}>
+            <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#eab308' }} />
+            <span style={{ fontSize: '0.7rem', color: '#b45309', fontWeight: 600 }}>Unsaved</span>
+          </div>
+        )}
+        {renderAutoSaveIndicator()}
+      </div>
 
-      {/* Right Side actions in Wizard Phase */}
       {editorPhase === 'wizard' && (
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ fontSize: '0.65rem', color: '#9CA3AF', display: 'none' }} className="editor-shortcut-hint">Ctrl+S to save</span>
           <button
-            onClick={handleSaveTop}
+            onClick={() => saveResume(false)}
             disabled={saving}
+            aria-label="Save resume"
+            title="Save (Ctrl+S)"
             style={{
               display: 'flex', alignItems: 'center', gap: 5,
               padding: '8px 16px', borderRadius: 10,
               background: '#fff', border: '1.5px solid rgba(0,0,0,0.12)',
               color: saved ? '#10b981' : '#374151',
               fontSize: '0.82rem', fontWeight: 600,
-              cursor: 'pointer', fontFamily: 'Inter',
+              cursor: saving ? 'wait' : 'pointer', fontFamily: 'Inter',
               boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
             }}
           >
-            {saving ? <Loader2 size={13} className="animate-spin" /> : saved ? <CheckCircle size={13} style={{ color: '#10b981' }} /> : <Save size={13} />}
-            {saving ? 'Saving…' : saved ? 'Saved!' : 'Save Progress'}
+            {saving ? <Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} /> : saved ? <CheckCircle size={13} style={{ color: '#10b981' }} /> : <Save size={13} />}
+            {saving ? 'Saving…' : saved ? 'Saved!' : 'Save'}
           </button>
-          
+
           <button
             onClick={() => setEditorPhase('canvas')}
+            aria-label="Preview and design resume"
             style={{
               display: 'flex', alignItems: 'center', gap: 5,
               padding: '8px 20px', borderRadius: 10,
@@ -156,17 +260,16 @@ export default function EditorPage() {
         </div>
       )}
 
-      {/* Right Side action in Canvas Phase */}
       {editorPhase === 'canvas' && (
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10 }}>
           <button
             onClick={() => setEditorPhase('wizard')}
+            aria-label="Edit resume content"
             style={{
               display: 'flex', alignItems: 'center', gap: 5,
               padding: '8px 16px', borderRadius: 10,
               background: '#FAFAFA', border: '1.5px solid rgba(0,0,0,0.12)',
-              color: '#374151',
-              fontSize: '0.82rem', fontWeight: 600,
+              color: '#374151', fontSize: '0.82rem', fontWeight: 600,
               cursor: 'pointer', fontFamily: 'Inter',
             }}
           >
@@ -184,6 +287,7 @@ export default function EditorPage() {
         <div className="scrollbar-thin" style={{ flex: 1, overflowY: 'auto', padding: '0 24px 60px' }}>
           <div style={{ maxWidth: 760, margin: '0 auto' }}>
             <StepperBar />
+            <CompletenessBar resume={resume} />
             <WizardForm />
           </div>
         </div>

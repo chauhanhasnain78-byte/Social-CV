@@ -1461,11 +1461,16 @@ export function WizardForm() {
     addEducation,  updateEducation,  removeEducation,
     addSkill,      removeSkill,
     addProject,    updateProject,    removeProject,
+    addLanguage,    updateLanguage,    removeLanguage,
+    addCertification, updateCertification, removeCertification,
     selectedTemplate, wizardStep, setWizardStep, setEditorPhase
   } = useResumeStore();
 
   const { personal, experience, education, skills, projects } = resume;
+  const languages      = resume.languages      || [];
+  const certifications = resume.certifications || [];
   const [skillInput, setSkillInput] = useState('');
+
 
   const currentTemplate = TEMPLATES.find((t) => t.id === selectedTemplate);
   const isPhotoTemplate = currentTemplate?.hasPhoto ?? false;
@@ -1487,12 +1492,13 @@ export function WizardForm() {
   };
 
   const handleNext = () => {
-    if (wizardStep < 4) {
+    if (wizardStep < 5) {
       setWizardStep(wizardStep + 1);
     } else {
       setEditorPhase('canvas'); // Transition to Preview/Canvas mode
     }
   };
+
 
   const handlePrev = () => {
     if (wizardStep > 0) setWizardStep(wizardStep - 1);
@@ -1818,6 +1824,98 @@ export function WizardForm() {
             <AddButton onClick={addProject} label="Add Project" />
           </div>
         )}
+
+        {wizardStep === 5 && (
+          <div>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#111827', marginBottom: 4 }}>Languages & Certifications</h2>
+            <p style={{ fontSize: '0.78rem', color: '#9CA3AF', marginBottom: 20 }}>Optional but powerful — boosts your ATS score and global appeal.</p>
+
+            {/* Languages */}
+            <h3 style={{ fontSize: '0.9rem', fontWeight: 700, color: '#374151', marginBottom: 12 }}>🌐 Languages</h3>
+            {languages.map((lang, idx) => (
+              <EntryCard key={lang.id} idx={idx} label="Language" onRemove={() => removeLanguage(lang.id)}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                  <Field
+                    label="Language"
+                    name={`lang-name-${lang.id}`}
+                    value={lang.language}
+                    onChange={(e) => updateLanguage(lang.id, 'language', e.target.value)}
+                    placeholder="English, Hindi, Marathi…"
+                  />
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5, letterSpacing: '0.02em' }}>Proficiency</label>
+                    <select
+                      value={lang.proficiency || 'Conversational'}
+                      onChange={(e) => updateLanguage(lang.id, 'proficiency', e.target.value)}
+                      style={{
+                        width: '100%', padding: '9px 12px',
+                        border: '1.5px solid rgba(0,0,0,0.1)', borderRadius: 10,
+                        fontSize: '0.85rem', fontFamily: 'Inter, sans-serif',
+                        color: '#0D0D0F', background: '#FAFAFA',
+                        outline: 'none', cursor: 'pointer', boxSizing: 'border-box',
+                      }}
+                      onFocus={(e) => { e.target.style.borderColor = '#6C47FF'; e.target.style.boxShadow = '0 0 0 3px rgba(108,71,255,0.1)'; }}
+                      onBlur={(e) => { e.target.style.borderColor = 'rgba(0,0,0,0.1)'; e.target.style.boxShadow = 'none'; }}
+                    >
+                      <option>Native / Bilingual</option>
+                      <option>Professional Working</option>
+                      <option>Conversational</option>
+                      <option>Basic</option>
+                    </select>
+                  </div>
+                </div>
+              </EntryCard>
+            ))}
+            <AddButton onClick={addLanguage} label="Add Language" />
+
+            {/* Certifications */}
+            <h3 style={{ fontSize: '0.9rem', fontWeight: 700, color: '#374151', margin: '24px 0 12px' }}>🏆 Certifications</h3>
+            {certifications.map((cert, idx) => (
+              <EntryCard key={cert.id} idx={idx} label="Certification" onRemove={() => removeCertification(cert.id)}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                  <Field
+                    label="Certification Name"
+                    name={`cert-name-${cert.id}`}
+                    value={cert.name}
+                    onChange={(e) => updateCertification(cert.id, 'name', e.target.value)}
+                    placeholder="AWS Solutions Architect, Google Analytics…"
+                  />
+                  <Field
+                    label="Issuing Organization"
+                    name={`cert-issuer-${cert.id}`}
+                    value={cert.issuer}
+                    onChange={(e) => updateCertification(cert.id, 'issuer', e.target.value)}
+                    placeholder="Amazon, Google, Coursera…"
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5, letterSpacing: '0.02em' }}>Year</label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="2024"
+                    value={cert.year || ''}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, '').slice(0, 4);
+                      updateCertification(cert.id, 'year', val);
+                    }}
+                    style={{
+                      width: '100%', padding: '9px 12px',
+                      border: '1.5px solid rgba(0,0,0,0.1)', borderRadius: 10,
+                      fontSize: '0.85rem', fontFamily: 'Inter, sans-serif',
+                      color: '#0D0D0F', background: '#FAFAFA',
+                      outline: 'none', boxSizing: 'border-box',
+                    }}
+                    onFocus={(e) => { e.target.style.borderColor = '#6C47FF'; e.target.style.boxShadow = '0 0 0 3px rgba(108,71,255,0.1)'; }}
+                    onBlur={(e) => { e.target.style.borderColor = 'rgba(0,0,0,0.1)'; e.target.style.boxShadow = 'none'; }}
+                  />
+                  <span style={{ fontSize: '0.62rem', color: '#9CA3AF', marginTop: 3, display: 'block' }}>4-digit year only, e.g. 2024</span>
+                </div>
+              </EntryCard>
+            ))}
+            <AddButton onClick={addCertification} label="Add Certification" />
+          </div>
+        )}
       </div>
 
       {/* Footer Navigation */}
@@ -1843,15 +1941,15 @@ export function WizardForm() {
           style={{
             display: 'flex', alignItems: 'center', gap: 6,
             padding: '10px 24px', borderRadius: 10,
-            background: wizardStep === 4 ? 'linear-gradient(135deg,#6C47FF,#4A2FD9)' : '#0D0D0F', 
+            background: wizardStep === 5 ? 'linear-gradient(135deg,#6C47FF,#4A2FD9)' : '#0D0D0F',
             border: 'none',
             color: '#FFFFFF', fontSize: '0.85rem', fontWeight: 700,
             cursor: 'pointer',
-            boxShadow: wizardStep === 4 ? '0 4px 14px rgba(108,71,255,0.4)' : '0 4px 12px rgba(0,0,0,0.1)',
+            boxShadow: wizardStep === 5 ? '0 4px 14px rgba(108,71,255,0.4)' : '0 4px 12px rgba(0,0,0,0.1)',
             transition: 'all 0.2s',
           }}
         >
-          {wizardStep === 4 ? (
+          {wizardStep === 5 ? (
             <>Generate Preview ✨ <ArrowRight size={16} /></>
           ) : (
             <>Next Step <ChevronRight size={16} /></>

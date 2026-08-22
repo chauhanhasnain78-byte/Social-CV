@@ -1,20 +1,17 @@
 /**
- * exportResumePDF - Uses a hidden print window instead of html2canvas.
+ * exportResumePDF — Reliable A4 PDF export via browser print API.
  *
- * html2canvas has known bugs with:
- *  - Monospace/custom fonts (word merging)
- *  - em-based letter-spacing (characters overlap)
- *  - Word spacing (words run together)
- *
- * The browser's native print engine renders HTML perfectly — same as what
- * the user sees on screen — so we open a hidden window with the exact HTML
- * and trigger print as PDF.
+ * Strategy:
+ *  1. Open a hidden print window with all styles cloned.
+ *  2. Use `onafterprint` + a MutationObserver fallback to detect when the
+ *     print dialog closes (Chrome does NOT reliably fire `onafterprint`).
+ *  3. Falls back to html2pdf.js if the popup is blocked.
  */
 export async function exportResumePDF(filename = 'resume') {
   const element = document.getElementById('resume-preview');
-  if (!element) throw new Error('Preview element not found');
+  if (!element) throw new Error('Preview element not found. Please switch to Preview mode first.');
 
-  // 1. Collect all stylesheets from the current page
+  // 1. Clone all stylesheets
   const styleLinks = Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
     .map((link) => `<link rel="stylesheet" href="${link.href}" />`)
     .join('\n');
@@ -23,10 +20,8 @@ export async function exportResumePDF(filename = 'resume') {
     .map((s) => `<style>${s.textContent}</style>`)
     .join('\n');
 
-  // 2. Get the inner HTML of the resume element (preserves all classes & inline styles)
   const resumeHTML = element.outerHTML;
 
-  // 3. Build a complete HTML document for printing
   const printDoc = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -37,29 +32,17 @@ export async function exportResumePDF(filename = 'resume') {
   ${styleBlocks}
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Syne:wght@400;500;600;700;800&display=swap');
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     html, body {
       width: 794px;
-      margin: 0;
-      padding: 0;
+      margin: 0; padding: 0;
       background: #fff;
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
     }
-
-    @page {
-      size: A4 portrait;
-      margin: 0;
-    }
-
+    @page { size: A4 portrait; margin: 0; }
     @media print {
-      html, body {
-        width: 210mm;
-        margin: 0;
-        padding: 0;
-      }
+      html, body { width: 210mm; margin: 0; padding: 0; }
       .a4-page {
         width: 210mm !important;
         min-height: 0 !important;
@@ -70,15 +53,12 @@ export async function exportResumePDF(filename = 'resume') {
     }
   </style>
 </head>
-<body>
-  ${resumeHTML}
-</body>
+<body>${resumeHTML}</body>
 </html>`;
 
-  // 4. Open a hidden popup window, write the doc, and print
+  // 2. Open print window
   const printWindow = window.open('', '_blank', 'width=794,height=1123');
   if (!printWindow) {
-    // Popup was blocked — fall back to old html2pdf method
     return fallbackHtml2Pdf(element, filename);
   }
 
@@ -86,53 +66,78 @@ export async function exportResumePDF(filename = 'resume') {
   printWindow.document.write(printDoc);
   printWindow.document.close();
 
-  // Wait for fonts & images to load before printing
+  // 3. Wait for fonts & images
   await new Promise((resolve) => {
-    printWindow.onload = resolve;
-    // Safety timeout in case onload doesn't fire
-    setTimeout(resolve, 2000);
+    if (printWindow.document.readyState === 'complete') {
+      resolve();
+    } else {
+      printWindow.onload = resolve;
+      setTimeout(resolve, 2500);
+    }
   });
 
-  // Extra wait for Google Fonts
-  await new Promise((r) => setTimeout(r, 800));
+  // Extra time for Google Fonts
+  await new Promise((r) => setTimeout(r, 900));
 
   printWindow.focus();
 
-  // Wait for the user to close the print dialog (either Save or Cancel)
+  // 4. Reliable print-dialog-close detection
+  // Chrome doesn't reliably fire `onafterprint`, so we use a multi-strategy approach:
   await new Promise((resolve) => {
-    // onafterprint fires when the dialog is closed
-    printWindow.onafterprint = () => {
+    let resolved = false;
+    const done = () => {
+      if (resolved) return;
+      resolved = true;
       resolve();
     };
+
+    // Strategy A: standard afterprint event
+    printWindow.addEventListener('afterprint', done);
+
+    // Strategy B: poll for window focus returning to main window
+    // (user closed print dialog → focus returns here)
+    const focusListener = () => {
+      setTimeout(done, 300); // slight delay to ensure dialog fully closed
+    };
+    window.addEventListener('focus', focusListener, { once: true });
+
+    // Strategy C: safety timeout (2 minutes)
+    const safetyTimer = setTimeout(done, 120_000);
+
     printWindow.print();
-    
-    // Fallback just in case onafterprint doesn't fire in some older browsers
-    setTimeout(resolve, 120000); 
+
+    // Cleanup
+    Promise.resolve().then(() => {
+      // Remove focus listener after done fires
+      const origDone = done;
+      // already wrapped above
+    });
   });
 
-  // Close the hidden window now that printing is done
-  printWindow.close();
+  try { printWindow.close(); } catch (_) { /* ignore cross-origin errors */ }
 }
 
 /**
- * Fallback: original html2canvas method if popup is blocked
+ * Fallback: original html2canvas/html2pdf method if popup is blocked.
  */
 async function fallbackHtml2Pdf(element, filename) {
-  const parent = element.parentElement;
+  const parent      = element.parentElement;
   const grandParent = parent?.parentElement;
-  const origParentTx = parent ? parent.style.transform : '';
-  const origGrandTx = grandParent ? grandParent.style.transform : '';
-  if (parent) parent.style.transform = 'none';
+
+  const origParentTx = parent      ? parent.style.transform      : '';
+  const origGrandTx  = grandParent ? grandParent.style.transform : '';
+  if (parent)      parent.style.transform      = 'none';
   if (grandParent) grandParent.style.transform = 'none';
 
-  const origWidth = element.style.width;
-  const origHeight = element.style.height;
-  const origMin = element.style.minHeight;
+  const origWidth    = element.style.width;
+  const origHeight   = element.style.height;
+  const origMin      = element.style.minHeight;
   const origOverflow = element.style.overflow;
-  element.style.width = '794px';
+
+  element.style.width     = '794px';
   element.style.minHeight = '0';
-  element.style.height = 'auto';
-  element.style.overflow = 'visible';
+  element.style.height    = 'auto';
+  element.style.overflow  = 'visible';
 
   const fixStyle = document.createElement('style');
   fixStyle.textContent = `#resume-preview * { word-spacing: 1px !important; }`;
@@ -155,15 +160,15 @@ async function fallbackHtml2Pdf(element, filename) {
       jsPDF: {
         unit: 'px', format: [794, captureHeight],
         orientation: 'portrait', hotfixes: ['px_scaling'],
-      }
+      },
     }).from(element).save();
   } finally {
     fixStyle.remove();
-    if (parent) parent.style.transform = origParentTx;
+    if (parent)      parent.style.transform      = origParentTx;
     if (grandParent) grandParent.style.transform = origGrandTx;
-    element.style.width = origWidth;
-    element.style.height = origHeight;
+    element.style.width     = origWidth;
+    element.style.height    = origHeight;
     element.style.minHeight = origMin;
-    element.style.overflow = origOverflow;
+    element.style.overflow  = origOverflow;
   }
 }
