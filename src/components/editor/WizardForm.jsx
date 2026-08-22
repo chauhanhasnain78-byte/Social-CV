@@ -950,6 +950,140 @@ function SmartWebsiteField({ value, onChange }) {
   );
 }
 
+// -- Smart Degree Field ------------------------------------------------------
+function SmartDegreeField({ label, value, onChange, placeholder }) {
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const wrapperRef = useRef(null);
+
+  const ALL_DEGREES = [
+    { short: "B.Sc", full: "Bachelor of Science" },
+    { short: "B.Com", full: "Bachelor of Commerce" },
+    { short: "B.A.", full: "Bachelor of Arts" },
+    { short: "B.Tech", full: "Bachelor of Technology" },
+    { short: "B.E.", full: "Bachelor of Engineering" },
+    { short: "BCA", full: "Bachelor of Computer Applications" },
+    { short: "BBA", full: "Bachelor of Business Administration" },
+    { short: "B.Arch", full: "Bachelor of Architecture" },
+    { short: "MBBS", full: "Bachelor of Medicine, Bachelor of Surgery" },
+    { short: "B.Pharm", full: "Bachelor of Pharmacy" },
+    { short: "B.Des", full: "Bachelor of Design" },
+    { short: "LLB", full: "Bachelor of Laws" },
+    { short: "BMS", full: "Bachelor of Management Studies" },
+    { short: "B.Ed", full: "Bachelor of Education" },
+    { short: "M.Sc", full: "Master of Science" },
+    { short: "M.Com", full: "Master of Commerce" },
+    { short: "M.A.", full: "Master of Arts" },
+    { short: "M.Tech", full: "Master of Technology" },
+    { short: "MBA", full: "Master of Business Administration" },
+    { short: "MCA", full: "Master of Computer Applications" },
+    { short: "Ph.D", full: "Doctor of Philosophy" },
+    { short: "Diploma", full: "Diploma" },
+    { short: "HSC (12th)", full: "Higher Secondary Certificate" },
+    { short: "SSC (10th)", full: "Secondary School Certificate" }
+  ];
+
+  const suggestions = value 
+    ? ALL_DEGREES.filter(d => 
+        d.short.toLowerCase().includes(value.toLowerCase()) || 
+        d.full.toLowerCase().includes(value.toLowerCase())
+      )
+    : ALL_DEGREES;
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+        setShowDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleKeyDown = (e) => {
+    if (!showDropdown || suggestions.length === 0) return;
+    
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActiveIndex(prev => (prev < suggestions.length - 1 ? prev + 1 : prev));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActiveIndex(prev => (prev > 0 ? prev - 1 : 0));
+    } else if (e.key === 'Enter' && activeIndex >= 0) {
+      e.preventDefault();
+      handleSelect(suggestions[activeIndex]);
+    }
+  };
+
+  const handleSelect = (deg) => {
+    onChange(deg.short);
+    setShowDropdown(false);
+    setActiveIndex(-1);
+  };
+
+  return (
+    <div ref={wrapperRef} style={{ position: 'relative' }}>
+      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5, letterSpacing: '0.02em' }}>
+        {label}
+      </label>
+      <div style={{ position: 'relative' }}>
+        <input
+          type="text"
+          placeholder={placeholder}
+          value={value || ''}
+          onChange={(e) => {
+            onChange(e.target.value);
+            setShowDropdown(true);
+            setActiveIndex(-1);
+          }}
+          onFocus={(e) => { 
+            e.target.style.borderColor = '#6C47FF'; 
+            e.target.style.boxShadow = '0 0 0 3px rgba(108,71,255,0.1)'; 
+            setShowDropdown(true);
+          }}
+          onBlur={(e) => {
+            e.target.style.borderColor = 'rgba(0,0,0,0.1)';
+            e.target.style.boxShadow = 'none';
+          }}
+          onKeyDown={handleKeyDown}
+          style={{
+            width: '100%', padding: '9px 12px',
+            border: "1.5px solid rgba(0,0,0,0.1)",
+            borderRadius: 10, fontSize: '0.85rem', fontFamily: 'Inter, sans-serif',
+            color: '#0D0D0F', background: '#FAFAFA',
+            outline: 'none', transition: 'border-color 0.2s, box-shadow 0.2s', boxSizing: 'border-box',
+          }}
+        />
+      </div>
+
+      {showDropdown && suggestions.length > 0 && (
+        <div style={{
+          position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4,
+          background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8,
+          boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 50, maxHeight: 200, overflowY: 'auto'
+        }}>
+          {suggestions.map((s, idx) => (
+            <div
+              key={idx}
+              onClick={() => handleSelect(s)}
+              onMouseEnter={() => setActiveIndex(idx)}
+              style={{
+                padding: '8px 12px', cursor: 'pointer',
+                background: activeIndex === idx ? '#F3F4F6' : '#fff',
+                borderBottom: idx < suggestions.length - 1 ? '1px solid #F3F4F6' : 'none',
+                display: 'flex', flexDirection: 'column'
+              }}
+            >
+              <span style={{ fontSize: '0.85rem', color: '#111827', fontWeight: 500 }}>{s.short}</span>
+              <span style={{ fontSize: '0.7rem', color: '#6B7280' }}>{s.full}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // -- Smart School Field ------------------------------------------------------
 function SmartSchoolField({ label, value, onChange, placeholder }) {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -1369,7 +1503,7 @@ export function WizardForm() {
               <EntryCard key={edu.id} idx={idx} label="Degree" onRemove={() => removeEducation(edu.id)}>
                 <SmartSchoolField label="School" value={edu.school} onChange={(val) => updateEducation(edu.id, 'school', val)} placeholder="e.g. Mumbai University" />
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                  <Field label="Degree" name={`edu-degree-${edu.id}`} value={edu.degree} onChange={(e) => updateEducation(edu.id, 'degree', e.target.value)} placeholder="B.S." />
+                  <SmartDegreeField label="Degree" value={edu.degree} onChange={(val) => updateEducation(edu.id, 'degree', val)} placeholder="B.Sc, B.Com, etc." />
                   <Field label="Field"  name={`edu-field-${edu.id}`}  value={edu.field}  onChange={(e) => updateEducation(edu.id, 'field',  e.target.value)} placeholder="Computer Science" />
                   <Field label="Start Date"  name={`edu-start-${edu.id}`}  value={edu.startDate} onChange={(e) => updateEducation(edu.id, 'startDate', e.target.value)} placeholder="2020" />
                   <Field label="End Date"    name={`edu-end-${edu.id}`}    value={edu.endDate}   onChange={(e) => updateEducation(edu.id, 'endDate',   e.target.value)} placeholder="2024" />
