@@ -950,6 +950,173 @@ function SmartWebsiteField({ value, onChange }) {
   );
 }
 
+// -- Smart School Field ------------------------------------------------------
+function SmartSchoolField({ label, value, onChange, placeholder }) {
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const [loading, setLoading] = useState(false);
+  const [apiSuggestions, setApiSuggestions] = useState([]);
+  const wrapperRef = useRef(null);
+
+  // Fetch real-time schools/universities from Photon API
+  useEffect(() => {
+    if (!value || value.trim().length < 3 || !showDropdown) {
+      setApiSuggestions([]);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setLoading(true);
+      try {
+        const searchQ = encodeURIComponent(value + ' Maharashtra');
+        const res = await fetch('https://photon.komoot.io/api/?q=' + searchQ + '&limit=15');
+        const data = await res.json();
+        
+        const results = [];
+        if (data && data.features) {
+          data.features.forEach(f => {
+            const p = f.properties;
+            if (p.osm_value === 'college' || p.osm_value === 'university' || p.osm_value === 'school' || p.name?.toLowerCase().includes('college') || p.name?.toLowerCase().includes('university')) {
+               let fullName = p.name;
+               if (p.city && !fullName.includes(p.city)) fullName += ', ' + p.city;
+               
+               if (!results.find(r => r.full === fullName) && p.name) {
+                 results.push({
+                   full: fullName,
+                   state: p.state || ''
+                 });
+               }
+            }
+          });
+        }
+        
+        // Fallback broad search
+        if (results.length === 0) {
+          const res2 = await fetch('https://photon.komoot.io/api/?q=' + encodeURIComponent(value + ' college') + '&limit=15');
+          const data2 = await res2.json();
+          if (data2 && data2.features) {
+             data2.features.forEach(f => {
+                const p = f.properties;
+                if (p.osm_value === 'college' || p.osm_value === 'university' || p.osm_value === 'school' || p.name?.toLowerCase().includes('college')) {
+                   let fullName = p.name;
+                   if (p.city && !fullName.includes(p.city)) fullName += ', ' + p.city;
+                   if (!results.find(r => r.full === fullName) && p.name) {
+                     results.push({ full: fullName, state: p.state || p.country || '' });
+                   }
+                }
+             });
+          }
+        }
+
+        setApiSuggestions(results);
+      } catch (err) {
+        console.error('School fetch error:', err);
+      }
+      setLoading(false);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [value, showDropdown]);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+        setShowDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleKeyDown = (e) => {
+    if (!showDropdown || apiSuggestions.length === 0) return;
+    
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActiveIndex(prev => (prev < apiSuggestions.length - 1 ? prev + 1 : prev));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActiveIndex(prev => (prev > 0 ? prev - 1 : 0));
+    } else if (e.key === 'Enter' && activeIndex >= 0) {
+      e.preventDefault();
+      handleSelect(apiSuggestions[activeIndex]);
+    }
+  };
+
+  const handleSelect = (school) => {
+    onChange(school.full);
+    setShowDropdown(false);
+    setActiveIndex(-1);
+  };
+
+  return (
+    <div ref={wrapperRef} style={{ position: 'relative', marginBottom: 16 }}>
+      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5, letterSpacing: '0.02em' }}>
+        {label}
+      </label>
+      <div style={{ position: 'relative' }}>
+        <GraduationCap size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} />
+        <input
+          type="text"
+          placeholder={placeholder}
+          value={value || ''}
+          onChange={(e) => {
+            onChange(e.target.value);
+            setShowDropdown(true);
+            setActiveIndex(-1);
+          }}
+          onFocus={(e) => { 
+            e.target.style.borderColor = '#6C47FF'; 
+            e.target.style.boxShadow = '0 0 0 3px rgba(108,71,255,0.1)'; 
+            setShowDropdown(true);
+          }}
+          onBlur={(e) => {
+            e.target.style.borderColor = 'rgba(0,0,0,0.1)';
+            e.target.style.boxShadow = 'none';
+          }}
+          onKeyDown={handleKeyDown}
+          style={{
+            width: '100%', padding: '9px 12px', paddingLeft: '2.3rem',
+            border: "1.5px solid rgba(0,0,0,0.1)",
+            borderRadius: 10, fontSize: '0.85rem', fontFamily: 'Inter, sans-serif',
+            color: '#0D0D0F', background: '#FAFAFA',
+            outline: 'none', transition: 'border-color 0.2s, box-shadow 0.2s', boxSizing: 'border-box',
+          }}
+        />
+      </div>
+
+      {showDropdown && (apiSuggestions.length > 0 || loading) && (
+        <div style={{
+          position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4,
+          background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8,
+          boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 50, maxHeight: 200, overflowY: 'auto'
+        }}>
+          {loading && apiSuggestions.length === 0 ? (
+            <div style={{ padding: '8px 12px', fontSize: '0.8rem', color: '#6B7280' }}>Searching...</div>
+          ) : (
+            apiSuggestions.map((s, idx) => (
+              <div
+                key={idx}
+                onClick={() => handleSelect(s)}
+                onMouseEnter={() => setActiveIndex(idx)}
+                style={{
+                  padding: '8px 12px', cursor: 'pointer',
+                  background: activeIndex === idx ? '#F3F4F6' : '#fff',
+                  borderBottom: idx < apiSuggestions.length - 1 ? '1px solid #F3F4F6' : 'none',
+                  display: 'flex', flexDirection: 'column'
+                }}
+              >
+                <span style={{ fontSize: '0.85rem', color: '#111827', fontWeight: 500 }}>{s.full}</span>
+                {s.state && <span style={{ fontSize: '0.7rem', color: '#6B7280' }}>{s.state}</span>}
+              </div>
+            ))
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // -- Smart Month Field -------------------------------------------------------
 function SmartMonthField({ label, value, onChange, isEndDate, current, onCurrentChange }) {
   const parseToYYYYMM = (str) => {
@@ -1200,7 +1367,7 @@ export function WizardForm() {
             <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#111827', marginBottom: 16 }}>Education</h2>
             {education.map((edu, idx) => (
               <EntryCard key={edu.id} idx={idx} label="Degree" onRemove={() => removeEducation(edu.id)}>
-                <Field label="School" name={`edu-school-${edu.id}`} value={edu.school} onChange={(e) => updateEducation(edu.id, 'school', e.target.value)} placeholder="MIT" />
+                <SmartSchoolField label="School" value={edu.school} onChange={(val) => updateEducation(edu.id, 'school', val)} placeholder="e.g. Mumbai University" />
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                   <Field label="Degree" name={`edu-degree-${edu.id}`} value={edu.degree} onChange={(e) => updateEducation(edu.id, 'degree', e.target.value)} placeholder="B.S." />
                   <Field label="Field"  name={`edu-field-${edu.id}`}  value={edu.field}  onChange={(e) => updateEducation(edu.id, 'field',  e.target.value)} placeholder="Computer Science" />
