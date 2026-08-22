@@ -1624,8 +1624,15 @@ export function WizardForm() {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                   <SmartDegreeField label="Degree" value={edu.degree} onChange={(val) => updateEducation(edu.id, 'degree', val)} placeholder="B.Sc, B.Com, etc." />
                   <SmartStudyField label="Field" value={edu.field} degreeValue={edu.degree} onChange={(val) => updateEducation(edu.id, 'field', val)} placeholder="e.g. Computer Science" />
-                  <Field label="Start Date"  name={`edu-start-${edu.id}`}  value={edu.startDate} onChange={(e) => updateEducation(edu.id, 'startDate', e.target.value)} placeholder="2020" />
-                  <Field label="End Date"    name={`edu-end-${edu.id}`}    value={edu.endDate}   onChange={(e) => updateEducation(edu.id, 'endDate',   e.target.value)} placeholder="2024" />
+                  <SmartMonthField label="Start Date" value={edu.startDate} onChange={(val) => updateEducation(edu.id, 'startDate', val)} />
+                  <SmartMonthField 
+                    label="End Date" 
+                    value={edu.endDate} 
+                    onChange={(val) => updateEducation(edu.id, 'endDate', val)} 
+                    isEndDate={true} 
+                    current={edu.current} 
+                    onCurrentChange={(checked) => updateEducation(edu.id, 'current', checked)} 
+                  />
                 </div>
                 <Field label="GPA (optional)" name={`edu-gpa-${edu.id}`} value={edu.gpa} onChange={(e) => updateEducation(edu.id, 'gpa', e.target.value)} placeholder="3.8 / 4.0" />
               </EntryCard>
