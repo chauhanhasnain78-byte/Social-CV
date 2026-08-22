@@ -791,7 +791,7 @@ function SmartLinkedInField({ value, onChange }) {
             outline: 'none', transition: 'border-color 0.2s, box-shadow 0.2s, background 0.2s', boxSizing: 'border-box',
           }}
           onFocus={(e) => { 
-            if (!error && !isLimitReached) {
+            if (!error) {
               e.target.style.borderColor = '#6C47FF'; 
               e.target.style.boxShadow = '0 0 0 3px rgba(108,71,255,0.1)'; 
             }
@@ -863,7 +863,7 @@ function SmartGithubField({ value, onChange }) {
             outline: 'none', transition: 'border-color 0.2s, box-shadow 0.2s, background 0.2s', boxSizing: 'border-box',
           }}
           onFocus={(e) => { 
-            if (!error && !isLimitReached) {
+            if (!error) {
               e.target.style.borderColor = '#6C47FF'; 
               e.target.style.boxShadow = '0 0 0 3px rgba(108,71,255,0.1)'; 
             }
@@ -933,7 +933,7 @@ function SmartWebsiteField({ value, onChange }) {
             outline: 'none', transition: 'border-color 0.2s, box-shadow 0.2s, background 0.2s', boxSizing: 'border-box',
           }}
           onFocus={(e) => { 
-            if (!error && !isLimitReached) {
+            if (!error) {
               e.target.style.borderColor = '#6C47FF'; 
               e.target.style.boxShadow = '0 0 0 3px rgba(108,71,255,0.1)'; 
             }
@@ -1371,7 +1371,7 @@ function SmartSchoolField({ label, value, onChange, placeholder }) {
 }
 
 // -- Smart Month Field -------------------------------------------------------
-function SmartMonthField({ label, value, onChange, isEndDate, current, onCurrentChange }) {
+function SmartMonthField({ label, value, onChange, isEndDate, current, onCurrentChange, currentLabel }) {
   const parseToYYYYMM = (str) => {
     if (!str || str.toLowerCase() === 'present') return '';
     if (/^\d{4}-\d{2}$/.test(str)) return str;
@@ -1420,7 +1420,7 @@ function SmartMonthField({ label, value, onChange, isEndDate, current, onCurrent
               }} 
               style={{ cursor: 'pointer' }}
             />
-            Currently Working
+            {currentLabel || 'Currently Working'}
           </label>
         )}
       </div>
@@ -1470,11 +1470,19 @@ export function WizardForm() {
   const currentTemplate = TEMPLATES.find((t) => t.id === selectedTemplate);
   const isPhotoTemplate = currentTemplate?.hasPhoto ?? false;
 
+  const [skillError, setSkillError] = useState('');
   const handleSkillKey = (e) => {
     if ((e.key === 'Enter' || e.key === ',') && skillInput.trim()) {
       e.preventDefault();
-      addSkill(skillInput.trim().replace(/,/g, ''));
-      setSkillInput('');
+      const newSkill = skillInput.trim().replace(/,/g, '');
+      if (skills.map(s => s.toLowerCase()).includes(newSkill.toLowerCase())) {
+        setSkillError('"' + newSkill + '" is already in your skills list');
+        setTimeout(() => setSkillError(''), 2500);
+      } else {
+        addSkill(newSkill);
+        setSkillInput('');
+        setSkillError('');
+      }
     }
   };
 
@@ -1500,7 +1508,11 @@ export function WizardForm() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#111827', marginBottom: 8 }}>Personal Info</h2>
             {isPhotoTemplate && <PhotoUpload />}
-            <Field label="Full Name"  icon={User}    name="name"     value={personal.name}     onChange={(e) => updatePersonal('name', e.target.value)}     placeholder="Hasnain Chauhan" />
+            <Field label="Full Name"  icon={User}    name="name"     value={personal.name}     onChange={(e) => {
+              const raw = e.target.value;
+              const capitalized = raw.replace(/\b\w/g, c => c.toUpperCase());
+              updatePersonal('name', capitalized);
+            }}     placeholder="Hasnain Chauhan" />
             <Field label="Job Title"  icon={FileText} name="title"    value={personal.title}    onChange={(e) => updatePersonal('title', e.target.value)}    placeholder="Full Stack Developer" />
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
               <SmartEmailField value={personal.email} onChange={(val) => updatePersonal('email', val)} />
@@ -1585,15 +1597,18 @@ export function WizardForm() {
                   {exp.bullets.map((b, i) => (
                     <div key={i} style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
                       <input
-                        placeholder={`• Achievement ${i + 1}...`} value={b}
+                        placeholder={`Achievement ${i + 1}: Describe impact...`} value={b}
+                        maxLength={150}
                         onChange={(e) => updateExpBullet(exp.id, i, e.target.value)}
                         style={{
-                          flex: 1, padding: '8px 12px', border: '1.5px solid rgba(0,0,0,0.1)',
+                          flex: 1, padding: '8px 12px',
+                          border: b.length >= 150 ? '1.5px solid #EF4444' : '1.5px solid rgba(0,0,0,0.1)',
                           borderRadius: 8, fontSize: '0.82rem', fontFamily: 'Inter, sans-serif',
-                          color: '#0D0D0F', background: '#fff', outline: 'none', boxSizing: 'border-box',
+                          color: '#0D0D0F', background: b.length >= 150 ? '#FEF2F2' : '#fff',
+                          outline: 'none', boxSizing: 'border-box',
                         }}
-                        onFocus={(e) => { e.target.style.borderColor = '#6C47FF'; }}
-                        onBlur={(e) => { e.target.style.borderColor = 'rgba(0,0,0,0.1)'; }}
+                        onFocus={(e) => { if (b.length < 150) e.target.style.borderColor = '#6C47FF'; }}
+                        onBlur={(e) => { e.target.style.borderColor = b.length >= 150 ? '#EF4444' : 'rgba(0,0,0,0.1)'; }}
                       />
                       <button onClick={() => removeExpBullet(exp.id, i)} style={{ color: '#EF4444', background: '#FEF2F2', border: '1px solid rgba(239,68,68,0.15)', borderRadius: 6, padding: '4px 6px', cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center' }}>
                         <Trash2 size={11} />
@@ -1631,10 +1646,33 @@ export function WizardForm() {
                     onChange={(val) => updateEducation(edu.id, 'endDate', val)} 
                     isEndDate={true} 
                     current={edu.current} 
-                    onCurrentChange={(checked) => updateEducation(edu.id, 'current', checked)} 
+                    onCurrentChange={(checked) => updateEducation(edu.id, 'current', checked)}
+                    currentLabel="Currently Studying"
                   />
                 </div>
-                <Field label="GPA (optional)" name={`edu-gpa-${edu.id}`} value={edu.gpa} onChange={(e) => updateEducation(edu.id, 'gpa', e.target.value)} placeholder="3.8 / 4.0" />
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5, letterSpacing: '0.02em' }}>GPA (optional)</label>
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    placeholder="3.8 / 4.0"
+                    value={edu.gpa || ''}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/[^0-9./ ]/g, '');
+                      updateEducation(edu.id, 'gpa', val);
+                    }}
+                    style={{
+                      width: '100%', padding: '9px 12px',
+                      border: '1.5px solid rgba(0,0,0,0.1)',
+                      borderRadius: 10, fontSize: '0.85rem', fontFamily: 'Inter, sans-serif',
+                      color: '#0D0D0F', background: '#FAFAFA',
+                      outline: 'none', boxSizing: 'border-box',
+                    }}
+                    onFocus={(e) => { e.target.style.borderColor = '#6C47FF'; e.target.style.boxShadow = '0 0 0 3px rgba(108,71,255,0.1)'; }}
+                    onBlur={(e) => { e.target.style.borderColor = 'rgba(0,0,0,0.1)'; e.target.style.boxShadow = 'none'; }}
+                  />
+                  <span style={{ fontSize: '0.62rem', color: '#9CA3AF', marginTop: 3, display: 'block' }}>Numbers only, e.g. 3.8 / 4.0 or 8.5 / 10</span>
+                </div>
               </EntryCard>
             ))}
             <AddButton onClick={addEducation} label="Add Education" />
@@ -1662,6 +1700,12 @@ export function WizardForm() {
                 onFocus={(e) => { e.target.style.borderColor = '#6C47FF'; e.target.style.boxShadow = '0 0 0 3px rgba(108,71,255,0.1)'; }}
                 onBlur={(e) => { e.target.style.borderColor = 'rgba(0,0,0,0.1)'; e.target.style.boxShadow = 'none'; }}
               />
+              {skillError && (
+                <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#EF4444', fontSize: '0.68rem', marginTop: 6, fontWeight: 500 }}>
+                  <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#EF4444' }} />
+                  {skillError}
+                </span>
+              )}
             </div>
             {skills.length > 0 && (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
@@ -1695,7 +1739,35 @@ export function WizardForm() {
                 <Field label="Project Name" name={`proj-name-${proj.id}`} value={proj.name} onChange={(e) => updateProject(proj.id, 'name', e.target.value)} placeholder="Social-CV" />
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                   <Field label="Tech Stack"   name={`proj-tech-${proj.id}`} value={proj.tech} onChange={(e) => updateProject(proj.id, 'tech', e.target.value)} placeholder="React, Firebase, Tailwind" />
-                  <Field label="Link" icon={Link2} name={`proj-link-${proj.id}`} value={proj.link} onChange={(e) => updateProject(proj.id, 'link', e.target.value)} placeholder="github.com/yourproject" />
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5, letterSpacing: '0.02em' }}>Link</label>
+                    <div style={{ position: 'relative' }}>
+                      <Link2 size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} />
+                      <input
+                        type="text"
+                        placeholder="github.com/yourproject"
+                        value={proj.link || ''}
+                        onChange={(e) => updateProject(proj.id, 'link', e.target.value)}
+                        onBlur={(e) => {
+                          let val = e.target.value.trim();
+                          if (val) {
+                            val = val.replace(/^(https?:\/\/)?(www\.)?/, '');
+                            updateProject(proj.id, 'link', val);
+                          }
+                          e.target.style.borderColor = 'rgba(0,0,0,0.1)';
+                          e.target.style.boxShadow = 'none';
+                        }}
+                        style={{
+                          width: '100%', padding: '9px 12px', paddingLeft: '2.3rem',
+                          border: '1.5px solid rgba(0,0,0,0.1)',
+                          borderRadius: 10, fontSize: '0.85rem', fontFamily: 'Inter, sans-serif',
+                          color: '#0D0D0F', background: '#FAFAFA',
+                          outline: 'none', boxSizing: 'border-box',
+                        }}
+                        onFocus={(e) => { e.target.style.borderColor = '#6C47FF'; e.target.style.boxShadow = '0 0 0 3px rgba(108,71,255,0.1)'; }}
+                      />
+                    </div>
+                  </div>
                 </div>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5 }}>Description</label>
