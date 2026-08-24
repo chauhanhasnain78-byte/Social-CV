@@ -4,8 +4,9 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDO4FGhKWc44huhmp9JVHiNNPLJxOTuBJA",
+  apiKey: "AIzaSyDO4FGhKWc44huhmp9JVHiNNPLJxOTu0JA",
   authDomain: "social-cv-ec137.firebaseapp.com",
+  databaseURL: "https://social-cv-ec137-default-rtdb.firebaseio.com",
   projectId: "social-cv-ec137",
   storageBucket: "social-cv-ec137.firebasestorage.app",
   messagingSenderId: "897078365088",
