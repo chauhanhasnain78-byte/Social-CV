@@ -14,6 +14,8 @@ import { useAuth } from '@/context/AuthContext';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '@/services/firebase';
 import { toast } from '@/components/ui/Toast';
+import { fire100Confetti } from '@/utils/confetti';
+
 
 // ── Completeness Calculator ───────────────────────────────────────────────────
 function calcCompleteness(resume) {
@@ -82,8 +84,23 @@ export default function EditorPage() {
   const [saved, setSaved]               = useState(false);
   const [autoSaveStatus, setAutoSaveStatus] = useState('idle'); // 'idle' | 'saving' | 'saved' | 'error'
   const autoSaveTimer = useRef(null);
+  const confettiFiredRef = useRef(false); // Only fire once per session
 
   const templateMeta = TEMPLATES.find((t) => t.id === selectedTemplate);
+
+  // 🎉 Fire confetti when resume hits 100%
+  useEffect(() => {
+    const pct = calcCompleteness(resume);
+    if (pct >= 100 && !confettiFiredRef.current) {
+      confettiFiredRef.current = true;
+      fire100Confetti();
+      toast.success('Your resume is 100% complete! 🏆', { title: '🎉 Perfect Score!' });
+    }
+    if (pct < 100) {
+      confettiFiredRef.current = false; // Reset if they remove info
+    }
+  }, [resume]);
+
 
   // ── Save function (shared by manual + auto) ────────────────────────────────
   const saveResume = useCallback(async (silent = false) => {

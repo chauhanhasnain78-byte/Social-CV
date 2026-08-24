@@ -14,6 +14,8 @@ import { ATSModal } from '@/components/ats/ATSModal';
 import RatingModal from '@/components/ui/RatingModal';
 import { updateHighestAtsScore, incrementResumesCount } from '@/services/statsService';
 import { CoverLetterModal } from '@/components/CoverLetterModal';
+import { fireDownloadConfetti } from '@/utils/confetti';
+
 
 import {
   DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors,
@@ -120,6 +122,8 @@ export function CanvasToolbar() {
       const name = resume.personal.name || 'My-Resume';
       await exportResumePDF(`${name}-Social-CV`);
       toast.success('PDF downloaded successfully!', { title: '✅ Export Complete' });
+      // 🎉 Confetti celebration!
+      fireDownloadConfetti();
       // Increment global resume creation count
       incrementResumesCount().catch(console.error);
       
@@ -132,6 +136,7 @@ export function CanvasToolbar() {
       setExporting(false);
     }
   };
+
 
   const handleSave = async () => {
     if (!user) return;
