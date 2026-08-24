@@ -1666,6 +1666,40 @@ export function WizardForm() {
                   }}>
                     <Plus size={13} /> Add bullet
                   </button>
+
+                  {/* AI Suggestions Box */}
+                  <div style={{ marginTop: 16, padding: '12px 14px', background: '#F8F8FC', borderRadius: 12, border: '1px dashed rgba(108,71,255,0.3)' }}>
+                    <p style={{ fontSize: '0.72rem', fontWeight: 700, color: '#6C47FF', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 5, letterSpacing: '0.02em' }}>
+                      <Sparkles size={12} fill="#6C47FF" /> Recommended Bullets
+                    </p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      {getBulletSuggestions(exp.role).map((sugg, i) => (
+                        <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                          <button
+                            onClick={() => {
+                              const emptyIdx = exp.bullets.findIndex(b => b.trim() === '');
+                              if (emptyIdx !== -1) {
+                                updateExpBullet(exp.id, emptyIdx, sugg);
+                              } else {
+                                updateExperience(exp.id, 'bullets', [...exp.bullets, sugg]);
+                              }
+                            }}
+                            title="Add this bullet"
+                            style={{
+                              background: 'rgba(108,71,255,0.1)', color: '#6C47FF', border: 'none',
+                              borderRadius: 6, padding: '4px', cursor: 'pointer', flexShrink: 0,
+                              display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s'
+                            }}
+                            onMouseEnter={(e) => { e.currentTarget.style.background = '#6C47FF'; e.currentTarget.style.color = '#FFF'; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(108,71,255,0.1)'; e.currentTarget.style.color = '#6C47FF'; }}
+                          >
+                            <Plus size={12} strokeWidth={3} />
+                          </button>
+                          <span style={{ fontSize: '0.78rem', color: '#4B5563', lineHeight: 1.4 }}>{sugg}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </EntryCard>
             ))}
