@@ -3,7 +3,7 @@ import { useResumeStore } from '@/store/resumeStore';
 import { useAuth } from '@/context/AuthContext';
 import {
   Palette, Download, Target, Save, CheckCircle,
-  Loader2, Share2, Type, GripVertical, FileText
+  Loader2, Share2, Type, GripVertical, FileText, Mail
 } from 'lucide-react';
 import { exportResumePDF } from '@/utils/pdfService';
 import { scoreResume } from '@/utils/atsEngine';
@@ -13,6 +13,8 @@ import { db } from '@/services/firebase';
 import { ATSModal } from '@/components/ats/ATSModal';
 import RatingModal from '@/components/ui/RatingModal';
 import { updateHighestAtsScore, incrementResumesCount } from '@/services/statsService';
+import { CoverLetterModal } from '@/components/CoverLetterModal';
+
 import {
   DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors,
 } from '@dnd-kit/core';
@@ -80,6 +82,8 @@ export function CanvasToolbar() {
   const [exporting, setExporting] = useState(false);
   const [saving, setSaving]       = useState(false);
   const [saved, setSaved]         = useState(false);
+  const [showCoverLetter, setShowCoverLetter] = useState(false);
+
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -364,6 +368,19 @@ export function CanvasToolbar() {
         </div>
 
         <button
+          onClick={() => setShowCoverLetter(true)}
+          style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+            width: '100%', padding: '10px', borderRadius: 10,
+            background: '#F0EDFF', border: '1.5px solid rgba(108,71,255,0.25)',
+            color: '#6C47FF', fontSize: '0.82rem', fontWeight: 700,
+            cursor: 'pointer',
+          }}
+        >
+          <Mail size={14} /> Generate Cover Letter
+        </button>
+
+        <button
           onClick={handleATSScan}
           disabled={scanning}
           style={{
@@ -381,6 +398,7 @@ export function CanvasToolbar() {
 
       {showATS && atsResult && <ATSModal result={atsResult} onClose={() => setShowATS(false)} />}
       <RatingModal isOpen={showRating} onClose={() => setShowRating(false)} />
+      {showCoverLetter && <CoverLetterModal onClose={() => setShowCoverLetter(false)} />}
     </div>
   );
 }

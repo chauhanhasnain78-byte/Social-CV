@@ -3,11 +3,13 @@ import { motion } from 'framer-motion';
 import { useResumeStore } from '@/store/resumeStore';
 import { useAuth } from '@/context/AuthContext';
 import { TEMPLATES } from '@/templates/templateMeta';
-import { LogOut, FileText, CheckCircle, Share2, Copy, Eye, ExternalLink, Image, AlignLeft } from 'lucide-react';
+import { LogOut, FileText, CheckCircle, Share2, Copy, Eye, ExternalLink, Image, AlignLeft, Mail } from 'lucide-react';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/services/firebase';
 import { useState, useEffect } from 'react';
 import { toast } from '@/components/ui/Toast';
+import { CoverLetterModal } from '@/components/CoverLetterModal';
+
 
 // Mini template preview card
 function TemplateCard({ tmpl, isSelected, onClick, idx }) {
@@ -98,6 +100,7 @@ export default function DashboardPage() {
   const { selectedTemplate, setTemplate } = useResumeStore();
   const [publicData, setPublicData] = useState(null);
   const [activeFilter, setActiveFilter] = useState('all');
+  const [showCoverLetter, setShowCoverLetter] = useState(false);
 
   useEffect(() => {
     if (!user?.uid) return;
@@ -151,6 +154,22 @@ export default function DashboardPage() {
           <span style={{ fontSize: '0.85rem', color: '#6B7280', fontWeight: 500 }}>
             Hi, <strong style={{ color: '#0D0D0F' }}>{user?.displayName?.split(' ')[0] || 'there'}</strong> 👋
           </span>
+          <button
+            onClick={() => setShowCoverLetter(true)}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              padding: '8px 16px', borderRadius: 10,
+              background: 'linear-gradient(135deg, rgba(108,71,255,0.1), rgba(74,47,217,0.08))',
+              border: '1.5px solid rgba(108,71,255,0.25)',
+              color: '#6C47FF', fontSize: '0.82rem', fontWeight: 700,
+              cursor: 'pointer', fontFamily: 'Inter',
+              transition: 'all 0.2s',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'linear-gradient(135deg,#6C47FF,#4A2FD9)'; e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = 'transparent'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'linear-gradient(135deg, rgba(108,71,255,0.1), rgba(74,47,217,0.08))'; e.currentTarget.style.color = '#6C47FF'; e.currentTarget.style.borderColor = 'rgba(108,71,255,0.25)'; }}
+          >
+            <Mail size={14} /> Cover Letter
+          </button>
           <button
             onClick={logout}
             className="btn-ghost-light"
@@ -263,6 +282,8 @@ export default function DashboardPage() {
           ))}
         </div>
       </div>
+
+      {showCoverLetter && <CoverLetterModal onClose={() => setShowCoverLetter(false)} />}
     </div>
   );
 }
