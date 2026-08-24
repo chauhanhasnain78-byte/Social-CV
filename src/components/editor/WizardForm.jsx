@@ -3,7 +3,7 @@ import { useResumeStore } from '@/store/resumeStore';
 import {
   User, Mail, Phone, MapPin, Link2, FileText,
   Briefcase, GraduationCap, Code2, Plus, Trash2,
-  GitFork, Globe, Camera, ChevronRight, ChevronLeft, ArrowRight
+  GitFork, Globe, Camera, ChevronRight, ChevronLeft, ArrowRight, Sparkles
 } from 'lucide-react';
 import { TEMPLATES } from '@/templates/templateMeta';
 
@@ -1453,6 +1453,43 @@ function SmartMonthField({ label, value, onChange, isEndDate, current, onCurrent
     </div>
   );
 }
+
+const getBulletSuggestions = (role) => {
+  const r = (role || '').toLowerCase();
+  if (r.includes('develop') || r.includes('engineer') || r.includes('program')) {
+    return [
+      "Engineered scalable solutions resulting in a 30% increase in system efficiency.",
+      "Resolved critical bugs and improved code test coverage by over 25%.",
+      "Collaborated with cross-functional teams to deliver features 2 weeks ahead of schedule."
+    ];
+  }
+  if (r.includes('design') || r.includes('ui') || r.includes('ux')) {
+    return [
+      "Designed intuitive user interfaces that increased user retention by 20%.",
+      "Conducted user research and usability testing to drive data-informed decisions.",
+      "Redesigned the onboarding flow, boosting initial conversion rates by 15%."
+    ];
+  }
+  if (r.includes('market') || r.includes('seo') || r.includes('sales')) {
+    return [
+      "Spearheaded a marketing campaign that generated a 40% increase in inbound leads.",
+      "Analyzed market trends to optimize SEO strategy, increasing organic traffic by 50%.",
+      "Cultivated relationships with key stakeholders to close 5 major enterprise accounts."
+    ];
+  }
+  if (r.includes('manag') || r.includes('lead')) {
+    return [
+      "Led a cross-functional team to successfully deliver 3 major product launches.",
+      "Streamlined operational workflows, reducing overhead costs by 15% annually.",
+      "Mentored and developed staff, improving overall team productivity by 25%."
+    ];
+  }
+  return [
+    "Spearheaded key initiatives that resulted in a 20% increase in overall productivity.",
+    "Identified process bottlenecks and implemented solutions to streamline operations.",
+    "Collaborated effectively with stakeholders to align project goals and deliverables."
+  ];
+};
 
 export function WizardForm() {
   const {
