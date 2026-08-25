@@ -406,3 +406,72 @@ body {
   .dashboard-nav { padding: 0 24px !important; }
 }
 
+/* -- Editor Dark Mode Overrides -- */
+.editor-dark-mode {
+  background: #0A0A10 !important;
+  color: #F0F0FF !important;
+}
+.editor-dark-mode * {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+.editor-dark-mode input,
+.editor-dark-mode textarea {
+  background: #111118 !important;
+  color: #F0F0FF !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+}
+.editor-dark-mode input:focus,
+.editor-dark-mode textarea:focus {
+  border-color: var(--brand) !important;
+  box-shadow: 0 0 0 3px rgba(108,71,255,0.2) !important;
+}
+.editor-dark-mode label {
+  color: #A0A0C0 !important;
+}
+.editor-dark-mode .entry-card {
+  background: #151520 !important;
+}
+.editor-dark-mode .entry-card:hover {
+  background: #1A1A24 !important;
+}
+.editor-dark-mode .stepper-bg {
+  background: #111118 !important;
+}
+.editor-dark-mode .stepper-text-active {
+  color: #F0F0FF !important;
+}
+.editor-dark-mode .editor-topbar {
+  background: #0D0D14 !important;
+  border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+}
+.editor-dark-mode button {
+  color: #E0E0E0;
+}
+.editor-dark-mode button.btn-brand,
+.editor-dark-mode button[style*="linear-gradient"] {
+  color: #FFF !important;
+}
+.editor-dark-mode .text-muted {
+  color: #8888A0 !important;
+}
+.editor-dark-mode .canvas-sidebar {
+  background: #111118 !important;
+  border-left-color: rgba(255,255,255,0.08) !important;
+}
+.editor-dark-mode .canvas-sidebar div[style*="background: rgb(250, 250, 250)"],
+.editor-dark-mode .canvas-sidebar div[style*="background: '#FAFAFA'"],
+.editor-dark-mode .canvas-sidebar div[style*="background: '#fff'"],
+.editor-dark-mode .canvas-sidebar div[style*="background: white"] {
+  background: #151520 !important;
+}
+.editor-dark-mode .preview-bg {
+  background: #0A0A10 !important;
+}
+.editor-dark-mode .editor-nav-btn {
+  background: #151520 !important;
+  color: #F0F0FF !important;
+  border-color: rgba(255,255,255,0.1) !important;
+}
+.editor-dark-mode .editor-nav-btn:hover {
+  background: #1A1A24 !important;
+}

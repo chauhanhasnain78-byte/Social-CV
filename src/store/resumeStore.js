@@ -53,10 +53,12 @@ export const useResumeStore = create(
       editorPhase:      'wizard',
       wizardStep:       0,
       sectionOrder:     ['experience', 'education', 'skills', 'projects'],
+      isDarkMode:       false,
 
       // ── Personal ────────────────────────────────────────────────────────────
       updatePersonal: (key, value) =>
         set((s) => ({ resume: { ...s.resume, personal: { ...s.resume.personal, [key]: value } }, isDirty: true })),
+
 
       updatePhoto: async (base64) => {
         if (!base64) {
@@ -79,6 +81,8 @@ export const useResumeStore = create(
       setEditorPhase:   (phase) => set({ editorPhase: phase }),
       setWizardStep:    (step)  => set({ wizardStep: step }),
       setSectionOrder:  (order) => set({ sectionOrder: order, isDirty: true }),
+      setDarkMode:      (val)   => set({ isDarkMode: val }),
+
 
       // ── Reorder sections (drag-and-drop) ────────────────────────────────────
       reorderArray: (key, oldIndex, newIndex) =>

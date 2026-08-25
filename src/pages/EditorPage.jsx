@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  FileText, ChevronLeft, LayoutTemplate, Image, AlignLeft, Edit3, Save, CheckCircle, Loader2, Cloud, CloudOff
+  FileText, ChevronLeft, LayoutTemplate, Image, AlignLeft, Edit3, Save, CheckCircle, Loader2, Cloud, CloudOff, Moon, Sun
 } from 'lucide-react';
 import { useResumeStore } from '@/store/resumeStore';
 import { StepperBar } from '@/components/editor/StepperBar';
@@ -76,7 +76,8 @@ export default function EditorPage() {
   const {
     resume, selectedTemplate, themeColor, fontFamily, sectionOrder,
     fontSize, textAlignment,
-    isDirty, resetDirty, editorPhase, setEditorPhase
+    isDirty, resetDirty, editorPhase, setEditorPhase,
+    isDarkMode, setDarkMode
   } = useResumeStore();
 
   const [previewScale, setPreviewScale] = useState(0.65);
@@ -237,8 +238,24 @@ export default function EditorPage() {
         {renderAutoSaveIndicator()}
       </div>
 
+      <button
+        onClick={() => setDarkMode(!isDarkMode)}
+        title="Toggle Dark Mode"
+        style={{
+          marginLeft: 'auto', marginRight: 16,
+          background: isDarkMode ? 'rgba(255,255,255,0.1)' : '#F3F4F6',
+          border: 'none', cursor: 'pointer',
+          padding: 8, borderRadius: '50%',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          color: isDarkMode ? '#F0F0FF' : '#374151',
+          transition: 'all 0.2s'
+        }}
+      >
+        {isDarkMode ? <Sun size={16} /> : <Moon size={16} />}
+      </button>
+
       {editorPhase === 'wizard' && (
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <span style={{ fontSize: '0.65rem', color: '#9CA3AF', display: 'none' }} className="editor-shortcut-hint">Ctrl+S to save</span>
           <button
             onClick={() => saveResume(false)}
@@ -278,7 +295,7 @@ export default function EditorPage() {
       )}
 
       {editorPhase === 'canvas' && (
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <button
             onClick={() => setEditorPhase('wizard')}
             aria-label="Edit resume content"
@@ -299,7 +316,7 @@ export default function EditorPage() {
 
   if (editorPhase === 'wizard') {
     return (
-      <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: '#FAFAFA', overflow: 'hidden' }}>
+      <div className={isDarkMode ? 'editor-dark-mode' : ''} style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: isDarkMode ? '#0A0A10' : '#FAFAFA', overflow: 'hidden' }}>
         {renderTopBar()}
         <div className="scrollbar-thin" style={{ flex: 1, overflowY: 'auto', padding: '0 24px 60px' }}>
           <div style={{ maxWidth: 760, margin: '0 auto' }}>
@@ -314,14 +331,14 @@ export default function EditorPage() {
 
   // Canvas Phase
   return (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: '#FDFCFF', overflow: 'hidden' }}>
+    <div className={isDarkMode ? 'editor-dark-mode' : ''} style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: isDarkMode ? '#0A0A10' : '#FDFCFF', overflow: 'hidden' }}>
       {renderTopBar()}
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
         {/* Live Preview Area */}
-        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', background: '#F3F4F6' }}>
+        <div className="preview-bg" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', background: isDarkMode ? '#0A0A10' : '#F3F4F6' }}>
           <div style={{
             padding: '8px 24px', flexShrink: 0,
-            borderBottom: '1px solid rgba(0,0,0,0.06)', background: '#FAFAFA',
+            borderBottom: '1px solid rgba(0,0,0,0.06)', background: isDarkMode ? '#111118' : '#FAFAFA',
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           }}>
             <span style={{ fontSize: '0.68rem', fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
@@ -333,6 +350,7 @@ export default function EditorPage() {
                 <button
                   key={z}
                   onClick={() => setPreviewScale(z)}
+                  className="editor-nav-btn"
                   style={{
                     padding: '4px 10px', borderRadius: 8, cursor: 'pointer',
                     fontFamily: 'Inter', fontSize: '0.72rem', fontWeight: 600,
@@ -353,7 +371,7 @@ export default function EditorPage() {
             style={{
               flex: 1, overflow: 'auto', padding: '40px 32px',
               display: 'flex', justifyContent: 'center',
-              background: '#EAEAEF',
+              background: isDarkMode ? '#0A0A10' : '#EAEAEF',
             }}
           >
             <div style={{
@@ -377,7 +395,7 @@ export default function EditorPage() {
         </div>
 
         {/* Right Panel: Canvas Toolbar */}
-        <div style={{ width: 340, flexShrink: 0, borderLeft: '1px solid rgba(0,0,0,0.08)', background: '#fff' }}>
+        <div className="canvas-sidebar" style={{ width: 340, flexShrink: 0, borderLeft: '1px solid rgba(0,0,0,0.08)', background: isDarkMode ? '#111118' : '#fff' }}>
           <CanvasToolbar />
         </div>
       </div>
