@@ -48,12 +48,12 @@ function CompletenessBar({ resume }) {
   const color = pct >= 80 ? '#10b981' : pct >= 50 ? '#6C47FF' : '#eab308';
 
   return (
-    <div style={{ marginBottom: 12, padding: '10px 16px', background: '#fff', borderRadius: 12, border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+    <div style={{ marginBottom: 12, padding: '10px 16px', background: 'var(--dm-bg, #fff)', borderRadius: 12, border: '1px solid var(--dm-border, rgba(0,0,0,0.06))', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-        <span style={{ fontSize: '0.72rem', fontWeight: 600, color: '#6B7280' }}>Resume Completeness</span>
+        <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--dm-muted, #6B7280)' }}>Resume Completeness</span>
         <span style={{ fontSize: '0.78rem', fontWeight: 700, color }}>{pct}%</span>
       </div>
-      <div style={{ height: 6, background: '#F3F4F6', borderRadius: 999, overflow: 'hidden' }}>
+      <div style={{ height: 6, background: 'var(--dm-raised, #F3F4F6)', borderRadius: 999, overflow: 'hidden' }}>
         <div style={{
           height: '100%', width: `${pct}%`,
           background: color,
@@ -62,7 +62,7 @@ function CompletenessBar({ resume }) {
         }} />
       </div>
       {pct < 80 && (
-        <p style={{ marginTop: 5, fontSize: '0.65rem', color: '#9CA3AF' }}>
+        <p style={{ marginTop: 5, fontSize: '0.65rem', color: 'var(--dm-muted-light, #9CA3AF)' }}>
           {pct < 40 ? '💡 Fill in your basic info to get started' : pct < 70 ? '⚡ Adding experience & skills will boost your ATS score' : '🎯 Almost there — add a summary & links for a complete profile'}
         </p>
       )}
@@ -162,7 +162,7 @@ export default function EditorPage() {
 
   const renderAutoSaveIndicator = () => {
     if (autoSaveStatus === 'saving') return (
-      <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.68rem', color: '#6B7280' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.68rem', color: 'var(--dm-muted, #6B7280)' }}>
         <Loader2 size={11} style={{ animation: 'spin 1s linear infinite' }} /> Auto-saving…
       </div>
     );
@@ -201,7 +201,7 @@ export default function EditorPage() {
         style={{
           display: 'flex', alignItems: 'center', gap: 5, fontSize: '0.82rem',
           background: 'none', border: 'none', cursor: 'pointer',
-          color: '#6B7280', fontWeight: 500, fontFamily: 'Inter',
+          color: 'var(--dm-muted, #6B7280)', fontWeight: 500, fontFamily: 'Inter',
           padding: '6px 10px', borderRadius: 8, transition: 'all 0.15s',
         }}
         onMouseEnter={(e) => { e.currentTarget.style.background = '#F3F4F6'; e.currentTarget.style.color = '#0D0D0F'; }}
@@ -256,7 +256,7 @@ export default function EditorPage() {
 
       {editorPhase === 'wizard' && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontSize: '0.65rem', color: '#9CA3AF', display: 'none' }} className="editor-shortcut-hint">Ctrl+S to save</span>
+          <span style={{ fontSize: '0.65rem', color: 'var(--dm-muted-light, #9CA3AF)', display: 'none' }} className="editor-shortcut-hint">Ctrl+S to save</span>
           <button
             onClick={() => saveResume(false)}
             disabled={saving}
@@ -265,7 +265,7 @@ export default function EditorPage() {
             style={{
               display: 'flex', alignItems: 'center', gap: 5,
               padding: '8px 16px', borderRadius: 10,
-              background: '#fff', border: '1.5px solid rgba(0,0,0,0.12)',
+              background: 'var(--dm-bg, #fff)', border: '1.5px solid var(--dm-border-strong, rgba(0,0,0,0.12))',
               color: saved ? '#10b981' : '#374151',
               fontSize: '0.82rem', fontWeight: 600,
               cursor: saving ? 'wait' : 'pointer', fontFamily: 'Inter',
@@ -302,8 +302,8 @@ export default function EditorPage() {
             style={{
               display: 'flex', alignItems: 'center', gap: 5,
               padding: '8px 16px', borderRadius: 10,
-              background: '#FAFAFA', border: '1.5px solid rgba(0,0,0,0.12)',
-              color: '#374151', fontSize: '0.82rem', fontWeight: 600,
+              background: 'var(--dm-surface, #FAFAFA)', border: '1.5px solid var(--dm-border-strong, rgba(0,0,0,0.12))',
+              color: 'var(--dm-text, #374151)', fontSize: '0.82rem', fontWeight: 600,
               cursor: 'pointer', fontFamily: 'Inter',
             }}
           >
@@ -316,7 +316,7 @@ export default function EditorPage() {
 
   if (editorPhase === 'wizard') {
     return (
-      <div className={isDarkMode ? 'editor-dark-mode' : ''} style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: isDarkMode ? '#0A0A10' : '#FAFAFA', overflow: 'hidden' }}>
+      <div className={isDarkMode ? 'editor-dark-mode' : ''} style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--dm-surface, #FAFAFA)', overflow: 'hidden' }}>
         {renderTopBar()}
         <div className="scrollbar-thin" style={{ flex: 1, overflowY: 'auto', padding: '0 24px 60px' }}>
           <div style={{ maxWidth: 760, margin: '0 auto' }}>
@@ -331,21 +331,21 @@ export default function EditorPage() {
 
   // Canvas Phase
   return (
-    <div className={isDarkMode ? 'editor-dark-mode' : ''} style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: isDarkMode ? '#0A0A10' : '#FDFCFF', overflow: 'hidden' }}>
+    <div className={isDarkMode ? 'editor-dark-mode' : ''} style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--dm-surface, #FDFCFF)', overflow: 'hidden' }}>
       {renderTopBar()}
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
         {/* Live Preview Area */}
-        <div className="preview-bg" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', background: isDarkMode ? '#0A0A10' : '#F3F4F6' }}>
+        <div className="preview-bg" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', background: 'var(--dm-raised, #F3F4F6)' }}>
           <div style={{
             padding: '8px 24px', flexShrink: 0,
-            borderBottom: '1px solid rgba(0,0,0,0.06)', background: isDarkMode ? '#111118' : '#FAFAFA',
+            borderBottom: '1px solid var(--dm-border, rgba(0,0,0,0.06))', background: 'var(--dm-bg, #FAFAFA)',
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           }}>
-            <span style={{ fontSize: '0.68rem', fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+            <span style={{ fontSize: '0.68rem', fontWeight: 700, color: 'var(--dm-muted-light, #9CA3AF)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
               Live Preview
             </span>
             <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              <span style={{ fontSize: '0.68rem', color: '#9CA3AF', marginRight: 4 }}>Zoom</span>
+              <span style={{ fontSize: '0.68rem', color: 'var(--dm-muted-light, #9CA3AF)', marginRight: 4 }}>Zoom</span>
               {[0.45, 0.55, 0.65, 0.8, 1].map((z) => (
                 <button
                   key={z}
@@ -380,7 +380,7 @@ export default function EditorPage() {
               width: `${794 / previewScale}px`,
               marginBottom: `${-(1 - previewScale) * 1123}px`,
             }}>
-              <div style={{ boxShadow: '0 4px 24px rgba(0,0,0,0.10)', overflow: 'hidden', background: '#fff' }}>
+              <div style={{ boxShadow: '0 4px 24px rgba(0,0,0,0.10)', overflow: 'hidden', background: 'var(--dm-bg, #fff)' }}>
                 <ResumePreview
                   resume={resume}
                   templateId={selectedTemplate || 'minimal-pro'}
@@ -395,10 +395,11 @@ export default function EditorPage() {
         </div>
 
         {/* Right Panel: Canvas Toolbar */}
-        <div className="canvas-sidebar" style={{ width: 340, flexShrink: 0, borderLeft: '1px solid rgba(0,0,0,0.08)', background: isDarkMode ? '#111118' : '#fff' }}>
+        <div className="canvas-sidebar" style={{ width: 340, flexShrink: 0, borderLeft: '1px solid var(--dm-border, rgba(0,0,0,0.08))', background: 'var(--dm-bg, #fff)' }}>
           <CanvasToolbar />
         </div>
       </div>
     </div>
   );
 }
+

@@ -11,9 +11,9 @@ import { TEMPLATES } from '@/templates/templateMeta';
 function Field({ label, icon: Icon, value, onChange, placeholder, type = 'text', name }) {
   return (
     <div>
-      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5, letterSpacing: '0.02em' }}>{label}</label>
+      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: 'var(--dm-muted, #6B7280)', marginBottom: 5, letterSpacing: '0.02em' }}>{label}</label>
       <div style={{ position: 'relative' }}>
-        {Icon && <Icon size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} />}
+        {Icon && <Icon size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--dm-muted-light, #9CA3AF)' }} />}
         <input
           id={`field-${name}`}
           type={type}
@@ -23,10 +23,10 @@ function Field({ label, icon: Icon, value, onChange, placeholder, type = 'text',
           style={{
             width: '100%', padding: '9px 12px',
             paddingLeft: Icon ? '2.3rem' : '12px',
-            border: '1.5px solid rgba(0,0,0,0.1)',
+            border: '1.5px solid var(--dm-border-strong, rgba(0,0,0,0.1))',
             borderRadius: 10, fontSize: '0.85rem',
             fontFamily: 'Inter, sans-serif',
-            color: '#0D0D0F', background: '#FAFAFA',
+            color: 'var(--dm-text, #0D0D0F)', background: 'var(--dm-surface, #FAFAFA)',
             outline: 'none',
             transition: 'border-color 0.2s, box-shadow 0.2s',
             boxSizing: 'border-box',
@@ -56,7 +56,7 @@ function PhotoUpload() {
 
   return (
     <div>
-      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5 }}>Profile Photo</label>
+      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: 'var(--dm-muted, #6B7280)', marginBottom: 5 }}>Profile Photo</label>
       <div
         onClick={() => !hasPhoto && fileRef.current?.click()}
         style={{
@@ -95,8 +95,8 @@ function PhotoUpload() {
               <Camera size={17} style={{ color: '#6C47FF' }} />
             </div>
             <div>
-              <p style={{ fontSize: '0.82rem', fontWeight: 600, color: '#374151', marginBottom: 2 }}>Upload your photo</p>
-              <p style={{ fontSize: '0.7rem', color: '#9CA3AF' }}>JPG, PNG Â· Max 5MB</p>
+              <p style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--dm-text, #374151)', marginBottom: 2 }}>Upload your photo</p>
+              <p style={{ fontSize: '0.7rem', color: 'var(--dm-muted-light, #9CA3AF)' }}>JPG, PNG Â· Max 5MB</p>
             </div>
           </>
         )}
@@ -114,9 +114,9 @@ function AddButton({ onClick, label }) {
       style={{
         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
         width: '100%', padding: '10px',
-        borderRadius: 12, background: '#FAFAFA',
+        borderRadius: 12, background: 'var(--dm-surface, #FAFAFA)',
         border: '1.5px dashed rgba(0,0,0,0.12)',
-        color: '#6B7280', fontSize: '0.82rem', fontWeight: 600,
+        color: 'var(--dm-muted, #6B7280)', fontSize: '0.82rem', fontWeight: 600,
         cursor: 'pointer', fontFamily: 'Inter',
         transition: 'all 0.18s',
       }}
@@ -133,11 +133,11 @@ function EntryCard({ idx, label, onRemove, children }) {
   return (
     <div style={{
       padding: '16px', borderRadius: 14, marginBottom: 16,
-      background: '#FAFAFA', border: '1px solid rgba(0,0,0,0.06)',
+      background: 'var(--dm-surface, #FAFAFA)', border: '1px solid var(--dm-border, rgba(0,0,0,0.06))',
       display: 'flex', flexDirection: 'column', gap: 12,
     }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span style={{ fontSize: '0.72rem', fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label} {idx + 1}</span>
+        <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--dm-muted-light, #9CA3AF)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label} {idx + 1}</span>
         <button onClick={onRemove} style={{
           color: '#EF4444', background: '#FEF2F2', border: '1px solid rgba(239,68,68,0.15)',
           borderRadius: 6, padding: '4px 6px', cursor: 'pointer', display: 'flex', alignItems: 'center',
@@ -256,7 +256,7 @@ function SmartEmailField({ value, onChange }) {
 
   return (
     <div style={{ position: 'relative' }} ref={wrapperRef}>
-      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5, letterSpacing: '0.02em' }}>Email</label>
+      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: 'var(--dm-muted, #6B7280)', marginBottom: 5, letterSpacing: '0.02em' }}>Email</label>
       <div style={{ position: 'relative' }}>
         <Mail size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: error ? '#EF4444' : '#9CA3AF' }} />
         <input
@@ -274,13 +274,13 @@ function SmartEmailField({ value, onChange }) {
             width: '100%', padding: '9px 12px', paddingLeft: '2.3rem',
             border: error ? "1.5px solid #EF4444" : "1.5px solid rgba(0,0,0,0.1)",
             borderRadius: 10, fontSize: '0.85rem', fontFamily: 'Inter, sans-serif',
-            color: '#0D0D0F', background: error ? '#FEF2F2' : '#FAFAFA',
+            color: 'var(--dm-text, #0D0D0F)', background: error ? '#FEF2F2' : '#FAFAFA',
             outline: 'none', transition: 'border-color 0.2s, box-shadow 0.2s', boxSizing: 'border-box',
           }}
         />
         {/* Suggestion hint inside input if activeIndex is matched */}
         {activeIndex === -1 && suggestions.length > 0 && value.includes('@') && suggestions[0].startsWith(value) && (
-          <div style={{ position: 'absolute', left: '2.3rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#9CA3AF', fontSize: '0.85rem', fontFamily: 'Inter, sans-serif' }}>
+          <div style={{ position: 'absolute', left: '2.3rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'var(--dm-muted-light, #9CA3AF)', fontSize: '0.85rem', fontFamily: 'Inter, sans-serif' }}>
             <span style={{ opacity: 0 }}>{value}</span>
             <span>{suggestions[0].slice(value.length)}</span>
           </div>
@@ -296,11 +296,11 @@ function SmartEmailField({ value, onChange }) {
       {showDropdown && suggestions.length > 0 && (
         <div style={{
           position: 'absolute', top: '100%', left: 0, right: 0,
-          background: '#fff', border: '1px solid rgba(0,0,0,0.08)',
+          background: 'var(--dm-bg, #fff)', border: '1px solid rgba(0,0,0,0.08)',
           borderRadius: 12, marginTop: 6, boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)',
           zIndex: 50, overflow: 'hidden', padding: '4px'
         }}>
-          <div style={{ padding: '6px 10px', fontSize: '0.65rem', fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <div style={{ padding: '6px 10px', fontSize: '0.65rem', fontWeight: 600, color: 'var(--dm-muted-light, #9CA3AF)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             Suggestions
           </div>
           {suggestions.map((sugg, i) => (
@@ -473,7 +473,7 @@ function SmartPhoneField({ value, onChange }) {
 
   return (
     <div style={{ position: 'relative' }} ref={wrapperRef}>
-      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5, letterSpacing: '0.02em' }}>Phone</label>
+      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: 'var(--dm-muted, #6B7280)', marginBottom: 5, letterSpacing: '0.02em' }}>Phone</label>
       <div style={{ position: 'relative' }}>
         <Phone size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: error ? '#EF4444' : '#9CA3AF' }} />
         <input
@@ -491,7 +491,7 @@ function SmartPhoneField({ value, onChange }) {
             width: '100%', padding: '9px 12px', paddingLeft: '2.3rem',
             border: error ? "1.5px solid #EF4444" : "1.5px solid rgba(0,0,0,0.1)",
             borderRadius: 10, fontSize: '0.85rem', fontFamily: 'Inter, sans-serif',
-            color: '#0D0D0F', background: error ? '#FEF2F2' : '#FAFAFA',
+            color: 'var(--dm-text, #0D0D0F)', background: error ? '#FEF2F2' : '#FAFAFA',
             outline: 'none', transition: 'border-color 0.2s, box-shadow 0.2s', boxSizing: 'border-box',
           }}
         />
@@ -506,11 +506,11 @@ function SmartPhoneField({ value, onChange }) {
       {showDropdown && suggestions.length > 0 && (
         <div className="scrollbar-thin" style={{
           position: 'absolute', top: '100%', left: 0, right: 0,
-          background: '#fff', border: '1px solid rgba(0,0,0,0.08)',
+          background: 'var(--dm-bg, #fff)', border: '1px solid rgba(0,0,0,0.08)',
           borderRadius: 12, marginTop: 6, boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)',
           zIndex: 50, overflowY: 'auto', maxHeight: 220, padding: '4px'
         }}>
-          <div style={{ padding: '8px 10px 4px', fontSize: '0.65rem', fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.05em', position: 'sticky', top: 0, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(4px)' }}>
+          <div style={{ padding: '8px 10px 4px', fontSize: '0.65rem', fontWeight: 600, color: 'var(--dm-muted-light, #9CA3AF)', textTransform: 'uppercase', letterSpacing: '0.05em', position: 'sticky', top: 0, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(4px)' }}>
             Select Country Code
           </div>
           {suggestions.map((sugg, i) => (
@@ -660,7 +660,7 @@ function SmartLocationField({ value, onChange }) {
 
   return (
     <div style={{ position: 'relative' }} ref={wrapperRef}>
-      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5, letterSpacing: '0.02em' }}>Location</label>
+      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: 'var(--dm-muted, #6B7280)', marginBottom: 5, letterSpacing: '0.02em' }}>Location</label>
       <div style={{ position: 'relative' }}>
         <MapPin size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: error ? '#EF4444' : '#9CA3AF' }} />
         <input
@@ -678,7 +678,7 @@ function SmartLocationField({ value, onChange }) {
             width: '100%', padding: '9px 12px', paddingLeft: '2.3rem',
             border: error ? "1.5px solid #EF4444" : "1.5px solid rgba(0,0,0,0.1)",
             borderRadius: 10, fontSize: '0.85rem', fontFamily: 'Inter, sans-serif',
-            color: '#0D0D0F', background: error ? '#FEF2F2' : '#FAFAFA',
+            color: 'var(--dm-text, #0D0D0F)', background: error ? '#FEF2F2' : '#FAFAFA',
             outline: 'none', transition: 'border-color 0.2s, box-shadow 0.2s', boxSizing: 'border-box',
           }}
         />
@@ -700,11 +700,11 @@ function SmartLocationField({ value, onChange }) {
       {showDropdown && displaySuggestions.length > 0 && (
         <div className="scrollbar-thin" style={{
           position: 'absolute', top: '100%', left: 0, right: 0,
-          background: '#fff', border: '1px solid rgba(0,0,0,0.08)',
+          background: 'var(--dm-bg, #fff)', border: '1px solid rgba(0,0,0,0.08)',
           borderRadius: 12, marginTop: 6, boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)',
           zIndex: 50, overflowY: 'auto', maxHeight: 220, padding: '4px'
         }}>
-          <div style={{ padding: '8px 10px 4px', fontSize: '0.65rem', fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.05em', position: 'sticky', top: 0, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(4px)' }}>
+          <div style={{ padding: '8px 10px 4px', fontSize: '0.65rem', fontWeight: 600, color: 'var(--dm-muted-light, #9CA3AF)', textTransform: 'uppercase', letterSpacing: '0.05em', position: 'sticky', top: 0, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(4px)' }}>
             {value ? 'Search Results' : 'Suggested Cities'}
           </div>
           {displaySuggestions.map((sugg, i) => (
@@ -726,7 +726,7 @@ function SmartLocationField({ value, onChange }) {
                 <MapPin size={14} style={{ color: i === activeIndex ? '#8B71FF' : '#9CA3AF' }} />
                 <span style={{ fontWeight: 600 }}>{sugg.city}</span>
               </div>
-              <span style={{ color: '#9CA3AF', fontSize: '0.75rem', textAlign: 'right', flex: 1, marginLeft: 10, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <span style={{ color: 'var(--dm-muted-light, #9CA3AF)', fontSize: '0.75rem', textAlign: 'right', flex: 1, marginLeft: 10, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {sugg.state ? sugg.state + ', ' : ''}{sugg.country}
               </span>
             </div>
@@ -772,7 +772,7 @@ function SmartLinkedInField({ value, onChange }) {
 
   return (
     <div>
-      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5, letterSpacing: '0.02em' }}>
+      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: 'var(--dm-muted, #6B7280)', marginBottom: 5, letterSpacing: '0.02em' }}>
         LinkedIn
       </label>
       <div style={{ position: 'relative' }}>
@@ -787,7 +787,7 @@ function SmartLinkedInField({ value, onChange }) {
             width: '100%', padding: '9px 12px', paddingLeft: '2.3rem',
             border: error ? "1.5px solid #EF4444" : "1.5px solid rgba(0,0,0,0.1)",
             borderRadius: 10, fontSize: '0.85rem', fontFamily: 'Inter, sans-serif',
-            color: '#0D0D0F', background: error ? '#FEF2F2' : '#FAFAFA',
+            color: 'var(--dm-text, #0D0D0F)', background: error ? '#FEF2F2' : '#FAFAFA',
             outline: 'none', transition: 'border-color 0.2s, box-shadow 0.2s, background 0.2s', boxSizing: 'border-box',
           }}
           onFocus={(e) => { 
@@ -844,7 +844,7 @@ function SmartGithubField({ value, onChange }) {
 
   return (
     <div>
-      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5, letterSpacing: '0.02em' }}>
+      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: 'var(--dm-muted, #6B7280)', marginBottom: 5, letterSpacing: '0.02em' }}>
         GitHub
       </label>
       <div style={{ position: 'relative' }}>
@@ -859,7 +859,7 @@ function SmartGithubField({ value, onChange }) {
             width: '100%', padding: '9px 12px', paddingLeft: '2.3rem',
             border: error ? "1.5px solid #EF4444" : "1.5px solid rgba(0,0,0,0.1)",
             borderRadius: 10, fontSize: '0.85rem', fontFamily: 'Inter, sans-serif',
-            color: '#0D0D0F', background: error ? '#FEF2F2' : '#FAFAFA',
+            color: 'var(--dm-text, #0D0D0F)', background: error ? '#FEF2F2' : '#FAFAFA',
             outline: 'none', transition: 'border-color 0.2s, box-shadow 0.2s, background 0.2s', boxSizing: 'border-box',
           }}
           onFocus={(e) => { 
@@ -914,7 +914,7 @@ function SmartWebsiteField({ value, onChange }) {
 
   return (
     <div>
-      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5, letterSpacing: '0.02em' }}>
+      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: 'var(--dm-muted, #6B7280)', marginBottom: 5, letterSpacing: '0.02em' }}>
         Website
       </label>
       <div style={{ position: 'relative' }}>
@@ -929,7 +929,7 @@ function SmartWebsiteField({ value, onChange }) {
             width: '100%', padding: '9px 12px', paddingLeft: '2.3rem',
             border: error ? "1.5px solid #EF4444" : "1.5px solid rgba(0,0,0,0.1)",
             borderRadius: 10, fontSize: '0.85rem', fontFamily: 'Inter, sans-serif',
-            color: '#0D0D0F', background: error ? '#FEF2F2' : '#FAFAFA',
+            color: 'var(--dm-text, #0D0D0F)', background: error ? '#FEF2F2' : '#FAFAFA',
             outline: 'none', transition: 'border-color 0.2s, box-shadow 0.2s, background 0.2s', boxSizing: 'border-box',
           }}
           onFocus={(e) => { 
@@ -1023,7 +1023,7 @@ function SmartDegreeField({ label, value, onChange, placeholder }) {
 
   return (
     <div ref={wrapperRef} style={{ position: 'relative' }}>
-      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5, letterSpacing: '0.02em' }}>
+      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: 'var(--dm-muted, #6B7280)', marginBottom: 5, letterSpacing: '0.02em' }}>
         {label}
       </label>
       <div style={{ position: 'relative' }}>
@@ -1050,7 +1050,7 @@ function SmartDegreeField({ label, value, onChange, placeholder }) {
             width: '100%', padding: '9px 12px',
             border: "1.5px solid rgba(0,0,0,0.1)",
             borderRadius: 10, fontSize: '0.85rem', fontFamily: 'Inter, sans-serif',
-            color: '#0D0D0F', background: '#FAFAFA',
+            color: 'var(--dm-text, #0D0D0F)', background: 'var(--dm-surface, #FAFAFA)',
             outline: 'none', transition: 'border-color 0.2s, box-shadow 0.2s', boxSizing: 'border-box',
           }}
         />
@@ -1059,7 +1059,7 @@ function SmartDegreeField({ label, value, onChange, placeholder }) {
       {showDropdown && suggestions.length > 0 && (
         <div style={{
           position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4,
-          background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8,
+          background: 'var(--dm-bg, #fff)', border: '1px solid #E5E7EB', borderRadius: 8,
           boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 50, maxHeight: 200, overflowY: 'auto'
         }}>
           {suggestions.map((s, idx) => (
@@ -1075,7 +1075,7 @@ function SmartDegreeField({ label, value, onChange, placeholder }) {
               }}
             >
               <span style={{ fontSize: '0.85rem', color: '#111827', fontWeight: 500 }}>{s.short}</span>
-              <span style={{ fontSize: '0.7rem', color: '#6B7280' }}>{s.full}</span>
+              <span style={{ fontSize: '0.7rem', color: 'var(--dm-muted, #6B7280)' }}>{s.full}</span>
             </div>
           ))}
         </div>
@@ -1143,7 +1143,7 @@ function SmartStudyField({ label, value, degreeValue, onChange, placeholder }) {
 
   return (
     <div ref={wrapperRef} style={{ position: 'relative' }}>
-      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5, letterSpacing: '0.02em' }}>
+      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: 'var(--dm-muted, #6B7280)', marginBottom: 5, letterSpacing: '0.02em' }}>
         {label}
       </label>
       <div style={{ position: 'relative' }}>
@@ -1170,7 +1170,7 @@ function SmartStudyField({ label, value, degreeValue, onChange, placeholder }) {
             width: '100%', padding: '9px 12px',
             border: "1.5px solid rgba(0,0,0,0.1)",
             borderRadius: 10, fontSize: '0.85rem', fontFamily: 'Inter, sans-serif',
-            color: '#0D0D0F', background: '#FAFAFA',
+            color: 'var(--dm-text, #0D0D0F)', background: 'var(--dm-surface, #FAFAFA)',
             outline: 'none', transition: 'border-color 0.2s, box-shadow 0.2s', boxSizing: 'border-box',
           }}
         />
@@ -1179,7 +1179,7 @@ function SmartStudyField({ label, value, degreeValue, onChange, placeholder }) {
       {showDropdown && suggestions.length > 0 && (
         <div style={{
           position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4,
-          background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8,
+          background: 'var(--dm-bg, #fff)', border: '1px solid #E5E7EB', borderRadius: 8,
           boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 50, maxHeight: 200, overflowY: 'auto'
         }}>
           {suggestions.map((s, idx) => (
@@ -1304,11 +1304,11 @@ function SmartSchoolField({ label, value, onChange, placeholder }) {
 
   return (
     <div ref={wrapperRef} style={{ position: 'relative', marginBottom: 16 }}>
-      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5, letterSpacing: '0.02em' }}>
+      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: 'var(--dm-muted, #6B7280)', marginBottom: 5, letterSpacing: '0.02em' }}>
         {label}
       </label>
       <div style={{ position: 'relative' }}>
-        <GraduationCap size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} />
+        <GraduationCap size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--dm-muted-light, #9CA3AF)' }} />
         <input
           type="text"
           placeholder={placeholder}
@@ -1332,7 +1332,7 @@ function SmartSchoolField({ label, value, onChange, placeholder }) {
             width: '100%', padding: '9px 12px', paddingLeft: '2.3rem',
             border: "1.5px solid rgba(0,0,0,0.1)",
             borderRadius: 10, fontSize: '0.85rem', fontFamily: 'Inter, sans-serif',
-            color: '#0D0D0F', background: '#FAFAFA',
+            color: 'var(--dm-text, #0D0D0F)', background: 'var(--dm-surface, #FAFAFA)',
             outline: 'none', transition: 'border-color 0.2s, box-shadow 0.2s', boxSizing: 'border-box',
           }}
         />
@@ -1341,11 +1341,11 @@ function SmartSchoolField({ label, value, onChange, placeholder }) {
       {showDropdown && (apiSuggestions.length > 0 || loading) && (
         <div style={{
           position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4,
-          background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8,
+          background: 'var(--dm-bg, #fff)', border: '1px solid #E5E7EB', borderRadius: 8,
           boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 50, maxHeight: 200, overflowY: 'auto'
         }}>
           {loading && apiSuggestions.length === 0 ? (
-            <div style={{ padding: '8px 12px', fontSize: '0.8rem', color: '#6B7280' }}>Searching...</div>
+            <div style={{ padding: '8px 12px', fontSize: '0.8rem', color: 'var(--dm-muted, #6B7280)' }}>Searching...</div>
           ) : (
             apiSuggestions.map((s, idx) => (
               <div
@@ -1360,7 +1360,7 @@ function SmartSchoolField({ label, value, onChange, placeholder }) {
                 }}
               >
                 <span style={{ fontSize: '0.85rem', color: '#111827', fontWeight: 500 }}>{s.full}</span>
-                {s.state && <span style={{ fontSize: '0.7rem', color: '#6B7280' }}>{s.state}</span>}
+                {s.state && <span style={{ fontSize: '0.7rem', color: 'var(--dm-muted, #6B7280)' }}>{s.state}</span>}
               </div>
             ))
           )}
@@ -1405,7 +1405,7 @@ function SmartMonthField({ label, value, onChange, isEndDate, current, onCurrent
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }}>
-        <label style={{ fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', letterSpacing: '0.02em' }}>
+        <label style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--dm-muted, #6B7280)', letterSpacing: '0.02em' }}>
           {label}
         </label>
         {isEndDate && (
@@ -1542,7 +1542,7 @@ export function WizardForm() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '60vh', background: '#FFFFFF', borderRadius: 16, boxShadow: '0 4px 20px rgba(0,0,0,0.05)', border: '1px solid rgba(0,0,0,0.06)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '60vh', background: '#FFFFFF', borderRadius: 16, boxShadow: '0 4px 20px rgba(0,0,0,0.05)', border: '1px solid var(--dm-border, rgba(0,0,0,0.06))' }}>
       
       {/* Content Area */}
       <div style={{ flex: 1, padding: '32px 40px' }}>
@@ -1568,7 +1568,7 @@ export function WizardForm() {
               <SmartGithubField value={personal.github} onChange={(val) => updatePersonal('github', val)} />
             </div>
             <div style={{ position: 'relative' }}>
-              <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5 }}>Professional Summary</label>
+              <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: 'var(--dm-muted, #6B7280)', marginBottom: 5 }}>Professional Summary</label>
               <div style={{ position: 'relative' }}>
                 <textarea
                   id="field-summary" rows={4}
@@ -1581,7 +1581,7 @@ export function WizardForm() {
                     border: (personal.summary || '').length >= 500 ? "1.5px solid #EF4444" : "1.5px solid rgba(0,0,0,0.1)", 
                     borderRadius: 10,
                     fontSize: '0.85rem', fontFamily: 'Inter, sans-serif',
-                    color: '#0D0D0F', 
+                    color: 'var(--dm-text, #0D0D0F)', 
                     background: (personal.summary || '').length >= 500 ? '#FEF2F2' : '#FAFAFA',
                     outline: 'none', boxSizing: 'border-box',
                     transition: 'border-color 0.2s, box-shadow 0.2s, background 0.2s',
@@ -1636,7 +1636,7 @@ export function WizardForm() {
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5 }}>Bullet Points</label>
+                  <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: 'var(--dm-muted, #6B7280)', marginBottom: 5 }}>Bullet Points</label>
                   {exp.bullets.map((b, i) => (
                     <div key={i} style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
                       <input
@@ -1647,7 +1647,7 @@ export function WizardForm() {
                           flex: 1, padding: '8px 12px',
                           border: b.length >= 150 ? '1.5px solid #EF4444' : '1.5px solid rgba(0,0,0,0.1)',
                           borderRadius: 8, fontSize: '0.82rem', fontFamily: 'Inter, sans-serif',
-                          color: '#0D0D0F', background: b.length >= 150 ? '#FEF2F2' : '#fff',
+                          color: 'var(--dm-text, #0D0D0F)', background: b.length >= 150 ? '#FEF2F2' : '#fff',
                           outline: 'none', boxSizing: 'border-box',
                         }}
                         onFocus={(e) => { if (b.length < 150) e.target.style.borderColor = '#6C47FF'; }}
@@ -1728,7 +1728,7 @@ export function WizardForm() {
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5, letterSpacing: '0.02em' }}>GPA (optional)</label>
+                  <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: 'var(--dm-muted, #6B7280)', marginBottom: 5, letterSpacing: '0.02em' }}>GPA (optional)</label>
                   <input
                     type="text"
                     inputMode="decimal"
@@ -1740,15 +1740,15 @@ export function WizardForm() {
                     }}
                     style={{
                       width: '100%', padding: '9px 12px',
-                      border: '1.5px solid rgba(0,0,0,0.1)',
+                      border: '1.5px solid var(--dm-border-strong, rgba(0,0,0,0.1))',
                       borderRadius: 10, fontSize: '0.85rem', fontFamily: 'Inter, sans-serif',
-                      color: '#0D0D0F', background: '#FAFAFA',
+                      color: 'var(--dm-text, #0D0D0F)', background: 'var(--dm-surface, #FAFAFA)',
                       outline: 'none', boxSizing: 'border-box',
                     }}
                     onFocus={(e) => { e.target.style.borderColor = '#6C47FF'; e.target.style.boxShadow = '0 0 0 3px rgba(108,71,255,0.1)'; }}
                     onBlur={(e) => { e.target.style.borderColor = 'rgba(0,0,0,0.1)'; e.target.style.boxShadow = 'none'; }}
                   />
-                  <span style={{ fontSize: '0.62rem', color: '#9CA3AF', marginTop: 3, display: 'block' }}>Numbers only, e.g. 3.8 / 4.0 or 8.5 / 10</span>
+                  <span style={{ fontSize: '0.62rem', color: 'var(--dm-muted-light, #9CA3AF)', marginTop: 3, display: 'block' }}>Numbers only, e.g. 3.8 / 4.0 or 8.5 / 10</span>
                 </div>
               </EntryCard>
             ))}
@@ -1760,7 +1760,7 @@ export function WizardForm() {
           <div>
             <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#111827', marginBottom: 16 }}>Skills</h2>
             <div style={{ marginBottom: 20 }}>
-              <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5 }}>Type a skill and press Enter</label>
+              <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: 'var(--dm-muted, #6B7280)', marginBottom: 5 }}>Type a skill and press Enter</label>
               <input
                 id="skill-input"
                 placeholder="React, Python, Figma..."
@@ -1769,9 +1769,9 @@ export function WizardForm() {
                 onKeyDown={handleSkillKey}
                 style={{
                   width: '100%', padding: '12px 14px',
-                  border: '1.5px solid rgba(0,0,0,0.1)', borderRadius: 10,
+                  border: '1.5px solid var(--dm-border-strong, rgba(0,0,0,0.1))', borderRadius: 10,
                   fontSize: '0.85rem', fontFamily: 'Inter, sans-serif',
-                  color: '#0D0D0F', background: '#FAFAFA', outline: 'none',
+                  color: 'var(--dm-text, #0D0D0F)', background: 'var(--dm-surface, #FAFAFA)', outline: 'none',
                   boxSizing: 'border-box',
                 }}
                 onFocus={(e) => { e.target.style.borderColor = '#6C47FF'; e.target.style.boxShadow = '0 0 0 3px rgba(108,71,255,0.1)'; }}
@@ -1817,9 +1817,9 @@ export function WizardForm() {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                   <Field label="Tech Stack"   name={`proj-tech-${proj.id}`} value={proj.tech} onChange={(e) => updateProject(proj.id, 'tech', e.target.value)} placeholder="React, Firebase, Tailwind" />
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5, letterSpacing: '0.02em' }}>Link</label>
+                    <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: 'var(--dm-muted, #6B7280)', marginBottom: 5, letterSpacing: '0.02em' }}>Link</label>
                     <div style={{ position: 'relative' }}>
-                      <Link2 size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} />
+                      <Link2 size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--dm-muted-light, #9CA3AF)' }} />
                       <input
                         type="text"
                         placeholder="github.com/yourproject"
@@ -1836,9 +1836,9 @@ export function WizardForm() {
                         }}
                         style={{
                           width: '100%', padding: '9px 12px', paddingLeft: '2.3rem',
-                          border: '1.5px solid rgba(0,0,0,0.1)',
+                          border: '1.5px solid var(--dm-border-strong, rgba(0,0,0,0.1))',
                           borderRadius: 10, fontSize: '0.85rem', fontFamily: 'Inter, sans-serif',
-                          color: '#0D0D0F', background: '#FAFAFA',
+                          color: 'var(--dm-text, #0D0D0F)', background: 'var(--dm-surface, #FAFAFA)',
                           outline: 'none', boxSizing: 'border-box',
                         }}
                         onFocus={(e) => { e.target.style.borderColor = '#6C47FF'; e.target.style.boxShadow = '0 0 0 3px rgba(108,71,255,0.1)'; }}
@@ -1847,7 +1847,7 @@ export function WizardForm() {
                   </div>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5 }}>Description</label>
+                  <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: 'var(--dm-muted, #6B7280)', marginBottom: 5 }}>Description</label>
                   <div style={{ position: 'relative' }}>
                     <textarea rows={3}
                       maxLength={500}
@@ -1859,7 +1859,7 @@ export function WizardForm() {
                         border: (proj.description || '').length >= 500 ? "1.5px solid #EF4444" : "1.5px solid rgba(0,0,0,0.1)",
                         borderRadius: 8,
                         fontSize: '0.82rem', fontFamily: 'Inter, sans-serif',
-                        color: '#0D0D0F', 
+                        color: 'var(--dm-text, #0D0D0F)', 
                         background: (proj.description || '').length >= 500 ? '#FEF2F2' : '#fff',
                         outline: 'none', boxSizing: 'border-box',
                         transition: 'border-color 0.2s, background 0.2s',
@@ -1899,10 +1899,10 @@ export function WizardForm() {
         {wizardStep === 5 && (
           <div>
             <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#111827', marginBottom: 4 }}>Languages & Certifications</h2>
-            <p style={{ fontSize: '0.78rem', color: '#9CA3AF', marginBottom: 20 }}>Optional but powerful — boosts your ATS score and global appeal.</p>
+            <p style={{ fontSize: '0.78rem', color: 'var(--dm-muted-light, #9CA3AF)', marginBottom: 20 }}>Optional but powerful — boosts your ATS score and global appeal.</p>
 
             {/* Languages */}
-            <h3 style={{ fontSize: '0.9rem', fontWeight: 700, color: '#374151', marginBottom: 12 }}>🌐 Languages</h3>
+            <h3 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--dm-text, #374151)', marginBottom: 12 }}>🌐 Languages</h3>
             {languages.map((lang, idx) => (
               <EntryCard key={lang.id} idx={idx} label="Language" onRemove={() => removeLanguage(lang.id)}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
@@ -1914,15 +1914,15 @@ export function WizardForm() {
                     placeholder="English, Hindi, Marathi…"
                   />
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5, letterSpacing: '0.02em' }}>Proficiency</label>
+                    <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: 'var(--dm-muted, #6B7280)', marginBottom: 5, letterSpacing: '0.02em' }}>Proficiency</label>
                     <select
                       value={lang.proficiency || 'Conversational'}
                       onChange={(e) => updateLanguage(lang.id, 'proficiency', e.target.value)}
                       style={{
                         width: '100%', padding: '9px 12px',
-                        border: '1.5px solid rgba(0,0,0,0.1)', borderRadius: 10,
+                        border: '1.5px solid var(--dm-border-strong, rgba(0,0,0,0.1))', borderRadius: 10,
                         fontSize: '0.85rem', fontFamily: 'Inter, sans-serif',
-                        color: '#0D0D0F', background: '#FAFAFA',
+                        color: 'var(--dm-text, #0D0D0F)', background: 'var(--dm-surface, #FAFAFA)',
                         outline: 'none', cursor: 'pointer', boxSizing: 'border-box',
                       }}
                       onFocus={(e) => { e.target.style.borderColor = '#6C47FF'; e.target.style.boxShadow = '0 0 0 3px rgba(108,71,255,0.1)'; }}
@@ -1940,7 +1940,7 @@ export function WizardForm() {
             <AddButton onClick={addLanguage} label="Add Language" />
 
             {/* Certifications */}
-            <h3 style={{ fontSize: '0.9rem', fontWeight: 700, color: '#374151', margin: '24px 0 12px' }}>🏆 Certifications</h3>
+            <h3 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--dm-text, #374151)', margin: '24px 0 12px' }}>🏆 Certifications</h3>
             {certifications.map((cert, idx) => (
               <EntryCard key={cert.id} idx={idx} label="Certification" onRemove={() => removeCertification(cert.id)}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
@@ -1960,7 +1960,7 @@ export function WizardForm() {
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#6B7280', marginBottom: 5, letterSpacing: '0.02em' }}>Year</label>
+                  <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: 'var(--dm-muted, #6B7280)', marginBottom: 5, letterSpacing: '0.02em' }}>Year</label>
                   <input
                     type="text"
                     inputMode="numeric"
@@ -1972,15 +1972,15 @@ export function WizardForm() {
                     }}
                     style={{
                       width: '100%', padding: '9px 12px',
-                      border: '1.5px solid rgba(0,0,0,0.1)', borderRadius: 10,
+                      border: '1.5px solid var(--dm-border-strong, rgba(0,0,0,0.1))', borderRadius: 10,
                       fontSize: '0.85rem', fontFamily: 'Inter, sans-serif',
-                      color: '#0D0D0F', background: '#FAFAFA',
+                      color: 'var(--dm-text, #0D0D0F)', background: 'var(--dm-surface, #FAFAFA)',
                       outline: 'none', boxSizing: 'border-box',
                     }}
                     onFocus={(e) => { e.target.style.borderColor = '#6C47FF'; e.target.style.boxShadow = '0 0 0 3px rgba(108,71,255,0.1)'; }}
                     onBlur={(e) => { e.target.style.borderColor = 'rgba(0,0,0,0.1)'; e.target.style.boxShadow = 'none'; }}
                   />
-                  <span style={{ fontSize: '0.62rem', color: '#9CA3AF', marginTop: 3, display: 'block' }}>4-digit year only, e.g. 2024</span>
+                  <span style={{ fontSize: '0.62rem', color: 'var(--dm-muted-light, #9CA3AF)', marginTop: 3, display: 'block' }}>4-digit year only, e.g. 2024</span>
                 </div>
               </EntryCard>
             ))}
@@ -1990,14 +1990,14 @@ export function WizardForm() {
       </div>
 
       {/* Footer Navigation */}
-      <div style={{ padding: '24px 40px', borderTop: '1px solid rgba(0,0,0,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#FAFAFA', borderRadius: '0 0 16px 16px' }}>
+      <div style={{ padding: '24px 40px', borderTop: '1px solid rgba(0,0,0,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--dm-surface, #FAFAFA)', borderRadius: '0 0 16px 16px' }}>
         <button
           onClick={handlePrev}
           style={{
             display: 'flex', alignItems: 'center', gap: 6,
             padding: '10px 20px', borderRadius: 10,
-            background: 'transparent', border: '1.5px solid rgba(0,0,0,0.12)',
-            color: '#374151', fontSize: '0.85rem', fontWeight: 600,
+            background: 'transparent', border: '1.5px solid var(--dm-border-strong, rgba(0,0,0,0.12))',
+            color: 'var(--dm-text, #374151)', fontSize: '0.85rem', fontWeight: 600,
             cursor: wizardStep === 0 ? 'not-allowed' : 'pointer',
             opacity: wizardStep === 0 ? 0 : 1,
             pointerEvents: wizardStep === 0 ? 'none' : 'auto',
@@ -2031,3 +2031,4 @@ export function WizardForm() {
     </div>
   );
 }
+

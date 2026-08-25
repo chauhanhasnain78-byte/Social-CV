@@ -475,3 +475,53 @@ body {
 .editor-dark-mode .editor-nav-btn:hover {
   background: #1A1A24 !important;
 }
+
+
+/* -- Premium Editor Dark Mode -- */
+.editor-dark-mode {
+  --dm-bg: #111118;
+  --dm-surface: #0A0A10;
+  --dm-raised: #1A1A24;
+  
+  --dm-text: #F0F0FF;
+  --dm-muted: #A1A1AA;
+  --dm-muted-light: #6B6B88;
+  
+  --dm-border: rgba(255,255,255,0.08);
+  --dm-border-strong: rgba(255,255,255,0.15);
+  
+  background-color: var(--dm-surface);
+  color: var(--dm-text);
+}
+
+.editor-dark-mode input,
+.editor-dark-mode textarea {
+  color: var(--dm-text) !important;
+  background-color: #16161D !important;
+}
+
+.editor-dark-mode input::placeholder,
+.editor-dark-mode textarea::placeholder {
+  color: var(--dm-muted-light) !important;
+}
+
+.editor-dark-mode input:focus,
+.editor-dark-mode textarea:focus {
+  border-color: var(--brand) !important;
+  box-shadow: 0 0 0 3px rgba(108,71,255,0.15) !important;
+}
+
+.editor-dark-mode button[style*="var(--dm-bg)"]:hover,
+.editor-dark-mode button[style*="var(--dm-surface)"]:hover {
+  background-color: var(--dm-raised) !important;
+}
+
+.editor-dark-mode label {
+  color: var(--dm-muted) !important;
+}
+
+/* Ensure the physical CV preview stays white */
+.editor-dark-mode .preview-bg > div > div > div > div {
+  background-color: #FFFFFF !important;
+  color: #000000 !important;
+}

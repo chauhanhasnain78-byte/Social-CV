@@ -59,10 +59,10 @@ function SortableSectionItem({ id }) {
         marginBottom: 8
       }}
     >
-      <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#374151' }}>
+      <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--dm-text, #374151)' }}>
         {SECTION_LABELS[id]}
       </span>
-      <div {...attributes} {...listeners} style={{ cursor: 'grab', color: '#9CA3AF' }}>
+      <div {...attributes} {...listeners} style={{ cursor: 'grab', color: 'var(--dm-muted-light, #9CA3AF)' }}>
         <GripVertical size={16} />
       </div>
     </div>
@@ -181,7 +181,7 @@ export function CanvasToolbar() {
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: '#FFFFFF', borderLeft: '1px solid rgba(0,0,0,0.06)' }}>
       {/* Header */}
-      <div style={{ padding: '20px 24px', borderBottom: '1px solid rgba(0,0,0,0.06)', background: '#FAFAFA' }}>
+      <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--dm-border, rgba(0,0,0,0.06))', background: 'var(--dm-surface, #FAFAFA)' }}>
         <h3 style={{ fontSize: '1rem', fontWeight: 800, color: '#111827', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
           <Palette size={18} style={{ color: '#6C47FF' }} /> Design & Export
         </h3>
@@ -204,7 +204,7 @@ export function CanvasToolbar() {
             </div>
             <button
               onClick={() => setShowATS(true)}
-              style={{ padding: '6px 12px', borderRadius: 8, background: '#fff', border: `1px solid ${scoreColor}40`, color: scoreColor, fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
+              style={{ padding: '6px 12px', borderRadius: 8, background: 'var(--dm-bg, #fff)', border: `1px solid ${scoreColor}40`, color: scoreColor, fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
             >
               View Details
             </button>
@@ -213,7 +213,7 @@ export function CanvasToolbar() {
 
         {/* Global Styles */}
         <div style={{ marginBottom: 32 }}>
-          <h4 style={{ fontSize: '0.8rem', fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}>Typography & Color</h4>
+          <h4 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--dm-muted, #6B7280)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}>Typography & Color</h4>
           
           <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.75rem', fontWeight: 600, color: '#4B5563', marginBottom: 8 }}>
             <Type size={14} /> Font Style
@@ -224,8 +224,8 @@ export function CanvasToolbar() {
               onChange={(e) => setFontFamily(e.target.value)}
               style={{
                 width: '100%', padding: '10px 12px', fontSize: '0.85rem', fontWeight: 500,
-                borderRadius: 10, border: '1px solid rgba(0,0,0,0.1)', background: '#FAFAFA',
-                color: '#374151', cursor: 'pointer', outline: 'none'
+                borderRadius: 10, border: '1px solid rgba(0,0,0,0.1)', background: 'var(--dm-surface, #FAFAFA)',
+                color: 'var(--dm-text, #374151)', cursor: 'pointer', outline: 'none'
               }}
             >
               <option value="sans-serif">Modern (Sans-Serif)</option>
@@ -253,8 +253,8 @@ export function CanvasToolbar() {
                 min="8" max="48"
                 style={{
                   width: '100%', padding: '8px 12px', fontSize: '0.85rem', fontWeight: 600,
-                  borderRadius: 10, border: '1px solid rgba(0,0,0,0.1)', background: '#FAFAFA',
-                  color: '#374151', outline: 'none'
+                  borderRadius: 10, border: '1px solid rgba(0,0,0,0.1)', background: 'var(--dm-surface, #FAFAFA)',
+                  color: 'var(--dm-text, #374151)', outline: 'none'
                 }}
               />
             </div>
@@ -263,7 +263,7 @@ export function CanvasToolbar() {
               <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.75rem', fontWeight: 600, color: '#4B5563', marginBottom: 8 }}>
                 Alignment
               </label>
-              <div style={{ display: 'flex', gap: 4, background: '#FAFAFA', padding: 4, borderRadius: 10, border: '1px solid rgba(0,0,0,0.08)' }}>
+              <div style={{ display: 'flex', gap: 4, background: 'var(--dm-surface, #FAFAFA)', padding: 4, borderRadius: 10, border: '1px solid rgba(0,0,0,0.08)' }}>
                 {['left', 'center', 'right'].map((align) => (
                   <button
                     key={align}
@@ -307,8 +307,8 @@ export function CanvasToolbar() {
 
         {/* Section Reordering */}
         <div style={{ marginBottom: 32 }}>
-          <h4 style={{ fontSize: '0.8rem', fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}>Reorder Sections</h4>
-          <p style={{ fontSize: '0.75rem', color: '#9CA3AF', marginBottom: 12 }}>Drag to change the vertical order of sections.</p>
+          <h4 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--dm-muted, #6B7280)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}>Reorder Sections</h4>
+          <p style={{ fontSize: '0.75rem', color: 'var(--dm-muted-light, #9CA3AF)', marginBottom: 12 }}>Drag to change the vertical order of sections.</p>
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={sectionOrder} strategy={verticalListSortingStrategy}>
               {sectionOrder.map((id) => (
@@ -321,7 +321,7 @@ export function CanvasToolbar() {
       </div>
 
       {/* Sticky Bottom Actions */}
-      <div style={{ padding: '20px 24px', borderTop: '1px solid rgba(0,0,0,0.06)', background: '#FAFAFA', display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ padding: '20px 24px', borderTop: '1px solid rgba(0,0,0,0.06)', background: 'var(--dm-surface, #FAFAFA)', display: 'flex', flexDirection: 'column', gap: 10 }}>
         
         <button
           onClick={handleExport}
@@ -346,7 +346,7 @@ export function CanvasToolbar() {
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
               padding: '10px', borderRadius: 10,
-              background: '#fff', border: '1.5px solid rgba(0,0,0,0.12)',
+              background: 'var(--dm-bg, #fff)', border: '1.5px solid var(--dm-border-strong, rgba(0,0,0,0.12))',
               color: saved ? '#10b981' : '#374151',
               fontSize: '0.82rem', fontWeight: 600,
               cursor: 'pointer',
@@ -362,8 +362,8 @@ export function CanvasToolbar() {
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
               padding: '10px', borderRadius: 10,
-              background: '#fff', border: '1.5px solid rgba(0,0,0,0.12)',
-              color: '#374151', fontSize: '0.82rem', fontWeight: 600,
+              background: 'var(--dm-bg, #fff)', border: '1.5px solid var(--dm-border-strong, rgba(0,0,0,0.12))',
+              color: 'var(--dm-text, #374151)', fontSize: '0.82rem', fontWeight: 600,
               cursor: 'pointer',
               boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
             }}
@@ -407,3 +407,4 @@ export function CanvasToolbar() {
     </div>
   );
 }
+
