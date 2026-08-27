@@ -1,10 +1,9 @@
-import { useState, useEffect } from 'react';
-import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
+import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Zap, Shield, Star, ArrowLeft, CheckCircle2, Briefcase, Users } from 'lucide-react';
 import { LoginForm  } from '@/components/auth/LoginForm';
 import { SignupForm } from '@/components/auth/SignupForm';
-import { useAuth } from '@/context/AuthContext';
 
 const SEEKER_PERKS = [
   { icon: Zap,    label: 'Live Preview',        desc: 'Every edit reflected in real-time' },
@@ -21,24 +20,14 @@ const HR_PERKS = [
 const SOCIAL_PROOF = ['10K+ CVs created', 'Free forever', 'No credit card'];
 
 export default function AuthPage({ onBack }) {
-  const { user, loading } = useAuth();
   const [tab, setTab] = useState('login');
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const roleParam = searchParams.get('role'); // 'hr' | 'seeker' | null
   const isHR = roleParam === 'hr';
   const PERKS = isHR ? HR_PERKS : SEEKER_PERKS;
 
-  // Jab login successful ho, role ke hisaab se route karo
-  useEffect(() => {
-    if (!loading && user) {
-      if (user.role === 'HR') {
-        navigate(user.hrSetupDone ? '/hr-feed' : '/hr-setup');
-      } else {
-        navigate('/dashboard');
-      }
-    }
-  }, [user, loading, navigate]);
+  // Routing is handled by LoginForm and SignupForm after successful auth.
+  // No useEffect needed here — avoids race condition with onAuthStateChanged.
 
   return (
     <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #F8F6FF 0%, #FDFCFF 50%, #FFF8F6 100%)', display: 'flex', flexDirection: 'column' }}>
