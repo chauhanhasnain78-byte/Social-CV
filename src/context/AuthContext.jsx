@@ -55,11 +55,12 @@ export function AuthProvider({ children }) {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         const profile = await getUserProfile(firebaseUser.uid);
+        const pendingRole = sessionStorage.getItem('pendingRole') || 'SEEKER';
         const sessionUser = {
           uid: firebaseUser.uid,
           email: firebaseUser.email,
           displayName: firebaseUser.displayName,
-          role: profile.role || 'SEEKER',         // 'SEEKER' | 'HR'
+          role: profile.role || pendingRole,         // 'SEEKER' | 'HR'
           company: profile.company || '',
           jobTitle: profile.jobTitle || '',
           hrSetupDone: profile.hrSetupDone || false,
