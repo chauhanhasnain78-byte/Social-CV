@@ -15,14 +15,20 @@ export function LoginForm({ onSwitchTab }) {
     e.preventDefault();
     setLoading(true);
     try {
-      await login(form);
+      const loggedUser = await login(form);
       toast.success('Welcome back!', { title: '👋 Logged in' });
-      navigate('/dashboard');
+      // Smart route based on role
+      if (loggedUser.role === 'HR') {
+        navigate(loggedUser.hrSetupDone ? '/hr-feed' : '/hr-setup');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       const errorMap = {
         'auth/user-not-found':  'No account found with this email. Please sign up.',
         'auth/wrong-password':  'Incorrect password. Please try again.',
         'auth/too-many-requests': 'Too many attempts. Please wait a moment.',
+        'auth/invalid-credential': 'Invalid email or password.',
       };
       const msg = errorMap[err.code] || err.message || 'Login failed. Please try again.';
       toast.error(msg, { title: '❌ Login Failed' });
@@ -30,6 +36,7 @@ export function LoginForm({ onSwitchTab }) {
       setLoading(false);
     }
   };
+
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">

@@ -214,14 +214,28 @@ export default function LandingPage({ onGetStarted }) {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const handleActionClick = () => {
-    if (user) {
-      navigate('/editor');
+  const handleSeekerClick = () => {
+    sessionStorage.setItem('pendingRole', 'SEEKER');
+    if (user && user.role === 'SEEKER') {
+      navigate('/dashboard');
     } else {
-      navigate('/auth');
+      navigate('/auth?role=seeker');
     }
     onGetStarted();
   };
+
+  const handleHRClick = () => {
+    sessionStorage.setItem('pendingRole', 'HR');
+    if (user && user.role === 'HR') {
+      navigate(user.hrSetupDone ? '/hr-feed' : '/hr-setup');
+    } else {
+      navigate('/auth?role=hr');
+    }
+    onGetStarted();
+  };
+
+  // Keep backward-compat for navbar buttons
+  const handleActionClick = handleSeekerClick;
 
   // Auto-advance carousel
   useEffect(() => {
@@ -329,26 +343,67 @@ export default function LandingPage({ onGetStarted }) {
               all in one intelligent workspace. <strong style={{ color: '#0D0D0F' }}>Free to start.</strong>
             </p>
 
-            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 40 }}>
+            {/* ── TWO DOORS — Role Selector ── */}
+            <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 40 }}>
+              {/* Job Seeker card */}
               <motion.button
-                className="btn-brand"
-                style={{ fontSize: '1rem', padding: '14px 32px' }}
-                whileHover={{ scale: 1.05, boxShadow: '0 16px 48px rgba(108,71,255,0.4)' }}
+                whileHover={{ scale: 1.04, y: -3, boxShadow: '0 24px 48px rgba(108,71,255,0.28)' }}
                 whileTap={{ scale: 0.97 }}
-                onClick={handleActionClick}
+                onClick={handleSeekerClick}
+                style={{
+                  flex: '1 1 200px', minWidth: 200, padding: '20px 24px',
+                  borderRadius: 20, border: '2px solid rgba(108,71,255,0.3)',
+                  background: 'linear-gradient(135deg, rgba(108,71,255,0.08) 0%, rgba(108,71,255,0.03) 100%)',
+                  cursor: 'pointer', textAlign: 'left',
+                  boxShadow: '0 8px 24px rgba(108,71,255,0.12)',
+                  transition: 'all 0.25s ease',
+                  display: 'flex', flexDirection: 'column', gap: 10,
+                }}
               >
-                Create My Resume <ArrowRight size={18} />
+                <div style={{ fontSize: '2rem' }}>👨‍💻</div>
+                <div>
+                  <div style={{ fontSize: '1rem', fontWeight: 800, color: '#6C47FF', marginBottom: 4, letterSpacing: '-0.02em' }}>
+                    I'm a Job Seeker
+                  </div>
+                  <div style={{ fontSize: '0.78rem', color: '#5A5A72', lineHeight: 1.5 }}>
+                    Build an ATS-beating CV & get discovered by top recruiters
+                  </div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#6C47FF', fontSize: '0.8rem', fontWeight: 700 }}>
+                  Create My CV <ArrowRight size={14} />
+                </div>
               </motion.button>
+
+              {/* HR / Recruiter card */}
               <motion.button
-                className="btn-outline"
-                style={{ fontSize: '1rem', padding: '14px 28px' }}
-                whileHover={{ scale: 1.03 }}
+                whileHover={{ scale: 1.04, y: -3, boxShadow: '0 24px 48px rgba(245,158,11,0.25)' }}
                 whileTap={{ scale: 0.97 }}
-                onClick={handleActionClick}
+                onClick={handleHRClick}
+                style={{
+                  flex: '1 1 200px', minWidth: 200, padding: '20px 24px',
+                  borderRadius: 20, border: '2px solid rgba(245,158,11,0.35)',
+                  background: 'linear-gradient(135deg, rgba(245,158,11,0.08) 0%, rgba(255,107,53,0.04) 100%)',
+                  cursor: 'pointer', textAlign: 'left',
+                  boxShadow: '0 8px 24px rgba(245,158,11,0.12)',
+                  transition: 'all 0.25s ease',
+                  display: 'flex', flexDirection: 'column', gap: 10,
+                }}
               >
-                Browse Templates
+                <div style={{ fontSize: '2rem' }}>👔</div>
+                <div>
+                  <div style={{ fontSize: '1rem', fontWeight: 800, color: '#D97706', marginBottom: 4, letterSpacing: '-0.02em' }}>
+                    I'm an HR / Recruiter
+                  </div>
+                  <div style={{ fontSize: '0.78rem', color: '#5A5A72', lineHeight: 1.5 }}>
+                    Browse top talent CVs in a swipeable Reels-style feed
+                  </div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#D97706', fontSize: '0.8rem', fontWeight: 700 }}>
+                  Find Talent <ArrowRight size={14} />
+                </div>
               </motion.button>
             </div>
+
 
             {/* Social proof row */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap' }}>

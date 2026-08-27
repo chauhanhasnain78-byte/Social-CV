@@ -5,7 +5,7 @@ import { toast } from '@/components/ui/Toast';
 import { useNavigate } from 'react-router-dom';
 import { generateSecurePassword, getPasswordStrength } from '@/utils/passwordUtils';
 
-export function SignupForm({ onSwitchTab }) {
+export function SignupForm({ onSwitchTab, role = 'SEEKER' }) {
   const { signup } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState({ name: '', email: '', password: '' });
@@ -28,9 +28,14 @@ export function SignupForm({ onSwitchTab }) {
     if (form.password.length < 8) { toast.error('Password must be at least 8 characters.'); return; }
     setLoading(true);
     try {
-      await signup(form);
+      const newUser = await signup({ ...form, role });
       toast.success('Account created! Welcome to Social-CV 🎉', { title: '✅ Success' });
-      navigate('/dashboard');
+      // Route based on role
+      if (newUser.role === 'HR') {
+        navigate('/hr-setup');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       const errorMap = {
         'auth/email-already-in-use': 'This email is already registered. Try logging in.',
@@ -43,6 +48,7 @@ export function SignupForm({ onSwitchTab }) {
       setLoading(false);
     }
   };
+
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">

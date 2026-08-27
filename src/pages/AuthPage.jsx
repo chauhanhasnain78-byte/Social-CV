@@ -1,18 +1,21 @@
-// src/pages/AuthPage.jsx
-import { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Zap, Shield, Star, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { Zap, Shield, Star, ArrowLeft, CheckCircle2, Briefcase, Users } from 'lucide-react';
 import { LoginForm  } from '@/components/auth/LoginForm';
 import { SignupForm } from '@/components/auth/SignupForm';
 import { useAuth } from '@/context/AuthContext';
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 
-const PERKS = [
+const SEEKER_PERKS = [
   { icon: Zap,    label: 'Live Preview',        desc: 'Every edit reflected in real-time' },
   { icon: Shield, label: 'ATS Optimized',       desc: 'Built to beat applicant tracking systems' },
   { icon: Star,   label: '6 Premium Templates', desc: 'Without & with photo — all professional' },
+];
+
+const HR_PERKS = [
+  { icon: Users,    label: 'Reels-Style Feed',   desc: 'Swipe through candidate CVs like Instagram' },
+  { icon: Briefcase, label: 'Smart Filtering',   desc: 'Candidates matched to your job description' },
+  { icon: Star,     label: 'Like & Comment',     desc: 'Shortlist talent and give instant feedback' },
 ];
 
 const SOCIAL_PROOF = ['10K+ CVs created', 'Free forever', 'No credit card'];
@@ -21,14 +24,21 @@ export default function AuthPage({ onBack }) {
   const { user, loading } = useAuth();
   const [tab, setTab] = useState('login');
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const roleParam = searchParams.get('role'); // 'hr' | 'seeker' | null
+  const isHR = roleParam === 'hr';
+  const PERKS = isHR ? HR_PERKS : SEEKER_PERKS;
 
-  // Jab login successful ho, toh seedha Landing Page par wapas le jao
+  // Jab login successful ho, role ke hisaab se route karo
   useEffect(() => {
     if (!loading && user) {
-      if (onBack) onBack();
-      navigate('/');
+      if (user.role === 'HR') {
+        navigate(user.hrSetupDone ? '/hr-feed' : '/hr-setup');
+      } else {
+        navigate('/dashboard');
+      }
     }
-  }, [user, loading, navigate, onBack]);
+  }, [user, loading, navigate]);
 
   return (
     <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #F8F6FF 0%, #FDFCFF 50%, #FFF8F6 100%)', display: 'flex', flexDirection: 'column' }}>
@@ -128,15 +138,26 @@ export default function AuthPage({ onBack }) {
               boxShadow: '0 24px 80px rgba(108,71,255,0.1), 0 8px 24px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,1)',
             }}
           >
+            {/* Role badge */}
+            {isHR && (
+              <div style={{ textAlign: 'center', marginBottom: 16 }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 14px', background: 'rgba(245,158,11,0.1)', borderRadius: 999, border: '1px solid rgba(245,158,11,0.3)', fontSize: '0.75rem', fontWeight: 700, color: '#D97706' }}>
+                  👔 HR / Recruiter Portal
+                </span>
+              </div>
+            )}
+
             {/* Card header */}
             <div style={{ marginBottom: 28, textAlign: 'center' }}>
               <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0D0D0F', marginBottom: 6, letterSpacing: '-0.03em' }}>
-                {tab === 'login' ? 'Welcome back 👋' : 'Create your account 🚀'}
+                {tab === 'login'
+                  ? (isHR ? 'Welcome back, HR 👔' : 'Welcome back 👋')
+                  : (isHR ? 'Join as Recruiter 🚀' : 'Create your account 🚀')}
               </h2>
               <p style={{ fontSize: '0.85rem', color: '#9CA3AF', fontWeight: 500 }}>
                 {tab === 'login'
-                  ? 'Sign in to continue building your resume.'
-                  : 'Join thousands of professionals. It\'s free.'}
+                  ? (isHR ? 'Sign in to access your talent feed.' : 'Sign in to continue building your resume.')
+                  : (isHR ? 'Start discovering top candidates.' : 'Join thousands of professionals. It\'s free.')}
               </p>
             </div>
 
@@ -174,7 +195,7 @@ export default function AuthPage({ onBack }) {
               >
                 {tab === 'login'
                   ? <LoginForm  onSwitchTab={() => setTab('signup')} />
-                  : <SignupForm onSwitchTab={() => setTab('login')} />
+                  : <SignupForm onSwitchTab={() => setTab('login')} role={isHR ? 'HR' : 'SEEKER'} />
                 }
               </motion.div>
             </AnimatePresence>

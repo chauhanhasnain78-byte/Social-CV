@@ -9,6 +9,8 @@ import DashboardPage from '@/pages/DashboardPage';
 import EditorPage    from '@/pages/EditorPage';
 import LandingPage   from '@/pages/LandingPage';
 import PublicResume  from '@/pages/PublicResume';
+import HRSetupPage   from '@/pages/HRSetupPage';
+import HRFeedPage    from '@/pages/HRFeedPage';
 
 // Cinematic page-slide variants — landing exits LEFT, auth enters from RIGHT
 const slideVariants = {
@@ -111,6 +113,8 @@ export default function App() {
                   <Route path="/p/:id"     element={<PublicResume />} />
                   <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
                   <Route path="/editor"    element={<ProtectedRoute><EditorPage /></ProtectedRoute>} />
+                  <Route path="/hr-setup"  element={<ProtectedRoute><HRSetupPage /></ProtectedRoute>} />
+                  <Route path="/hr-feed"   element={<ProtectedRoute><HRFeedPage /></ProtectedRoute>} />
                   <Route path="*"          element={<Navigate to="/auth" replace />} />
                 </Routes>
               </motion.div>

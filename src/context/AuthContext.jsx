@@ -7,7 +7,7 @@ import {
   onAuthStateChanged,
   updateProfile
 } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { useResumeStore } from '@/store/resumeStore';
 
 const AuthContext = createContext(null);
@@ -26,11 +26,11 @@ export function AuthProvider({ children }) {
         const store = useResumeStore.getState();
         if (data.resume) {
           store.loadResume(data.resume);
-          if (data.templateId) store.setTemplate(data.templateId);
-          if (data.themeColor) store.setThemeColor(data.themeColor);
-          if (data.fontFamily) store.setFontFamily(data.fontFamily);
+          if (data.templateId)   store.setTemplate(data.templateId);
+          if (data.themeColor)   store.setThemeColor(data.themeColor);
+          if (data.fontFamily)   store.setFontFamily(data.fontFamily);
           if (data.sectionOrder) store.setSectionOrder(data.sectionOrder);
-          if (data.fontSize) store.setFontSize(data.fontSize);
+          if (data.fontSize)     store.setFontSize(data.fontSize);
           if (data.textAlignment) store.setTextAlignment(data.textAlignment);
         }
       }
@@ -39,15 +39,37 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // Read user profile (role, company etc.) from Firestore
+  const getUserProfile = async (uid) => {
+    try {
+      const profileRef = doc(db, 'users', uid);
+      const profileSnap = await getDoc(profileRef);
+      if (profileSnap.exists()) return profileSnap.data();
+    } catch (err) {
+      console.error("Failed to read user profile:", err);
+    }
+    return {};
+  };
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        setUser({
+        const profile = await getUserProfile(firebaseUser.uid);
+        const sessionUser = {
           uid: firebaseUser.uid,
           email: firebaseUser.email,
           displayName: firebaseUser.displayName,
-        });
-        await syncResumeFromFirebase(firebaseUser.uid);
+          role: profile.role || 'SEEKER',         // 'SEEKER' | 'HR'
+          company: profile.company || '',
+          jobTitle: profile.jobTitle || '',
+          hrSetupDone: profile.hrSetupDone || false,
+          allowRecruiterView: profile.allowRecruiterView ?? false,
+        };
+        setUser(sessionUser);
+        // Only sync resume for job seekers
+        if (sessionUser.role === 'SEEKER') {
+          await syncResumeFromFirebase(firebaseUser.uid);
+        }
       } else {
         setUser(null);
       }
@@ -57,14 +79,27 @@ export function AuthProvider({ children }) {
     return () => unsubscribe();
   }, []);
 
-  const signup = async ({ name, email, password }) => {
+  const signup = async ({ name, email, password, role = 'SEEKER' }) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(userCredential.user, { displayName: name });
-    
+
+    // Save role to Firestore users/{uid}
+    await setDoc(doc(db, 'users', userCredential.user.uid), {
+      role,
+      displayName: name,
+      email,
+      createdAt: Date.now(),
+      allowRecruiterView: false,
+      hrSetupDone: false,
+    });
+
     const sessionUser = {
       uid: userCredential.user.uid,
       email: userCredential.user.email,
       displayName: name,
+      role,
+      hrSetupDone: false,
+      allowRecruiterView: false,
     };
     setUser(sessionUser);
     return sessionUser;
@@ -72,24 +107,42 @@ export function AuthProvider({ children }) {
 
   const login = async ({ email, password }) => {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const profile = await getUserProfile(userCredential.user.uid);
     const sessionUser = {
       uid: userCredential.user.uid,
       email: userCredential.user.email,
       displayName: userCredential.user.displayName,
+      role: profile.role || 'SEEKER',
+      company: profile.company || '',
+      jobTitle: profile.jobTitle || '',
+      hrSetupDone: profile.hrSetupDone || false,
+      allowRecruiterView: profile.allowRecruiterView ?? false,
     };
     setUser(sessionUser);
-    await syncResumeFromFirebase(userCredential.user.uid);
+    if (sessionUser.role === 'SEEKER') {
+      await syncResumeFromFirebase(userCredential.user.uid);
+    }
     return sessionUser;
   };
 
   const logout = async () => {
     await signOut(auth);
     setUser(null);
-    useResumeStore.getState().resetResume(); // Clear local store on logout so next user doesn't see it
+    useResumeStore.getState().resetResume();
+  };
+
+  // Refresh user profile from Firestore (called after HR setup)
+  const refreshUserProfile = async () => {
+    if (!user?.uid) return;
+    const profile = await getUserProfile(user.uid);
+    setUser(prev => ({
+      ...prev,
+      ...profile,
+    }));
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signup, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, signup, login, logout, refreshUserProfile }}>
       {!loading && children}
     </AuthContext.Provider>
   );

@@ -101,7 +101,10 @@ export default function DashboardPage() {
   const [publicData, setPublicData] = useState(null);
   const [activeFilter, setActiveFilter] = useState('all');
   const [showCoverLetter, setShowCoverLetter] = useState(false);
+  const [interactions, setInteractions] = useState({ likes: 0, views: 0, comments: [] });
+  const [allowRecruiterView, setAllowRecruiterView] = useState(user?.allowRecruiterView || false);
 
+  // Resume data
   useEffect(() => {
     if (!user?.uid) return;
     const ref = doc(db, 'resumes', user.uid);
@@ -110,6 +113,40 @@ export default function DashboardPage() {
     }, (err) => console.error(err));
     return () => unsub();
   }, [user]);
+
+  // HR Interaction Analytics
+  useEffect(() => {
+    if (!user?.uid) return;
+    import('firebase/firestore').then(({ collection, getDocs }) => {
+      Promise.all([
+        getDocs(collection(db, 'interactions', user.uid, 'views')),
+        getDocs(collection(db, 'interactions', user.uid, 'likes')),
+        getDocs(collection(db, 'interactions', user.uid, 'comments'))
+      ]).then(([viewsSnap, likesSnap, commentsSnap]) => {
+        setInteractions({
+          views: viewsSnap.size,
+          likes: likesSnap.size,
+          comments: commentsSnap.docs.map(d => ({ id: d.id, ...d.data() }))
+        });
+      }).catch(console.error);
+    });
+  }, [user]);
+
+  const toggleVisibility = async () => {
+    if (!user?.uid) return;
+    const newVal = !allowRecruiterView;
+    setAllowRecruiterView(newVal);
+    try {
+      const { updateDoc } = await import('firebase/firestore');
+      await updateDoc(doc(db, 'users', user.uid), { allowRecruiterView: newVal });
+      if (newVal) toast.success('Your CV is now visible to HRs! 🚀');
+      else toast.success('Your CV is now private. 🔒');
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to update visibility.');
+      setAllowRecruiterView(!newVal);
+    }
+  };
 
   const handleSelect = (id) => {
     setTemplate(id);
@@ -239,7 +276,79 @@ export default function DashboardPage() {
                 <Eye size={16} style={{ color: '#6C47FF' }} />
                 <span style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0D0D0F' }}>{publicData.views || 0}</span>
               </div>
-              <span style={{ fontSize: '0.7rem', color: '#9CA3AF', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Views</span>
+              <span style={{ fontSize: '0.7rem', color: '#9CA3AF', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Link Views</span>
+            </div>
+          </motion.div>
+        )}
+
+        {/* ── HR Analytics & Visibility Panel ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+          style={{
+            background: 'linear-gradient(135deg, #0A0A10 0%, #1A1A24 100%)',
+            borderRadius: 20, padding: '32px', color: '#F0F0FF',
+            display: 'flex', flexWrap: 'wrap', gap: 40, alignItems: 'center', justifyContent: 'space-between',
+            marginBottom: 48, boxShadow: '0 24px 60px rgba(10,10,16,0.15)',
+          }}
+        >
+          <div style={{ flex: '1 1 300px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+              <div style={{ fontSize: '1.6rem' }}>🚀</div>
+              <h2 style={{ fontSize: '1.4rem', fontWeight: 800, letterSpacing: '-0.02em', margin: 0 }}>Get Discovered by HRs</h2>
+            </div>
+            <p style={{ fontSize: '0.9rem', color: '#9CA3AF', lineHeight: 1.6, marginBottom: 24, maxWidth: 440 }}>
+              Allow top recruiters to discover your CV in their talent feed. You can turn this off at any time to remain private.
+            </p>
+            {/* Toggle Switch */}
+            <label style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', userSelect: 'none' }}>
+              <div style={{
+                width: 52, height: 28, borderRadius: 999,
+                background: allowRecruiterView ? '#10B981' : 'rgba(255,255,255,0.1)',
+                position: 'relative', transition: 'all 0.3s ease'
+              }}>
+                <div style={{
+                  width: 22, height: 22, borderRadius: '50%', background: '#fff',
+                  position: 'absolute', top: 3, left: allowRecruiterView ? 27 : 3,
+                  transition: 'all 0.3s ease', boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
+                }} />
+              </div>
+              <span style={{ fontSize: '0.9rem', fontWeight: 600, color: allowRecruiterView ? '#10B981' : '#9CA3AF' }}>
+                {allowRecruiterView ? 'Recruiters can see your CV' : 'Your CV is Private'}
+              </span>
+              {/* Invisible checkbox for accessibility */}
+              <input type="checkbox" checked={allowRecruiterView} onChange={toggleVisibility} style={{ display: 'none' }} />
+            </label>
+          </div>
+
+          <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
+            <div style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: '20px 24px', minWidth: 140 }}>
+              <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>HR Views</div>
+              <div style={{ fontSize: '2.2rem', fontWeight: 800, color: '#6C47FF' }}>{interactions.views}</div>
+            </div>
+            <div style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: '20px 24px', minWidth: 140 }}>
+              <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Shortlists (Likes)</div>
+              <div style={{ fontSize: '2.2rem', fontWeight: 800, color: '#EF4444' }}>{interactions.likes}</div>
+            </div>
+            <div style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: '20px 24px', minWidth: 140 }}>
+              <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Feedback (Comments)</div>
+              <div style={{ fontSize: '2.2rem', fontWeight: 800, color: '#F59E0B' }}>{interactions.comments.length}</div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* ── HR Comments Section ── */}
+        {interactions.comments.length > 0 && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ marginBottom: 48 }}>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0D0D0F', marginBottom: 16 }}>💬 Feedback from Recruiters</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {interactions.comments.map((c, i) => (
+                <div key={i} style={{ background: '#F8F8FC', borderRadius: 12, padding: '16px 20px', border: '1px solid rgba(0,0,0,0.05)' }}>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#6C47FF', marginBottom: 6 }}>
+                    {c.hrName} {c.hrCompany ? `· ${c.hrCompany}` : ''}
+                  </div>
+                  <div style={{ fontSize: '0.9rem', color: '#374151', lineHeight: 1.5 }}>{c.text}</div>
+                </div>
+              ))}
             </div>
           </motion.div>
         )}
