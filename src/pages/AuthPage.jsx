@@ -29,17 +29,16 @@ export default function AuthPage({ onBack }) {
   const isHR = roleParam === 'hr';
   const PERKS = isHR ? HR_PERKS : SEEKER_PERKS;
 
-  // Jab login successful ho, route user to the right place.
-  // If they clicked "HR" on the landing page (roleParam === 'hr'), we send them to HR flow.
+  // Jab login successful ho, role ke hisaab se route karo
   useEffect(() => {
     if (!loading && user) {
-      if (roleParam === 'hr' || user.role === 'HR') {
+      if (user.role === 'HR') {
         navigate(user.hrSetupDone ? '/hr-feed' : '/hr-setup');
       } else {
         navigate('/dashboard');
       }
     }
-  }, [user, loading, navigate, roleParam]);
+  }, [user, loading, navigate]);
 
   return (
     <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #F8F6FF 0%, #FDFCFF 50%, #FFF8F6 100%)', display: 'flex', flexDirection: 'column' }}>

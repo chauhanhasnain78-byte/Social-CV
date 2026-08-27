@@ -211,20 +211,19 @@ export default function LandingPage({ onGetStarted }) {
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [showContact, setShowContact] = useState(false);
-  const { user, refreshUserProfile } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
   const handleSeekerClick = async () => {
     sessionStorage.setItem('pendingRole', 'SEEKER');
     if (user) {
-      if (user.role !== 'SEEKER') {
-        const { doc, updateDoc } = await import('firebase/firestore');
-        const { db } = await import('@/services/firebase');
-        await updateDoc(doc(db, 'users', user.uid), { role: 'SEEKER' });
-        await refreshUserProfile();
+      if (user.role === 'HR') {
+        await logout();
+        navigate('/auth?role=seeker');
+      } else {
+        navigate('/dashboard');
       }
-      navigate('/dashboard');
     } else {
       navigate('/auth?role=seeker');
     }
@@ -234,13 +233,12 @@ export default function LandingPage({ onGetStarted }) {
   const handleHRClick = async () => {
     sessionStorage.setItem('pendingRole', 'HR');
     if (user) {
-      if (user.role !== 'HR') {
-        const { doc, updateDoc } = await import('firebase/firestore');
-        const { db } = await import('@/services/firebase');
-        await updateDoc(doc(db, 'users', user.uid), { role: 'HR' });
-        await refreshUserProfile();
+      if (user.role === 'SEEKER') {
+        await logout();
+        navigate('/auth?role=hr');
+      } else {
+        navigate(user.hrSetupDone ? '/hr-feed' : '/hr-setup');
       }
-      navigate(user.hrSetupDone ? '/hr-feed' : '/hr-setup');
     } else {
       navigate('/auth?role=hr');
     }
