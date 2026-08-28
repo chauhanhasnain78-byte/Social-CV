@@ -126,7 +126,17 @@ export function SignupForm({ onSwitchTab, role = 'SEEKER' }) {
         <div className="relative animated-border">
           <User size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
           <input id="signup-name" type="text" required className="glass-input pl-11" placeholder="Hasnain Chauhan"
-            value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+            value={form.name} 
+            onChange={(e) => {
+              let val = e.target.value.replace(/[^a-zA-Z\s.-]/g, '');
+              val = val.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase());
+              if (val) {
+                if (/([a-zA-Z])\1{3,}/.test(val.toLowerCase())) return;
+                if (/[bcdfghjklmnpqrstvwxyz]{6,}/i.test(val.replace(/[\s0-9]/g, ''))) return;
+              }
+              setForm({ ...form, name: val });
+            }} 
+          />
         </div>
       </div>
       <div>
@@ -134,7 +144,14 @@ export function SignupForm({ onSwitchTab, role = 'SEEKER' }) {
         <div className="relative animated-border">
           <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
           <input id="signup-email" type="email" required className="glass-input pl-11" placeholder="you@example.com"
-            value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+            value={form.email} 
+            onChange={(e) => {
+              let val = e.target.value.replace(/\s/g, '').toLowerCase().replace(/[^a-z0-9@._-]/g, '');
+              const match = val.match(/^(.*@[a-z-]+\.(com|in|org|net|co|edu|gov))(.*)$/);
+              if (match) val = match[1];
+              setForm({ ...form, email: val });
+            }} 
+          />
         </div>
       </div>
       <div>

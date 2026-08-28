@@ -118,7 +118,14 @@ export function LoginForm({ onSwitchTab, targetRole = null }) {
         <div className="relative animated-border">
           <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
           <input id="login-email" type="email" required className="glass-input pl-11" placeholder="you@example.com"
-            value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+            value={form.email} 
+            onChange={(e) => {
+              let val = e.target.value.replace(/\s/g, '').toLowerCase().replace(/[^a-z0-9@._-]/g, '');
+              const match = val.match(/^(.*@[a-z-]+\.(com|in|org|net|co|edu|gov))(.*)$/);
+              if (match) val = match[1];
+              setForm({ ...form, email: val });
+            }} 
+          />
         </div>
       </div>
       <div>

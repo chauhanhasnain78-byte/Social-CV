@@ -517,6 +517,7 @@ export default function HRSetupPage() {
                   if (val) {
                     if (/([a-zA-Z])\1{3,}/.test(val.toLowerCase())) return;
                     if (/[bcdfghjklmnpqrstvwxyz]{6,}/i.test(val.replace(/[\s0-9]/g, ''))) return;
+                    val = val.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase());
                   }
                   setForm({ ...form, customRole: val });
                 }}

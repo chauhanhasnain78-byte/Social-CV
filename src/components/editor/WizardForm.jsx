@@ -9,10 +9,17 @@ import { TEMPLATES } from '@/templates/templateMeta';
 
 // â”€â”€ Reusable input field (LIGHT) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function Field({ label, icon: Icon, value, onChange, placeholder, type = 'text', name, onlyLetters }) {
+  const toTitleCase = (str) => str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase());
+
   const handleChange = (e) => {
     let val = e.target.value;
     if (onlyLetters) {
       val = val.replace(/[^a-zA-Z\s.-]/g, '');
+    }
+    
+    // Auto Title Case for names and titles
+    if (onlyLetters && val) {
+      val = toTitleCase(val);
     }
     
     // Gibberish guard (Smart implementation)
@@ -203,8 +210,15 @@ function SmartEmailField({ value, onChange }) {
   };
 
   const handleChange = (e) => {
-    // Auto trim spaces and convert to lowercase for practicality
-    const val = e.target.value.replace(/\s/g, '').toLowerCase();
+    // 1. Auto trim spaces, convert to lowercase, and strip invalid email characters
+    let val = e.target.value.replace(/\s/g, '').toLowerCase().replace(/[^a-z0-9@._-]/g, '');
+    
+    // 2. Prevent typing anything after a standard TLD is reached
+    const match = val.match(/^(.*@[a-z-]+\.(com|in|org|net|co|edu|gov))(.*)$/);
+    if (match) {
+      val = match[1]; // Truncate anything typed after .com, .in, etc.
+    }
+
     onChange(val);
     setError(false);
     setActiveIndex(-1);
