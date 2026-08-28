@@ -168,10 +168,10 @@ function SmartCompanyField({ value, onChange }) {
   const handleChange = (e) => {
     let val = e.target.value.replace(/[^a-zA-Z0-9\s.&-]/g, '');
     
-    // Gibberish guard
+    // Gibberish guard (Smart implementation)
     if (val) {
-      if (/(.)\1{3,}/.test(val.toLowerCase())) return;
-      if (/[bcdfghjklmnpqrstvwxyz]{6,}/i.test(val.replace(/\s/g, ''))) return;
+      if (/([a-zA-Z])\1{3,}/.test(val.toLowerCase())) return;
+      if (/[bcdfghjklmnpqrstvwxyz]{6,}/i.test(val.replace(/[\s0-9]/g, ''))) return;
     }
 
     val = toTitleCase(val);
@@ -267,10 +267,10 @@ function SmartTitleField({ value, onChange }) {
   const handleChange = (e) => {
     let val = e.target.value.replace(/[^a-zA-Z\s.-]/g, '');
 
-    // Gibberish guard
+    // Gibberish guard (Smart implementation)
     if (val) {
-      if (/(.)\1{3,}/.test(val.toLowerCase())) return;
-      if (/[bcdfghjklmnpqrstvwxyz]{6,}/i.test(val.replace(/\s/g, ''))) return;
+      if (/([a-zA-Z])\1{3,}/.test(val.toLowerCase())) return;
+      if (/[bcdfghjklmnpqrstvwxyz]{6,}/i.test(val.replace(/[\s0-9]/g, ''))) return;
     }
 
     val = toTitleCase(val);
@@ -371,8 +371,8 @@ export default function HRSetupPage() {
 
     const isGibberish = (text) => {
       if (!text) return false;
-      if (/(.)\1{3,}/.test(text.toLowerCase())) return true; // 4+ repeating chars
-      if (/[bcdfghjklmnpqrstvwxyz]{6,}/i.test(text.replace(/\s/g, ''))) return true; // 6+ consonants in a row
+      if (/([a-zA-Z])\1{3,}/.test(text.toLowerCase())) return true; // 4+ repeating letters
+      if (/[bcdfghjklmnpqrstvwxyz]{6,}/i.test(text.replace(/[\s0-9]/g, ''))) return true; // 6+ consonants in a row (ignore spaces/numbers)
       return false;
     };
 
@@ -515,8 +515,8 @@ export default function HRSetupPage() {
                 onChange={e => {
                   let val = e.target.value.replace(/[^a-zA-Z\s.-]/g, '');
                   if (val) {
-                    if (/(.)\1{3,}/.test(val.toLowerCase())) return;
-                    if (/[bcdfghjklmnpqrstvwxyz]{6,}/i.test(val.replace(/\s/g, ''))) return;
+                    if (/([a-zA-Z])\1{3,}/.test(val.toLowerCase())) return;
+                    if (/[bcdfghjklmnpqrstvwxyz]{6,}/i.test(val.replace(/[\s0-9]/g, ''))) return;
                   }
                   setForm({ ...form, customRole: val });
                 }}
