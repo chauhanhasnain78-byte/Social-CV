@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/services/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { toast } from '@/components/ui/Toast';
-import { Building2, Briefcase, FileText, ArrowRight, Loader2, LogOut } from 'lucide-react';
+import { Building2, Briefcase, FileText, ArrowRight, Loader2, LogOut, MapPin } from 'lucide-react';
 
 const JOB_ROLES = [
   'Frontend Developer', 'Backend Developer', 'Full Stack Developer',
@@ -15,6 +15,139 @@ const JOB_ROLES = [
   'HR Manager', 'Finance Analyst', 'Content Writer', 'Graphic Designer',
   'Other',
 ];
+
+function SmartLocationField({ value, onChange }) {
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const [loading, setLoading] = useState(false);
+  const [apiSuggestions, setApiSuggestions] = useState([]);
+  const wrapperRef = useRef(null);
+
+  useEffect(() => {
+    if (!value || value.trim().length < 2 || !showDropdown) {
+      setApiSuggestions([]);
+      return;
+    }
+    const timer = setTimeout(async () => {
+      setLoading(true);
+      try {
+        const res = await fetch('https://photon.komoot.io/api/?q=' + encodeURIComponent(value) + '&layer=city&limit=5');
+        const data = await res.json();
+        const results = [];
+        if (data && data.features) {
+          data.features.forEach(f => {
+            const p = f.properties;
+            let fullName = p.name;
+            if (p.state && p.state !== p.name) fullName += ', ' + p.state;
+            if (p.country) fullName += ', ' + p.country;
+            if (!results.find(r => r.full === fullName)) {
+              results.push({ city: p.name, state: p.state || '', country: p.country || '', full: fullName });
+            }
+          });
+        }
+        setApiSuggestions(results);
+      } catch (err) {
+        console.error('Location fetch error:', err);
+      }
+      setLoading(false);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [value, showDropdown]);
+
+  const handleBlur = () => {
+    setTimeout(() => { setShowDropdown(false); setActiveIndex(-1); }, 200);
+  };
+
+  const toTitleCase = (str) => str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase());
+
+  const handleChange = (e) => {
+    const val = toTitleCase(e.target.value);
+    onChange(val);
+    setActiveIndex(-1);
+    setShowDropdown(val.trim() !== '');
+  };
+
+  const handleSelect = (suggestion) => {
+    onChange(suggestion.full);
+    setShowDropdown(false);
+    setActiveIndex(-1);
+  };
+
+  const fallbackSuggestions = !value ? [
+    { city: 'Mumbai', state: 'Maharashtra', country: 'India', full: 'Mumbai, Maharashtra, India' },
+    { city: 'Delhi', state: '', country: 'India', full: 'Delhi, India' },
+    { city: 'Bangalore', state: 'Karnataka', country: 'India', full: 'Bangalore, Karnataka, India' },
+    { city: 'Remote', state: '', country: '', full: 'Remote' }
+  ] : [];
+
+  const displaySuggestions = value && value.trim().length >= 2 ? apiSuggestions : fallbackSuggestions;
+
+  const handleKeyDown = (e) => {
+    if (!showDropdown || displaySuggestions.length === 0) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActiveIndex(prev => (prev < displaySuggestions.length - 1 ? prev + 1 : prev));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActiveIndex(prev => (prev > 0 ? prev - 1 : -1));
+    } else if (e.key === 'Enter' || e.key === 'Tab') {
+      if (activeIndex >= 0 && activeIndex < displaySuggestions.length) {
+        e.preventDefault();
+        handleSelect(displaySuggestions[activeIndex]);
+      }
+    } else if (e.key === 'Escape') {
+      setShowDropdown(false);
+      setActiveIndex(-1);
+    }
+  };
+
+  return (
+    <div style={{ position: 'relative' }} ref={wrapperRef}>
+      <label style={{ fontSize: '0.82rem', fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>Location *</label>
+      <div style={{ position: 'relative' }}>
+        <MapPin size={17} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} />
+        <input
+          type="text" required placeholder="e.g. Bhopal"
+          value={value || ''}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          onFocus={() => setShowDropdown(true)}
+          onBlur={handleBlur}
+          className="glass-input"
+          style={{ width: '100%', paddingLeft: 42 }}
+        />
+        {loading && value && (
+          <div style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)' }}>
+            <div style={{ width: 14, height: 14, border: '2px solid #E5E7EB', borderTopColor: '#6C47FF', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+            <style>{'@keyframes spin { 100% { transform: rotate(360deg); } }'}</style>
+          </div>
+        )}
+      </div>
+      {showDropdown && displaySuggestions.length > 0 && (
+        <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4, background: '#fff', border: '1px solid rgba(0,0,0,0.08)', borderRadius: 12, boxShadow: '0 12px 30px rgba(0,0,0,0.12)', zIndex: 50, overflow: 'hidden', padding: 4 }}>
+          {displaySuggestions.map((sugg, i) => (
+            <div
+              key={i} id={'loc-sugg-' + i}
+              onMouseDown={(e) => { e.preventDefault(); handleSelect(sugg); }}
+              onMouseEnter={() => setActiveIndex(i)}
+              style={{ padding: '10px 14px', borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, background: activeIndex === i ? 'rgba(108,71,255,0.08)' : 'transparent', transition: 'background 0.1s' }}
+            >
+              <MapPin size={14} color={activeIndex === i ? '#6C47FF' : '#9CA3AF'} />
+              <div>
+                <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#0D0D0F' }}>{sugg.city}</div>
+                {(sugg.state || sugg.country) && (
+                  <div style={{ fontSize: '0.7rem', color: '#6B7280' }}>
+                    {sugg.state && sugg.country ? `${sugg.state}, ${sugg.country}` : sugg.state || sugg.country}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function HRSetupPage() {
   const { user, logout, refreshUserProfile } = useAuth();
@@ -214,28 +347,10 @@ export default function HRSetupPage() {
 
           {/* Location + Type row */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <div>
-              <label style={{ fontSize: '0.82rem', fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>
-                Location
-              </label>
-              <select
-                value={form.location}
-                onChange={e => setForm({ ...form, location: e.target.value })}
-                className="glass-input"
-                style={{ width: '100%', cursor: 'pointer' }}
-              >
-                <option value="">Select location…</option>
-                <option value="Remote">Remote</option>
-                <option value="Hybrid">Hybrid</option>
-                <option value="Bengaluru, India">Bengaluru, India</option>
-                <option value="Mumbai, India">Mumbai, India</option>
-                <option value="Delhi NCR, India">Delhi NCR, India</option>
-                <option value="Pune, India">Pune, India</option>
-                <option value="Hyderabad, India">Hyderabad, India</option>
-                <option value="Chennai, India">Chennai, India</option>
-                <option value="On-site (Other)">On-site (Other)</option>
-              </select>
-            </div>
+            <SmartLocationField 
+              value={form.location} 
+              onChange={val => setForm({ ...form, location: val })} 
+            />
             <div>
               <label style={{ fontSize: '0.82rem', fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>
                 Employment Type
