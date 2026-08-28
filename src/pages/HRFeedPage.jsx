@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -11,13 +11,12 @@ import { toast } from '@/components/ui/Toast';
 import { ResumePreview } from '@/components/preview/ResumePreview';
 import {
   Heart, MessageSquare, Eye, ChevronDown, ChevronUp,
-  X, Send, Briefcase, MapPin, Search, LogOut, Settings,
+  X, Send, Briefcase, MapPin, Search, LogOut, Settings, Repeat2,
 } from 'lucide-react';
 
 // ── Full CV Modal ─────────────────────────────────────────────────────────────
 function FullCVModal({ candidateId, candidateResume, templateId, themeColor, fontFamily, onClose, hrUser }) {
   useEffect(() => {
-    // Log view in Firestore
     const viewRef = doc(db, 'interactions', candidateId, 'views', hrUser.uid);
     setDoc(viewRef, {
       hrUid: hrUser.uid,
@@ -30,12 +29,7 @@ function FullCVModal({ candidateId, candidateResume, templateId, themeColor, fon
   return (
     <motion.div
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      style={{
-        position: 'fixed', inset: 0, zIndex: 1000,
-        background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        padding: 24,
-      }}
+      style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}
       onClick={onClose}
     >
       <motion.div
@@ -43,33 +37,13 @@ function FullCVModal({ candidateId, candidateResume, templateId, themeColor, fon
         exit={{ scale: 0.85, opacity: 0 }}
         transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
         onClick={e => e.stopPropagation()}
-        style={{
-          width: '100%', maxWidth: 820, maxHeight: '90vh',
-          overflow: 'auto', borderRadius: 20,
-          boxShadow: '0 40px 100px rgba(0,0,0,0.5)',
-          background: '#fff',
-          position: 'relative',
-        }}
+        style={{ width: '100%', maxWidth: 820, maxHeight: '90vh', overflow: 'auto', borderRadius: 20, boxShadow: '0 40px 100px rgba(0,0,0,0.5)', background: '#fff', position: 'relative' }}
       >
-        <button
-          onClick={onClose}
-          style={{
-            position: 'sticky', top: 12, right: 12, float: 'right',
-            background: 'rgba(0,0,0,0.6)', border: 'none', color: '#fff',
-            width: 36, height: 36, borderRadius: '50%', cursor: 'pointer',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            zIndex: 10, marginRight: 12, marginTop: 12,
-          }}
-        >
+        <button onClick={onClose} style={{ position: 'sticky', top: 12, right: 12, float: 'right', background: 'rgba(0,0,0,0.6)', border: 'none', color: '#fff', width: 36, height: 36, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10, marginRight: 12, marginTop: 12 }}>
           <X size={18} />
         </button>
         <div style={{ clear: 'both' }} />
-        <ResumePreview
-          resume={candidateResume}
-          templateId={templateId || 'minimal-pro'}
-          themeColor={themeColor || '#6C47FF'}
-          fontFamily={fontFamily || 'inter'}
-        />
+        <ResumePreview resume={candidateResume} templateId={templateId || 'minimal-pro'} themeColor={themeColor || '#6C47FF'} fontFamily={fontFamily || 'inter'} />
       </motion.div>
     </motion.div>
   );
@@ -113,12 +87,7 @@ function CommentDrawer({ candidateId, hrUser, onClose }) {
     <motion.div
       initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
       transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-      style={{
-        position: 'fixed', right: 0, top: 0, bottom: 0,
-        width: 360, background: '#fff', zIndex: 200,
-        boxShadow: '-8px 0 40px rgba(0,0,0,0.15)',
-        display: 'flex', flexDirection: 'column',
-      }}
+      style={{ position: 'fixed', right: 0, top: 0, bottom: 0, width: 360, background: '#fff', zIndex: 200, boxShadow: '-8px 0 40px rgba(0,0,0,0.15)', display: 'flex', flexDirection: 'column' }}
     >
       <div style={{ padding: '20px 20px 16px', borderBottom: '1px solid rgba(0,0,0,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
@@ -129,13 +98,9 @@ function CommentDrawer({ candidateId, hrUser, onClose }) {
           <X size={20} color="#6B7280" />
         </button>
       </div>
-
-      {/* Comments list */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
         {comments.length === 0 && (
-          <div style={{ textAlign: 'center', color: '#9CA3AF', fontSize: '0.85rem', marginTop: 40 }}>
-            No feedback yet. Be the first!
-          </div>
+          <div style={{ textAlign: 'center', color: '#9CA3AF', fontSize: '0.85rem', marginTop: 40 }}>No feedback yet. Be the first!</div>
         )}
         {comments.map(c => (
           <div key={c.id} style={{ background: '#F9FAFB', borderRadius: 12, padding: '12px 14px' }}>
@@ -146,31 +111,16 @@ function CommentDrawer({ candidateId, hrUser, onClose }) {
           </div>
         ))}
       </div>
-
-      {/* Input */}
       <div style={{ padding: '16px 20px', borderTop: '1px solid rgba(0,0,0,0.06)', display: 'flex', gap: 8 }}>
         <textarea
-          value={text}
-          onChange={e => setText(e.target.value)}
+          value={text} onChange={e => setText(e.target.value)}
           placeholder="e.g. Great profile! Missing GitHub projects…"
           rows={3}
-          style={{
-            flex: 1, borderRadius: 12, border: '1.5px solid rgba(0,0,0,0.12)',
-            padding: '10px 12px', fontSize: '0.85rem', fontFamily: 'Inter',
-            resize: 'none', outline: 'none', color: '#374151',
-          }}
+          style={{ flex: 1, borderRadius: 12, border: '1.5px solid rgba(0,0,0,0.12)', padding: '10px 12px', fontSize: '0.85rem', fontFamily: 'Inter', resize: 'none', outline: 'none', color: '#374151' }}
           onKeyDown={e => { if (e.key === 'Enter' && e.ctrlKey) handleSend(); }}
         />
-        <button
-          onClick={handleSend}
-          disabled={sending || !text.trim()}
-          style={{
-            background: 'linear-gradient(135deg,#6C47FF,#4A2FD9)',
-            border: 'none', borderRadius: 12, width: 44,
-            cursor: sending ? 'not-allowed' : 'pointer',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            opacity: (!text.trim() || sending) ? 0.5 : 1,
-          }}
+        <button onClick={handleSend} disabled={sending || !text.trim()}
+          style={{ background: 'linear-gradient(135deg,#6C47FF,#4A2FD9)', border: 'none', borderRadius: 12, width: 44, cursor: sending ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: (!text.trim() || sending) ? 0.5 : 1 }}
         >
           <Send size={18} color="#fff" />
         </button>
@@ -180,7 +130,7 @@ function CommentDrawer({ candidateId, hrUser, onClose }) {
 }
 
 // ── Candidate Card ────────────────────────────────────────────────────────────
-function CandidateCard({ candidate, hrUser, isActive, onNext, onPrev, totalCount, currentIndex }) {
+function CandidateCard({ candidate, hrUser, onNext, onPrev, onPass, totalCount, currentIndex }) {
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [showComments, setShowComments] = useState(false);
@@ -193,12 +143,8 @@ function CandidateCard({ candidate, hrUser, isActive, onNext, onPrev, totalCount
 
   useEffect(() => {
     if (!candidate.uid) return;
-    // Check if this HR already liked
-    const likeRef = doc(db, 'interactions', candidate.uid, 'likes', hrUser.uid);
-    getDoc(likeRef).then(snap => { if (snap.exists()) setLiked(true); });
-    // Get total likes count
-    getDocs(collection(db, 'interactions', candidate.uid, 'likes'))
-      .then(snap => setLikeCount(snap.size));
+    getDoc(doc(db, 'interactions', candidate.uid, 'likes', hrUser.uid)).then(snap => { if (snap.exists()) setLiked(true); });
+    getDocs(collection(db, 'interactions', candidate.uid, 'likes')).then(snap => setLikeCount(snap.size));
   }, [candidate.uid, hrUser.uid]);
 
   const handleLike = async () => {
@@ -208,12 +154,7 @@ function CandidateCard({ candidate, hrUser, isActive, onNext, onPrev, totalCount
       setLiked(false);
       setLikeCount(c => Math.max(0, c - 1));
     } else {
-      await setDoc(likeRef, {
-        hrUid: hrUser.uid,
-        hrName: hrUser.displayName || hrUser.email,
-        hrCompany: hrUser.company || '',
-        timestamp: serverTimestamp(),
-      });
+      await setDoc(likeRef, { hrUid: hrUser.uid, hrName: hrUser.displayName || hrUser.email, hrCompany: hrUser.company || '', timestamp: serverTimestamp() });
       setLiked(true);
       setLikeCount(c => c + 1);
       toast.success('Candidate shortlisted! ❤️');
@@ -223,58 +164,30 @@ function CandidateCard({ candidate, hrUser, isActive, onNext, onPrev, totalCount
   return (
     <motion.div
       key={candidate.uid}
-      initial={{ opacity: 0, y: 40 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -40 }}
+      initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -40 }}
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-      style={{
-        width: '100%', maxWidth: 480,
-        background: '#fff', borderRadius: 28,
-        boxShadow: '0 24px 64px rgba(0,0,0,0.14)',
-        overflow: 'hidden', position: 'relative',
-      }}
+      style={{ width: '100%', maxWidth: 480, background: '#fff', borderRadius: 28, boxShadow: '0 24px 64px rgba(0,0,0,0.14)', overflow: 'hidden', position: 'relative' }}
     >
-      {/* Top strip with gradient */}
-      <div style={{
-        background: `linear-gradient(135deg, ${themeColor || '#6C47FF'}22, ${themeColor || '#6C47FF'}08)`,
-        borderBottom: `3px solid ${themeColor || '#6C47FF'}30`,
-        padding: '28px 28px 20px',
-      }}>
-        {/* Counter */}
+      {/* Top gradient strip */}
+      <div style={{ background: `linear-gradient(135deg, ${themeColor || '#6C47FF'}22, ${themeColor || '#6C47FF'}08)`, borderBottom: `3px solid ${themeColor || '#6C47FF'}30`, padding: '28px 28px 20px' }}>
+        {/* Counter dots */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-          <div style={{ fontSize: '0.72rem', fontWeight: 600, color: '#9CA3AF' }}>
-            {currentIndex + 1} / {totalCount} candidates
-          </div>
+          <div style={{ fontSize: '0.72rem', fontWeight: 600, color: '#9CA3AF' }}>{currentIndex + 1} / {totalCount} candidates</div>
           <div style={{ display: 'flex', gap: 4 }}>
             {Array.from({ length: Math.min(totalCount, 5) }).map((_, i) => (
-              <div key={i} style={{
-                width: i === currentIndex % 5 ? 20 : 6,
-                height: 6, borderRadius: 999,
-                background: i === currentIndex % 5 ? (themeColor || '#6C47FF') : '#E5E7EB',
-                transition: 'all 0.3s',
-              }} />
+              <div key={i} style={{ width: i === currentIndex % 5 ? 20 : 6, height: 6, borderRadius: 999, background: i === currentIndex % 5 ? (themeColor || '#6C47FF') : '#E5E7EB', transition: 'all 0.3s' }} />
             ))}
           </div>
         </div>
 
         {/* Avatar + Name */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16 }}>
-          <div style={{
-            width: 60, height: 60, borderRadius: '50%', flexShrink: 0,
-            background: `linear-gradient(135deg, ${themeColor || '#6C47FF'}, ${themeColor || '#6C47FF'}88)`,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '1.5rem', fontWeight: 800, color: '#fff',
-            boxShadow: `0 6px 20px ${themeColor || '#6C47FF'}40`,
-          }}>
+          <div style={{ width: 60, height: 60, borderRadius: '50%', flexShrink: 0, background: `linear-gradient(135deg, ${themeColor || '#6C47FF'}, ${themeColor || '#6C47FF'}88)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', fontWeight: 800, color: '#fff', boxShadow: `0 6px 20px ${themeColor || '#6C47FF'}40` }}>
             {name.charAt(0).toUpperCase()}
           </div>
           <div>
-            <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0D0D0F', letterSpacing: '-0.03em' }}>
-              {name}
-            </div>
-            <div style={{ fontSize: '0.88rem', color: themeColor || '#6C47FF', fontWeight: 600 }}>
-              {headline}
-            </div>
+            <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0D0D0F', letterSpacing: '-0.03em' }}>{name}</div>
+            <div style={{ fontSize: '0.88rem', color: themeColor || '#6C47FF', fontWeight: 600 }}>{headline}</div>
             {resume?.personalInfo?.city && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.75rem', color: '#9CA3AF', marginTop: 2 }}>
                 <MapPin size={11} /> {resume.personalInfo.city}
@@ -287,13 +200,7 @@ function CandidateCard({ candidate, hrUser, isActive, onNext, onPrev, totalCount
         {skills.length > 0 && (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
             {skills.map((s, i) => (
-              <span key={i} style={{
-                padding: '4px 10px', borderRadius: 999,
-                background: `${themeColor || '#6C47FF'}15`,
-                border: `1px solid ${themeColor || '#6C47FF'}30`,
-                fontSize: '0.72rem', fontWeight: 600,
-                color: themeColor || '#6C47FF',
-              }}>
+              <span key={i} style={{ padding: '4px 10px', borderRadius: 999, background: `${themeColor || '#6C47FF'}15`, border: `1px solid ${themeColor || '#6C47FF'}30`, fontSize: '0.72rem', fontWeight: 600, color: themeColor || '#6C47FF' }}>
                 {s.name}
               </span>
             ))}
@@ -301,12 +208,10 @@ function CandidateCard({ candidate, hrUser, isActive, onNext, onPrev, totalCount
         )}
       </div>
 
-      {/* Latest experience snippet */}
+      {/* Latest experience */}
       {latestExp && (
         <div style={{ padding: '16px 28px', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
-          <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
-            Latest Experience
-          </div>
+          <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Latest Experience</div>
           <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#0D0D0F' }}>{latestExp.role || 'Role'}</div>
           <div style={{ fontSize: '0.8rem', color: '#6B7280' }}>{latestExp.company || ''}</div>
           {latestExp.bullets?.[0] && (
@@ -318,104 +223,53 @@ function CandidateCard({ candidate, hrUser, isActive, onNext, onPrev, totalCount
       )}
 
       {/* Action buttons */}
-      <div style={{ padding: '16px 28px', display: 'flex', gap: 10, alignItems: 'center' }}>
-        {/* Like */}
-        <motion.button
-          whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.92 }}
-          onClick={handleLike}
-          style={{
-            flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-            padding: '12px', borderRadius: 14, border: 'none', cursor: 'pointer',
-            background: liked ? 'linear-gradient(135deg,#FF6B6B,#FF4444)' : '#FFF0F0',
-            color: liked ? '#fff' : '#EF4444',
-            fontWeight: 700, fontSize: '0.85rem',
-            transition: 'all 0.2s',
-          }}
+      <div style={{ padding: '16px 28px', display: 'flex', gap: 8, alignItems: 'center' }}>
+        {/* ❌ Pass */}
+        <motion.button whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.94 }} onClick={onPass}
+          style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '12px', borderRadius: 14, border: '1.5px solid rgba(0,0,0,0.1)', cursor: 'pointer', background: '#F9FAFB', color: '#6B7280', fontWeight: 700, fontSize: '0.82rem' }}
         >
-          <Heart size={16} fill={liked ? '#fff' : 'none'} />
-          {liked ? 'Shortlisted' : 'Like'} {likeCount > 0 && `(${likeCount})`}
+          <X size={14} /> Pass
         </motion.button>
-
-        {/* Comment */}
-        <motion.button
-          whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.92 }}
-          onClick={() => setShowComments(true)}
-          style={{
-            flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-            padding: '12px', borderRadius: 14, border: 'none', cursor: 'pointer',
-            background: '#F0F4FF', color: '#6C47FF',
-            fontWeight: 700, fontSize: '0.85rem',
-          }}
+        {/* ❤️ Like */}
+        <motion.button whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.94 }} onClick={handleLike}
+          style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '12px', borderRadius: 14, border: 'none', cursor: 'pointer', background: liked ? 'linear-gradient(135deg,#FF6B6B,#FF4444)' : '#FFF0F0', color: liked ? '#fff' : '#EF4444', fontWeight: 700, fontSize: '0.82rem', transition: 'all 0.2s' }}
         >
-          <MessageSquare size={16} /> Feedback
+          <Heart size={15} fill={liked ? '#fff' : 'none'} />
+          {liked ? 'Liked' : 'Like'}{likeCount > 0 ? ` (${likeCount})` : ''}
         </motion.button>
-
-        {/* View Full CV */}
-        <motion.button
-          whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.92 }}
-          onClick={() => setShowFullCV(true)}
-          style={{
-            flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-            padding: '12px', borderRadius: 14, border: 'none', cursor: 'pointer',
-            background: 'linear-gradient(135deg,#6C47FF,#4A2FD9)', color: '#fff',
-            fontWeight: 700, fontSize: '0.85rem',
-          }}
+        {/* 💬 Feedback */}
+        <motion.button whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.94 }} onClick={() => setShowComments(true)}
+          style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '12px', borderRadius: 14, border: 'none', cursor: 'pointer', background: '#F0F4FF', color: '#6C47FF', fontWeight: 700, fontSize: '0.82rem' }}
         >
-          <Eye size={16} /> Full CV
+          <MessageSquare size={15} /> Feedback
+        </motion.button>
+        {/* 👁️ Full CV */}
+        <motion.button whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.94 }} onClick={() => setShowFullCV(true)}
+          style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '12px', borderRadius: 14, border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg,#6C47FF,#4A2FD9)', color: '#fff', fontWeight: 700, fontSize: '0.82rem' }}
+        >
+          <Eye size={15} /> Full CV
         </motion.button>
       </div>
 
-      {/* Next/Prev nav */}
+      {/* Prev/Next navigation */}
       <div style={{ padding: '0 28px 20px', display: 'flex', gap: 8 }}>
-        <button
-          onClick={onPrev} disabled={currentIndex === 0}
-          style={{
-            flex: 1, padding: '10px', borderRadius: 12, border: '1.5px solid rgba(0,0,0,0.1)',
-            background: '#fff', cursor: currentIndex === 0 ? 'not-allowed' : 'pointer',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
-            opacity: currentIndex === 0 ? 0.4 : 1, fontWeight: 600, fontSize: '0.8rem', color: '#374151',
-          }}
+        <button onClick={onPrev} disabled={currentIndex === 0}
+          style={{ flex: 1, padding: '10px', borderRadius: 12, border: '1.5px solid rgba(0,0,0,0.1)', background: '#fff', cursor: currentIndex === 0 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, opacity: currentIndex === 0 ? 0.4 : 1, fontWeight: 600, fontSize: '0.8rem', color: '#374151' }}
         >
           <ChevronUp size={16} /> Previous
         </button>
-        <button
-          onClick={onNext} disabled={currentIndex === totalCount - 1}
-          style={{
-            flex: 1, padding: '10px', borderRadius: 12, border: 'none',
-            background: 'linear-gradient(135deg,#F59E0B,#EF4444)',
-            cursor: currentIndex === totalCount - 1 ? 'not-allowed' : 'pointer',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
-            opacity: currentIndex === totalCount - 1 ? 0.5 : 1, fontWeight: 700, fontSize: '0.8rem', color: '#fff',
-          }}
+        <button onClick={onNext} disabled={currentIndex === totalCount - 1}
+          style={{ flex: 1, padding: '10px', borderRadius: 12, border: 'none', background: 'linear-gradient(135deg,#F59E0B,#EF4444)', cursor: currentIndex === totalCount - 1 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, opacity: currentIndex === totalCount - 1 ? 0.5 : 1, fontWeight: 700, fontSize: '0.8rem', color: '#fff' }}
         >
           Next <ChevronDown size={16} />
         </button>
       </div>
 
-      {/* Full CV modal */}
       <AnimatePresence>
-        {showFullCV && (
-          <FullCVModal
-            candidateId={candidate.uid}
-            candidateResume={resume}
-            templateId={templateId}
-            themeColor={themeColor}
-            fontFamily={fontFamily}
-            hrUser={hrUser}
-            onClose={() => setShowFullCV(false)}
-          />
-        )}
+        {showFullCV && <FullCVModal candidateId={candidate.uid} candidateResume={resume} templateId={templateId} themeColor={themeColor} fontFamily={fontFamily} hrUser={hrUser} onClose={() => setShowFullCV(false)} />}
       </AnimatePresence>
-
-      {/* Comment Drawer */}
       <AnimatePresence>
-        {showComments && (
-          <CommentDrawer
-            candidateId={candidate.uid}
-            hrUser={hrUser}
-            onClose={() => setShowComments(false)}
-          />
-        )}
+        {showComments && <CommentDrawer candidateId={candidate.uid} hrUser={hrUser} onClose={() => setShowComments(false)} />}
       </AnimatePresence>
     </motion.div>
   );
@@ -426,6 +280,7 @@ export default function HRFeedPage() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [candidates, setCandidates] = useState([]);
+  const [passedUids, setPassedUids] = useState(new Set()); // ← tracks passed candidates
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -438,22 +293,15 @@ export default function HRFeedPage() {
   const loadCandidates = async () => {
     setLoading(true);
     try {
-      // Get all users who are seekers and have allowRecruiterView = true
       const usersSnap = await getDocs(
         query(collection(db, 'users'), where('role', '==', 'SEEKER'), where('allowRecruiterView', '==', true))
       );
-
       const seekerUids = usersSnap.docs.map(d => d.id);
       if (seekerUids.length === 0) { setLoading(false); return; }
 
-      // Load their resumes
-      const resumePromises = seekerUids.map(uid =>
-        getDoc(doc(db, 'resumes', uid)).then(snap => {
-          if (snap.exists()) return { uid, ...snap.data() };
-          return null;
-        })
-      );
-      const resumes = (await Promise.all(resumePromises)).filter(Boolean);
+      const resumes = (await Promise.all(
+        seekerUids.map(uid => getDoc(doc(db, 'resumes', uid)).then(snap => snap.exists() ? { uid, ...snap.data() } : null))
+      )).filter(Boolean);
       setCandidates(resumes);
     } catch (err) {
       console.error(err);
@@ -463,13 +311,17 @@ export default function HRFeedPage() {
     }
   };
 
-  const handleLogout = async () => {
-    await logout();
-    navigate('/');
+  const handleLogout = async () => { await logout(); navigate('/'); };
+
+  const handlePass = (uid) => {
+    setPassedUids(prev => new Set([...prev, uid]));
+    // Move to next without incrementing if last
+    setCurrentIndex(i => Math.min(filtered.length - 2, i));
   };
 
-  // Filter by search
+  // Filter: exclude passed candidates + search
   const filtered = candidates.filter(c => {
+    if (passedUids.has(c.uid)) return false;
     if (!searchTerm.trim()) return true;
     const s = searchTerm.toLowerCase();
     const name = `${c.resume?.personalInfo?.firstName || ''} ${c.resume?.personalInfo?.lastName || ''}`.toLowerCase();
@@ -481,25 +333,13 @@ export default function HRFeedPage() {
   const currentCandidate = filtered[currentIndex];
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: 'linear-gradient(160deg, #0A0A10 0%, #0F0F1A 50%, #0A0A10 100%)',
-      display: 'flex', flexDirection: 'column',
-    }}>
-      {/* Navbar */}
-      <nav style={{
-        position: 'sticky', top: 0, zIndex: 100,
-        background: 'rgba(10,10,16,0.9)', backdropFilter: 'blur(20px)',
-        borderBottom: '1px solid rgba(255,255,255,0.06)',
-        padding: '0 24px', height: 64,
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      }}>
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg, #0A0A10 0%, #0F0F1A 50%, #0A0A10 100%)', display: 'flex', flexDirection: 'column' }}>
+      {/* ── Navbar ── */}
+      <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(10,10,16,0.9)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.06)', padding: '0 24px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <img src="/logo.png" alt="Social-CV" style={{ height: 40, objectFit: 'contain' }} />
           <div>
-            <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#F0F0FF', letterSpacing: '-0.02em' }}>
-              Talent Feed
-            </div>
+            <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#F0F0FF', letterSpacing: '-0.02em' }}>Talent Feed</div>
             {user?.company && (
               <div style={{ fontSize: '0.7rem', color: '#6B7280', display: 'flex', alignItems: 'center', gap: 4 }}>
                 <Briefcase size={11} /> {user.company} · {user.hiringFor || 'Recruiter'}
@@ -508,39 +348,27 @@ export default function HRFeedPage() {
           </div>
         </div>
 
-        {/* Search bar */}
+        {/* Search */}
         <div style={{ position: 'relative', flex: 1, maxWidth: 360, margin: '0 24px' }}>
           <Search size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#6B7280' }} />
           <input
             type="text" placeholder="Search by name, role, or skill…"
-            value={searchTerm}
-            onChange={e => { setSearchTerm(e.target.value); setCurrentIndex(0); }}
-            style={{
-              width: '100%', padding: '9px 14px 9px 42px',
-              background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: 12, color: '#F0F0FF', fontSize: '0.85rem',
-              outline: 'none', fontFamily: 'Inter',
-            }}
+            value={searchTerm} onChange={e => { setSearchTerm(e.target.value); setCurrentIndex(0); }}
+            style={{ width: '100%', padding: '9px 14px 9px 42px', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, color: '#F0F0FF', fontSize: '0.85rem', outline: 'none', fontFamily: 'Inter' }}
           />
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <button
-            onClick={() => navigate('/hr-setup')}
-            style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '8px 12px', color: '#9CA3AF', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, fontSize: '0.8rem' }}
-          >
+          <button onClick={() => navigate('/hr-setup')} style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '8px 12px', color: '#9CA3AF', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, fontSize: '0.8rem' }}>
             <Settings size={15} /> Edit Job
           </button>
-          <button
-            onClick={handleLogout}
-            style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 10, padding: '8px 12px', color: '#EF4444', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, fontSize: '0.8rem' }}
-          >
+          <button onClick={handleLogout} style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 10, padding: '8px 12px', color: '#EF4444', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, fontSize: '0.8rem' }}>
             <LogOut size={15} /> Logout
           </button>
         </div>
       </nav>
 
-      {/* Main content */}
+      {/* ── Main content ── */}
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '32px 24px' }}>
         {loading ? (
           <div style={{ textAlign: 'center', color: '#F0F0FF' }}>
@@ -548,16 +376,17 @@ export default function HRFeedPage() {
             <div style={{ fontSize: '1rem', fontWeight: 600 }}>Loading talent pool…</div>
           </div>
         ) : filtered.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-            style={{ textAlign: 'center', maxWidth: 400, color: '#F0F0FF' }}
-          >
-            <div style={{ fontSize: '4rem', marginBottom: 16 }}>🔍</div>
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ textAlign: 'center', maxWidth: 400, color: '#F0F0FF' }}>
+            <div style={{ fontSize: '4rem', marginBottom: 16 }}>
+              {passedUids.size > 0 && candidates.length > 0 ? '✅' : '🔍'}
+            </div>
             <div style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: 8 }}>
-              {searchTerm ? 'No matching candidates' : 'No candidates yet'}
+              {passedUids.size > 0 && candidates.length > 0 ? "You've reviewed everyone!" : searchTerm ? 'No matching candidates' : 'No candidates yet'}
             </div>
             <div style={{ fontSize: '0.9rem', color: '#6B7280', lineHeight: 1.6 }}>
-              {searchTerm
+              {passedUids.size > 0 && candidates.length > 0
+                ? 'Check back later for new talent.'
+                : searchTerm
                 ? 'Try a different skill or name.'
                 : 'Job seekers who enable "Recruiter View" will appear here. Check back soon!'}
             </div>
@@ -570,11 +399,11 @@ export default function HRFeedPage() {
                   key={currentCandidate.uid}
                   candidate={currentCandidate}
                   hrUser={user}
-                  isActive
                   currentIndex={currentIndex}
                   totalCount={filtered.length}
                   onNext={() => setCurrentIndex(i => Math.min(filtered.length - 1, i + 1))}
                   onPrev={() => setCurrentIndex(i => Math.max(0, i - 1))}
+                  onPass={() => handlePass(currentCandidate.uid)}
                 />
               )}
             </AnimatePresence>
@@ -582,18 +411,26 @@ export default function HRFeedPage() {
         )}
       </div>
 
-      {/* Bottom stats bar */}
+      {/* ── Bottom stats ── */}
       {!loading && filtered.length > 0 && (
-        <div style={{
-          padding: '12px 24px', textAlign: 'center',
-          borderTop: '1px solid rgba(255,255,255,0.05)',
-          color: '#6B7280', fontSize: '0.78rem',
-        }}>
+        <div style={{ padding: '12px 24px', textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.05)', color: '#6B7280', fontSize: '0.78rem' }}>
           👔 Hiring for <strong style={{ color: '#F59E0B' }}>{user?.hiringFor || 'Open Role'}</strong>
           {user?.company && <> at <strong style={{ color: '#F0F0FF' }}>{user.company}</strong></>}
-          &nbsp;·&nbsp; {filtered.length} candidate{filtered.length !== 1 ? 's' : ''} available
+          &nbsp;·&nbsp; {filtered.length} candidate{filtered.length !== 1 ? 's' : ''} in queue
+          {passedUids.size > 0 && <> · <span style={{ color: '#6C47FF' }}>{passedUids.size} passed</span></>}
         </div>
       )}
+
+      {/* ── Floating Switch to Seeker Mode ── */}
+      <motion.button
+        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
+        onClick={() => navigate('/auth?role=seeker')}
+        style={{ position: 'fixed', bottom: 28, right: 28, zIndex: 100, display: 'flex', alignItems: 'center', gap: 8, padding: '12px 20px', borderRadius: 999, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: '#F0F0FF', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer', boxShadow: '0 8px 32px rgba(0,0,0,0.4)', fontFamily: 'Inter' }}
+        whileHover={{ scale: 1.04, background: 'rgba(255,255,255,0.12)' }}
+        whileTap={{ scale: 0.97 }}
+      >
+        <Repeat2 size={15} /> Switch to Seeker Mode
+      </motion.button>
     </div>
   );
 }

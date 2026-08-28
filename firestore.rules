@@ -1,26 +1,45 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // ── Resumes ──────────────────────────────────────────────────────────────
     match /resumes/{resumeId} {
-      // Allow public read access to view the resume
+      // Public read for shareable resume links
       allow read: if true;
-      
-      // Allow the owner to fully create/update/delete their resume
+      // Only the owner can write their resume
       allow write: if request.auth != null && request.auth.uid == resumeId;
-      
-      // Allow anyone to update the resume ONLY if they are incrementing the views counter
-      // and not modifying any other field.
+      // Allow view counter increment by anyone (public page views)
       allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['views'])
                     && request.resource.data.views == resource.data.views + 1;
     }
-    
+
+    // ── User Profiles ─────────────────────────────────────────────────────────
+    match /users/{userId} {
+      // Anyone authenticated can read profiles (needed for HR feed to fetch seekers)
+      allow read: if request.auth != null;
+      // Only the owner can write their own profile
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // ── HR ↔ Seeker Interactions ──────────────────────────────────────────────
+    match /interactions/{seekerId}/{type}/{docId} {
+      // Seeker can read their own interactions (for dashboard analytics)
+      allow read: if request.auth != null && request.auth.uid == seekerId;
+      // Any authenticated HR can write interactions (views, likes, comments)
+      allow write: if request.auth != null;
+      // HR can delete their own like (unlike)
+      allow delete: if request.auth != null && request.auth.uid == docId;
+    }
+
+    // ── System stats (global counters) ────────────────────────────────────────
     match /system/{document=**} {
       allow read, write: if true;
     }
-    
+
+    // ── Feedback / Contact form ───────────────────────────────────────────────
     match /feedback/{feedbackId} {
-      allow write: if true; // allow users to submit feedback
-      allow read: if false; // only admin can read from console
+      allow write: if true;
+      allow read: if false;
     }
   }
 }
