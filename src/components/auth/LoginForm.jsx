@@ -1,10 +1,13 @@
 import { useState } from 'react';
-import { Eye, EyeOff, Mail, Lock, LogIn } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from '@/components/ui/Toast';
 import { useNavigate } from 'react-router-dom';
+import { doc, updateDoc } from 'firebase/firestore';
+import { db } from '@/services/firebase';
 
-export function LoginForm({ onSwitchTab }) {
+export function LoginForm({ onSwitchTab, targetRole = null }) {
+  // targetRole: 'HR' | 'SEEKER' | null — passed from AuthPage based on ?role= param
   const { login } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: '', password: '' });
@@ -16,17 +19,38 @@ export function LoginForm({ onSwitchTab }) {
     setLoading(true);
     try {
       const loggedUser = await login(form);
-      toast.success('Welcome back!', { title: '👋 Logged in' });
-      // Smart route based on role
-      if (loggedUser.role === 'HR') {
-        navigate(loggedUser.hrSetupDone ? '/hr-feed' : '/hr-setup');
+
+      // ✨ Smart role switching: if user came from HR door but has Seeker account (or vice versa),
+      //    silently update their role in Firestore so they get the right experience.
+      let effectiveRole = loggedUser.role;
+      let effectiveHrSetupDone = loggedUser.hrSetupDone;
+
+      if (targetRole && targetRole !== loggedUser.role) {
+        // Update role in Firestore
+        await updateDoc(doc(db, 'users', loggedUser.uid), { role: targetRole });
+        effectiveRole = targetRole;
+        // If switching TO HR, hrSetupDone stays false (they need to set up)
+        if (targetRole === 'HR') effectiveHrSetupDone = loggedUser.hrSetupDone || false;
+        toast.success(
+          targetRole === 'HR'
+            ? 'Switched to HR mode! Let\'s find great talent. 🚀'
+            : 'Switched to Job Seeker mode! Time to shine. ✨',
+          { title: '🔄 Mode Switched' }
+        );
+      } else {
+        toast.success('Welcome back!', { title: '👋 Logged in' });
+      }
+
+      // Route based on effective role
+      if (effectiveRole === 'HR') {
+        navigate(effectiveHrSetupDone ? '/hr-feed' : '/hr-setup');
       } else {
         navigate('/dashboard');
       }
     } catch (err) {
       const errorMap = {
-        'auth/user-not-found':  'No account found with this email. Please sign up.',
-        'auth/wrong-password':  'Incorrect password. Please try again.',
+        'auth/user-not-found':    'No account found with this email. Please sign up.',
+        'auth/wrong-password':    'Incorrect password. Please try again.',
         'auth/too-many-requests': 'Too many attempts. Please wait a moment.',
         'auth/invalid-credential': 'Invalid email or password.',
       };
@@ -36,7 +60,6 @@ export function LoginForm({ onSwitchTab }) {
       setLoading(false);
     }
   };
-
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">

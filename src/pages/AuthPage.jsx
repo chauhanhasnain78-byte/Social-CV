@@ -183,7 +183,7 @@ export default function AuthPage({ onBack }) {
                 transition={{ duration: 0.2 }}
               >
                 {tab === 'login'
-                  ? <LoginForm  onSwitchTab={() => setTab('signup')} />
+                  ? <LoginForm  onSwitchTab={() => setTab('signup')} targetRole={isHR ? 'HR' : 'SEEKER'} />
                   : <SignupForm onSwitchTab={() => setTab('login')} role={isHR ? 'HR' : 'SEEKER'} />
                 }
               </motion.div>

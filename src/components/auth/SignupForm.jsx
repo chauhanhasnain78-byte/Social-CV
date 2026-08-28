@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Eye, EyeOff, Mail, Lock, User, Sparkles, LogIn } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, Sparkles } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from '@/components/ui/Toast';
 import { useNavigate } from 'react-router-dom';
@@ -30,17 +30,26 @@ export function SignupForm({ onSwitchTab, role = 'SEEKER' }) {
     try {
       const newUser = await signup({ ...form, role });
       toast.success('Account created! Welcome to Social-CV 🎉', { title: '✅ Success' });
-      // Route based on role
       if (newUser.role === 'HR') {
         navigate('/hr-setup');
       } else {
         navigate('/dashboard');
       }
     } catch (err) {
+      // ✨ Smart error: if email already exists, silently switch to Login tab
+      if (err.code === 'auth/email-already-in-use') {
+        toast.success(
+          role === 'HR'
+            ? 'You already have an account! Login to access the HR portal.'
+            : 'You already have an account! Login to continue.',
+          { title: '👋 Welcome back!' }
+        );
+        onSwitchTab(); // switch to Login tab automatically
+        return;
+      }
       const errorMap = {
-        'auth/email-already-in-use': 'This email is already registered. Try logging in.',
-        'auth/weak-password':        'Password must be at least 6 characters.',
-        'auth/invalid-email':        'Invalid email address format.',
+        'auth/weak-password':  'Password must be at least 6 characters.',
+        'auth/invalid-email':  'Invalid email address format.',
       };
       const msg = errorMap[err.code] || err.message || 'Sign up failed. Please try again.';
       toast.error(msg, { title: '❌ Signup Failed' });
@@ -48,7 +57,6 @@ export function SignupForm({ onSwitchTab, role = 'SEEKER' }) {
       setLoading(false);
     }
   };
-
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
