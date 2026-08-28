@@ -409,7 +409,7 @@ export default function HRFeedPage() {
 
 
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #FFFBEB 0%, #FDFCFF 60%, #FFF8F0 100%)', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ height: '100vh', overflow: 'hidden', background: 'linear-gradient(135deg, #FFFBEB 0%, #FDFCFF 60%, #FFF8F0 100%)', display: 'flex', flexDirection: 'column' }}>
       {/* ── Navbar ── */}
       <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(253,252,255,0.85)', backdropFilter: 'blur(24px)', borderBottom: '1px solid rgba(0,0,0,0.08)', padding: '0 40px', height: 72, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
@@ -453,7 +453,7 @@ export default function HRFeedPage() {
       </nav>
 
       {/* ── Main content ── */}
-      <div style={{ flex: 1, overflowY: 'auto', scrollSnapType: 'y mandatory', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', scrollSnapType: 'y mandatory', display: 'flex', flexDirection: 'column' }}>
         {loading ? (
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0D0D0F' }}>
             <div style={{ textAlign: 'center' }}>
@@ -483,9 +483,9 @@ export default function HRFeedPage() {
           filtered.map((candidate, i) => (
             <div key={candidate.uid} style={{ 
               scrollSnapAlign: 'start', scrollSnapStop: 'always',
-              minHeight: 'calc(100vh - 72px)', /* 72px is navbar height */
+              flex: '0 0 100%', height: '100%', boxSizing: 'border-box',
               display: 'flex', alignItems: 'center', justifyContent: 'center', 
-              padding: '32px 24px'
+              padding: '16px 24px'
             }}>
               <CandidateCard
                 candidate={candidate}
