@@ -244,6 +244,99 @@ function SmartCompanyField({ value, onChange }) {
   );
 }
 
+const POPULAR_HR_TITLES = [
+  "Recruiter", "Senior Recruiter", "Talent Acquisition Specialist", "Talent Acquisition Manager", 
+  "HR Manager", "HR Generalist", "HR Director", "VP of Human Resources", "Technical Recruiter", 
+  "Hiring Manager", "Founder", "CEO", "CTO", "Head of People", "People Operations Manager",
+  "Talent Sourcer", "Chief Human Resources Officer"
+];
+
+function SmartTitleField({ value, onChange }) {
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const wrapperRef = useRef(null);
+
+  const toTitleCase = (str) => str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase());
+
+  const handleChange = (e) => {
+    // Keep user's letters validation mask
+    let val = e.target.value.replace(/[^a-zA-Z\s.-]/g, '');
+    val = toTitleCase(val);
+    onChange(val);
+    setActiveIndex(-1);
+    setShowDropdown(val.trim() !== '');
+  };
+
+  const handleSelect = (suggestion) => {
+    onChange(suggestion);
+    setShowDropdown(false);
+    setActiveIndex(-1);
+  };
+
+  const handleBlur = () => {
+    setTimeout(() => { setShowDropdown(false); setActiveIndex(-1); }, 200);
+  };
+
+  // Filter based on input, hide if exact match
+  const displaySuggestions = POPULAR_HR_TITLES
+    .filter(c => c.toLowerCase().includes((value || '').toLowerCase()))
+    .filter(c => c.toLowerCase() !== (value || '').trim().toLowerCase())
+    .slice(0, 5);
+
+  const handleKeyDown = (e) => {
+    if (!showDropdown || displaySuggestions.length === 0) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActiveIndex(prev => (prev < displaySuggestions.length - 1 ? prev + 1 : prev));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActiveIndex(prev => (prev > 0 ? prev - 1 : -1));
+    } else if (e.key === 'Enter' || e.key === 'Tab') {
+      if (activeIndex >= 0 && activeIndex < displaySuggestions.length) {
+        e.preventDefault();
+        handleSelect(displaySuggestions[activeIndex]);
+      }
+    } else if (e.key === 'Escape') {
+      setShowDropdown(false);
+      setActiveIndex(-1);
+    }
+  };
+
+  return (
+    <div style={{ position: 'relative' }} ref={wrapperRef}>
+      <label style={{ fontSize: '0.82rem', fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>Your Job Title (optional)</label>
+      <div style={{ position: 'relative' }}>
+        <Briefcase size={17} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} />
+        <input
+          type="text" placeholder="e.g. Senior HR Manager, Talent Acquisition Lead"
+          value={value || ''}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          onFocus={() => setShowDropdown(true)}
+          onBlur={handleBlur}
+          className="glass-input"
+          style={{ width: '100%', paddingLeft: 42 }}
+        />
+      </div>
+      {showDropdown && displaySuggestions.length > 0 && (
+        <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4, background: '#fff', border: '1px solid rgba(0,0,0,0.08)', borderRadius: 12, boxShadow: '0 12px 30px rgba(0,0,0,0.12)', zIndex: 50, overflow: 'hidden', padding: 4 }}>
+          {displaySuggestions.map((sugg, i) => (
+            <div
+              key={i} id={'title-sugg-' + i}
+              onMouseDown={(e) => { e.preventDefault(); handleSelect(sugg); }}
+              onMouseEnter={() => setActiveIndex(i)}
+              style={{ padding: '10px 14px', borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, background: activeIndex === i ? 'rgba(108,71,255,0.08)' : 'transparent', transition: 'background 0.1s' }}
+            >
+              <Briefcase size={14} color={activeIndex === i ? '#6C47FF' : '#9CA3AF'} />
+              <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#0D0D0F' }}>{sugg}</div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function HRSetupPage() {
   const { user, logout, refreshUserProfile } = useAuth();
   const navigate = useNavigate();
@@ -368,24 +461,7 @@ export default function HRSetupPage() {
           <SmartCompanyField value={form.company} onChange={val => setForm({ ...form, company: val })} />
 
           {/* Your Title */}
-          <div>
-            <label style={{ fontSize: '0.82rem', fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>
-              Your Job Title (optional)
-            </label>
-            <div style={{ position: 'relative' }}>
-              <Briefcase size={17} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} />
-              <input
-                type="text" placeholder="e.g. Senior HR Manager, Talent Acquisition Lead"
-                value={form.yourTitle}
-                onChange={e => {
-                  const val = e.target.value.replace(/[^a-zA-Z\s.-]/g, '');
-                  setForm({ ...form, yourTitle: val });
-                }}
-                className="glass-input"
-                style={{ paddingLeft: 42, width: '100%' }}
-              />
-            </div>
-          </div>
+          <SmartTitleField value={form.yourTitle} onChange={val => setForm({ ...form, yourTitle: val })} />
 
           {/* Hiring For */}
           <div>
