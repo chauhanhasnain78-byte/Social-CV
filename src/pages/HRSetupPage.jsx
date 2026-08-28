@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { db } from '@/services/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { toast } from '@/components/ui/Toast';
-import { Building2, Briefcase, FileText, ArrowRight, Loader2 } from 'lucide-react';
+import { Building2, Briefcase, FileText, ArrowRight, Loader2, LogOut } from 'lucide-react';
 
 const JOB_ROLES = [
   'Frontend Developer', 'Backend Developer', 'Full Stack Developer',
@@ -17,7 +17,7 @@ const JOB_ROLES = [
 ];
 
 export default function HRSetupPage() {
-  const { user, refreshUserProfile } = useAuth();
+  const { user, logout, refreshUserProfile } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
@@ -65,11 +65,13 @@ export default function HRSetupPage() {
       background: 'linear-gradient(135deg, #FFFBEB 0%, #FDFCFF 60%, #FFF8F0 100%)',
       display: 'flex', flexDirection: 'column', alignItems: 'center',
     }}>
-      {/* ── Navbar ── */}
+      {/* ── Premium Navbar ── */}
       <nav style={{ 
         width: '100%', padding: '0 40px', height: 64, 
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        background: 'transparent', zIndex: 50, position: 'relative'
+        background: 'rgba(253,252,255,0.9)', backdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(0,0,0,0.07)',
+        position: 'sticky', top: 0, zIndex: 100
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }} onClick={() => navigate('/')}>
           <img src="/logo.png" alt="Social-CV" style={{ height: 44, width: 'auto', objectFit: 'contain' }} />
@@ -81,8 +83,20 @@ export default function HRSetupPage() {
           <span style={{ fontSize: '0.85rem', color: '#6B7280', fontWeight: 500 }}>
             Hi, <strong style={{ color: '#0D0D0F' }}>{user?.displayName?.split(' ')[0] || 'there'}</strong> 👋
           </span>
-          <button onClick={() => useAuth().logout()} className="btn-ghost-light" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: '0.82rem' }}>
-            Logout
+          <button 
+            onClick={logout} 
+            style={{ 
+              display: 'inline-flex', alignItems: 'center', gap: 6, 
+              padding: '8px 16px', borderRadius: 10,
+              background: '#fff', border: '1.5px solid rgba(0,0,0,0.08)',
+              color: '#374151', fontSize: '0.82rem', fontWeight: 600,
+              cursor: 'pointer', transition: 'all 0.2s',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+            }}
+            onMouseOver={e => { e.currentTarget.style.background = '#F9FAFB'; e.currentTarget.style.color = '#EF4444'; e.currentTarget.style.borderColor = 'rgba(239,68,68,0.2)' }}
+            onMouseOut={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.color = '#374151'; e.currentTarget.style.borderColor = 'rgba(0,0,0,0.08)' }}
+          >
+            <LogOut size={14} /> Logout
           </button>
         </div>
       </nav>
