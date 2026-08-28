@@ -64,13 +64,36 @@ export default function HRSetupPage() {
       minHeight: '100vh',
       background: 'linear-gradient(135deg, #FFFBEB 0%, #FDFCFF 60%, #FFF8F0 100%)',
       display: 'flex', flexDirection: 'column', alignItems: 'center',
-      justifyContent: 'center', padding: '40px 24px',
     }}>
+      {/* ── Navbar ── */}
+      <nav style={{ 
+        width: '100%', padding: '0 40px', height: 64, 
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        background: 'transparent', zIndex: 50, position: 'relative'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }} onClick={() => navigate('/')}>
+          <img src="/logo.png" alt="Social-CV" style={{ height: 44, width: 'auto', objectFit: 'contain' }} />
+          <span className="font-display" style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0D0D0F', letterSpacing: '-0.01em' }}>
+            Social<span style={{ color: '#6C47FF' }}>-CV</span>
+          </span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <span style={{ fontSize: '0.85rem', color: '#6B7280', fontWeight: 500 }}>
+            Hi, <strong style={{ color: '#0D0D0F' }}>{user?.displayName?.split(' ')[0] || 'there'}</strong> 👋
+          </span>
+          <button onClick={() => useAuth().logout()} className="btn-ghost-light" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: '0.82rem' }}>
+            Logout
+          </button>
+        </div>
+      </nav>
+
       {/* Background blobs */}
       <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', overflow: 'hidden', zIndex: 0 }}>
         <div style={{ position: 'absolute', top: '-10%', right: '-5%', width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle, rgba(245,158,11,0.12) 0%, transparent 70%)', filter: 'blur(60px)' }} />
         <div style={{ position: 'absolute', bottom: '-10%', left: '-5%', width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(108,71,255,0.08) 0%, transparent 70%)', filter: 'blur(60px)' }} />
       </div>
+
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', padding: '20px 24px' }}>
 
       <motion.div
         initial={{ opacity: 0, y: 32 }}
@@ -240,6 +263,7 @@ export default function HRSetupPage() {
           </motion.button>
         </form>
       </motion.div>
+      </div>
     </div>
   );
 }
