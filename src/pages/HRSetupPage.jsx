@@ -6,6 +6,7 @@ import { db } from '@/services/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { toast } from '@/components/ui/Toast';
 import { Building2, Briefcase, FileText, ArrowRight, Loader2, LogOut, MapPin } from 'lucide-react';
+import ProfileDropdown from '@/components/ui/ProfileDropdown';
 
 const JOB_ROLES = [
   'Frontend Developer', 'Backend Developer', 'Full Stack Developer',
@@ -424,33 +425,7 @@ export default function HRSetupPage() {
           </span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            {user?.photoURL ? (
-              <img src={user.photoURL} alt="Profile" style={{ width: 30, height: 30, borderRadius: '50%', objectFit: 'cover', border: '1.5px solid rgba(0,0,0,0.08)' }} />
-            ) : (
-              <div style={{ width: 30, height: 30, borderRadius: '50%', background: '#F59E0B', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.8rem' }}>
-                {user?.displayName?.charAt(0)?.toUpperCase() || 'U'}
-              </div>
-            )}
-            <span style={{ fontSize: '0.85rem', color: '#6B7280', fontWeight: 500 }}>
-              Hi, <strong style={{ color: '#0D0D0F' }}>{user?.displayName?.split(' ')[0] || 'there'}</strong> 👋
-            </span>
-          </div>
-          <button 
-            onClick={logout} 
-            style={{ 
-              display: 'inline-flex', alignItems: 'center', gap: 6, 
-              padding: '8px 16px', borderRadius: 10,
-              background: '#fff', border: '1.5px solid rgba(0,0,0,0.08)',
-              color: '#374151', fontSize: '0.82rem', fontWeight: 600,
-              cursor: 'pointer', transition: 'all 0.2s',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
-            }}
-            onMouseOver={e => { e.currentTarget.style.background = '#F9FAFB'; e.currentTarget.style.color = '#EF4444'; e.currentTarget.style.borderColor = 'rgba(239,68,68,0.2)' }}
-            onMouseOut={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.color = '#374151'; e.currentTarget.style.borderColor = 'rgba(0,0,0,0.08)' }}
-          >
-            <LogOut size={14} /> Logout
-          </button>
+          <ProfileDropdown user={user} logout={logout} theme="light" />
         </div>
       </nav>
 
