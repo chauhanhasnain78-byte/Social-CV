@@ -335,35 +335,50 @@ export default function HRFeedPage() {
   return (
     <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg, #0A0A10 0%, #0F0F1A 50%, #0A0A10 100%)', display: 'flex', flexDirection: 'column' }}>
       {/* ── Navbar ── */}
-      <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(10,10,16,0.9)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.06)', padding: '0 24px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <img src="/logo.png" alt="Social-CV" style={{ height: 40, objectFit: 'contain' }} />
+      <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(10,10,16,0.85)', backdropFilter: 'blur(24px)', borderBottom: '1px solid rgba(255,255,255,0.08)', padding: '0 40px', height: 72, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }} onClick={() => navigate('/')}>
+            <img src="/logo.png" alt="Social-CV" style={{ height: 42, objectFit: 'contain' }} />
+            <span className="font-display" style={{ fontSize: '1.2rem', fontWeight: 800, color: '#F0F0FF', letterSpacing: '-0.01em' }}>
+              Social<span style={{ color: '#6C47FF' }}>-CV</span>
+            </span>
+          </div>
+          <div style={{ height: 24, width: 1, background: 'rgba(255,255,255,0.1)' }} />
           <div>
-            <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#F0F0FF', letterSpacing: '-0.02em' }}>Talent Feed</div>
+            <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#F0F0FF', letterSpacing: '-0.01em' }}>Talent Feed</div>
             {user?.company && (
-              <div style={{ fontSize: '0.7rem', color: '#6B7280', display: 'flex', alignItems: 'center', gap: 4 }}>
-                <Briefcase size={11} /> {user.company} · {user.hiringFor || 'Recruiter'}
+              <div style={{ fontSize: '0.72rem', color: '#9CA3AF', display: 'flex', alignItems: 'center', gap: 4, marginTop: 2 }}>
+                <Briefcase size={12} /> {user.company} · {user.hiringFor || 'Recruiter'}
               </div>
             )}
           </div>
         </div>
 
         {/* Search */}
-        <div style={{ position: 'relative', flex: 1, maxWidth: 360, margin: '0 24px' }}>
-          <Search size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#6B7280' }} />
+        <div style={{ position: 'relative', flex: 1, maxWidth: 400, margin: '0 32px' }}>
+          <Search size={16} style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} />
           <input
             type="text" placeholder="Search by name, role, or skill…"
             value={searchTerm} onChange={e => { setSearchTerm(e.target.value); setCurrentIndex(0); }}
-            style={{ width: '100%', padding: '9px 14px 9px 42px', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, color: '#F0F0FF', fontSize: '0.85rem', outline: 'none', fontFamily: 'Inter' }}
+            style={{ width: '100%', padding: '10px 16px 10px 44px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 999, color: '#F0F0FF', fontSize: '0.88rem', outline: 'none', fontFamily: 'Inter', transition: 'all 0.2s' }}
+            onFocus={e => { e.target.style.background = 'rgba(255,255,255,0.08)'; e.target.style.borderColor = 'rgba(108,71,255,0.5)'; }}
+            onBlur={e => { e.target.style.background = 'rgba(255,255,255,0.05)'; e.target.style.borderColor = 'rgba(255,255,255,0.1)'; }}
           />
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <button onClick={() => navigate('/hr-setup')} style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '8px 12px', color: '#9CA3AF', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, fontSize: '0.8rem' }}>
-            <Settings size={15} /> Edit Job
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <span style={{ fontSize: '0.85rem', color: '#9CA3AF', fontWeight: 500, marginRight: 8 }}>
+            Hi, <strong style={{ color: '#F0F0FF' }}>{user?.displayName?.split(' ')[0] || 'there'}</strong> 👋
+          </span>
+          <button onClick={() => navigate('/hr-setup')} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 10, background: 'rgba(255,255,255,0.08)', border: '1.5px solid rgba(255,255,255,0.1)', color: '#F0F0FF', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}
+            onMouseOver={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.12)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)' }}
+            onMouseOut={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)' }}>
+            <Settings size={14} /> Edit Job
           </button>
-          <button onClick={handleLogout} style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 10, padding: '8px 12px', color: '#EF4444', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, fontSize: '0.8rem' }}>
-            <LogOut size={15} /> Logout
+          <button onClick={handleLogout} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 10, background: 'transparent', border: '1.5px solid rgba(255,255,255,0.1)', color: '#9CA3AF', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}
+            onMouseOver={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.1)'; e.currentTarget.style.color = '#EF4444'; e.currentTarget.style.borderColor = 'rgba(239,68,68,0.3)' }}
+            onMouseOut={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#9CA3AF'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)' }}>
+            <LogOut size={14} /> Logout
           </button>
         </div>
       </nav>

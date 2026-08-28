@@ -8,7 +8,17 @@ import {
 import { TEMPLATES } from '@/templates/templateMeta';
 
 // â”€â”€ Reusable input field (LIGHT) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-function Field({ label, icon: Icon, value, onChange, placeholder, type = 'text', name }) {
+function Field({ label, icon: Icon, value, onChange, placeholder, type = 'text', name, onlyLetters }) {
+  const handleChange = (e) => {
+    let val = e.target.value;
+    if (onlyLetters) {
+      val = val.replace(/[^a-zA-Z\s.-]/g, '');
+    }
+    // create a synthetic event-like object or call onChange(e)
+    e.target.value = val;
+    onChange(e);
+  };
+
   return (
     <div>
       <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: 'var(--dm-muted, #6B7280)', marginBottom: 5, letterSpacing: '0.02em' }}>{label}</label>
@@ -19,7 +29,7 @@ function Field({ label, icon: Icon, value, onChange, placeholder, type = 'text',
           type={type}
           placeholder={placeholder}
           value={value || ''}
-          onChange={onChange}
+          onChange={handleChange}
           style={{
             width: '100%', padding: '9px 12px',
             paddingLeft: Icon ? '2.3rem' : '12px',
@@ -396,10 +406,11 @@ function SmartPhoneField({ value, onChange }) {
       const code = clean.slice(0, spaceIndex);
       let rest = clean.slice(spaceIndex + 1).replace(/\D/g, '');
       
+      // Strict 5 space 5 formatting
       if (rest.length > 5) {
-        rest = rest.slice(0, 5) + ' ' + rest.slice(5, 10);
+        rest = rest.slice(0, 5) + ' ' + rest.slice(5, 15);
       }
-      return code + ' ' + rest;
+      return code + ' ' + rest.trim();
     }
     return clean;
   };
@@ -1551,12 +1562,12 @@ export function WizardForm() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#111827', marginBottom: 8 }}>Personal Info</h2>
             {isPhotoTemplate && <PhotoUpload />}
-            <Field label="Full Name"  icon={User}    name="name"     value={personal.name}     onChange={(e) => {
+            <Field label="Full Name"  icon={User}    name="name" onlyLetters={true} value={personal.name}     onChange={(e) => {
               const raw = e.target.value;
               const capitalized = raw.replace(/\b\w/g, c => c.toUpperCase());
               updatePersonal('name', capitalized);
             }}     placeholder="Hasnain Chauhan" />
-            <Field label="Job Title"  icon={FileText} name="title"    value={personal.title}    onChange={(e) => updatePersonal('title', e.target.value)}    placeholder="Full Stack Developer" />
+            <Field label="Job Title"  icon={FileText} name="title" onlyLetters={true} value={personal.title}    onChange={(e) => updatePersonal('title', e.target.value)}    placeholder="Full Stack Developer" />
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
               <SmartEmailField value={personal.email} onChange={(val) => updatePersonal('email', val)} />
               <SmartPhoneField value={personal.phone} onChange={(val) => updatePersonal('phone', val)} />
@@ -1728,14 +1739,17 @@ export function WizardForm() {
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: 'var(--dm-muted, #6B7280)', marginBottom: 5, letterSpacing: '0.02em' }}>GPA (optional)</label>
+                  <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: 'var(--dm-muted, #6B7280)', marginBottom: 5, letterSpacing: '0.02em' }}>CGPA / Score</label>
                   <input
                     type="text"
                     inputMode="decimal"
-                    placeholder="3.8 / 4.0"
+                    placeholder="e.g. 9.8"
                     value={edu.gpa || ''}
                     onChange={(e) => {
-                      const val = e.target.value.replace(/[^0-9./ ]/g, '');
+                      let val = e.target.value.replace(/[^0-9]/g, '');
+                      if (val.length > 1) {
+                        val = val.slice(0,1) + '.' + val.slice(1, 3);
+                      }
                       updateEducation(edu.id, 'gpa', val);
                     }}
                     style={{
@@ -1748,7 +1762,7 @@ export function WizardForm() {
                     onFocus={(e) => { e.target.style.borderColor = '#6C47FF'; e.target.style.boxShadow = '0 0 0 3px rgba(108,71,255,0.1)'; }}
                     onBlur={(e) => { e.target.style.borderColor = 'rgba(0,0,0,0.1)'; e.target.style.boxShadow = 'none'; }}
                   />
-                  <span style={{ fontSize: '0.62rem', color: 'var(--dm-muted-light, #9CA3AF)', marginTop: 3, display: 'block' }}>Numbers only, e.g. 3.8 / 4.0 or 8.5 / 10</span>
+                  <span style={{ fontSize: '0.62rem', color: 'var(--dm-muted-light, #9CA3AF)', marginTop: 3, display: 'block' }}>Numbers only, auto-formats to X.XX</span>
                 </div>
               </EntryCard>
             ))}
@@ -1909,6 +1923,7 @@ export function WizardForm() {
                   <Field
                     label="Language"
                     name={`lang-name-${lang.id}`}
+                    onlyLetters={true}
                     value={lang.language}
                     onChange={(e) => updateLanguage(lang.id, 'language', e.target.value)}
                     placeholder="English, Hindi, Marathi…"
