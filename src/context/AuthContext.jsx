@@ -7,7 +7,7 @@ import {
   onAuthStateChanged,
   updateProfile
 } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { useResumeStore } from '@/store/resumeStore';
 
 const AuthContext = createContext(null);
@@ -106,22 +106,34 @@ export function AuthProvider({ children }) {
     return sessionUser;
   };
 
-  const login = async ({ email, password }) => {
+  const login = async ({ email, password, targetRole = null }) => {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    const profile = await getUserProfile(userCredential.user.uid);
+    const uid = userCredential.user.uid;
+    const profile = await getUserProfile(uid);
+
+    // If user came from a different portal door, switch their role in Firestore
+    let finalRole = profile.role || 'SEEKER';
+    let finalHrSetupDone = profile.hrSetupDone || false;
+    if (targetRole && targetRole !== finalRole) {
+      await updateDoc(doc(db, 'users', uid), { role: targetRole });
+      finalRole = targetRole;
+      // If switching to HR for the first time, mark setup as not done
+      if (targetRole === 'HR') finalHrSetupDone = false;
+    }
+
     const sessionUser = {
-      uid: userCredential.user.uid,
+      uid,
       email: userCredential.user.email,
       displayName: userCredential.user.displayName,
-      role: profile.role || 'SEEKER',
+      role: finalRole,
       company: profile.company || '',
       jobTitle: profile.jobTitle || '',
-      hrSetupDone: profile.hrSetupDone || false,
+      hrSetupDone: finalHrSetupDone,
       allowRecruiterView: profile.allowRecruiterView ?? false,
     };
     setUser(sessionUser);
     if (sessionUser.role === 'SEEKER') {
-      await syncResumeFromFirebase(userCredential.user.uid);
+      await syncResumeFromFirebase(uid);
     }
     return sessionUser;
   };
