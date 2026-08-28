@@ -1,11 +1,12 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { auth, db } from '@/services/firebase';
+import { auth, db, googleProvider } from '@/services/firebase';
 import { 
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword, 
   signOut, 
   onAuthStateChanged,
-  updateProfile
+  updateProfile,
+  signInWithPopup,
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { useResumeStore } from '@/store/resumeStore';
@@ -138,6 +139,54 @@ export function AuthProvider({ children }) {
     return sessionUser;
   };
 
+  const loginWithGoogle = async ({ role = 'SEEKER' } = {}) => {
+    const result = await signInWithPopup(auth, googleProvider);
+    const firebaseUser = result.user;
+    const uid = firebaseUser.uid;
+
+    // Check if this user already has a Firestore doc
+    const profileSnap = await getDoc(doc(db, 'users', uid));
+
+    let finalRole = role;
+    let hrSetupDone = false;
+
+    if (profileSnap.exists()) {
+      // Returning Google user — respect existing role, but allow portal switch
+      const existing = profileSnap.data();
+      finalRole = existing.role || role;
+      hrSetupDone = existing.hrSetupDone || false;
+      // If they're switching portal role via Google, update it
+      if (role !== finalRole) {
+        await updateDoc(doc(db, 'users', uid), { role });
+        finalRole = role;
+        if (role === 'HR') hrSetupDone = false;
+      }
+    } else {
+      // Brand new Google user — create Firestore doc
+      await setDoc(doc(db, 'users', uid), {
+        role,
+        displayName: firebaseUser.displayName || '',
+        email: firebaseUser.email,
+        createdAt: Date.now(),
+        allowRecruiterView: false,
+        hrSetupDone: false,
+      });
+    }
+
+    const sessionUser = {
+      uid,
+      email: firebaseUser.email,
+      displayName: firebaseUser.displayName,
+      role: finalRole,
+      hrSetupDone,
+      allowRecruiterView: profileSnap.exists() ? (profileSnap.data().allowRecruiterView ?? false) : false,
+      company: profileSnap.exists() ? (profileSnap.data().company || '') : '',
+    };
+    setUser(sessionUser);
+    if (finalRole === 'SEEKER') await syncResumeFromFirebase(uid);
+    return sessionUser;
+  };
+
   const logout = async () => {
     await signOut(auth);
     setUser(null);
@@ -155,7 +204,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signup, login, logout, refreshUserProfile }}>
+    <AuthContext.Provider value={{ user, loading, signup, login, loginWithGoogle, logout, refreshUserProfile }}>
       {!loading && children}
     </AuthContext.Provider>
   );
