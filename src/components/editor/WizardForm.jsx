@@ -428,11 +428,17 @@ function SmartPhoneField({ value, onChange }) {
       const code = clean.slice(0, spaceIndex);
       let rest = clean.slice(spaceIndex + 1).replace(/\D/g, '');
       
-      // Strict 5 space 5 formatting
+      // Strict 5 space 5 formatting for the number part
       if (rest.length > 5) {
-        rest = rest.slice(0, 5) + ' ' + rest.slice(5, 15);
+        rest = rest.slice(0, 5) + ' ' + rest.slice(5, 10);
       }
       return code + ' ' + rest.trim();
+    }
+    
+    // Fallback if no country code yet, limit to 10 digits
+    clean = clean.replace(/\D/g, '').slice(0, 10);
+    if (clean.length > 5) {
+      clean = clean.slice(0, 5) + ' ' + clean.slice(5, 10);
     }
     return clean;
   };
@@ -1065,7 +1071,13 @@ function SmartDegreeField({ label, value, onChange, placeholder }) {
           placeholder={placeholder}
           value={value || ''}
           onChange={(e) => {
-            onChange(e.target.value);
+            let val = e.target.value;
+            if (val) {
+              if (/([a-zA-Z])\1{3,}/.test(val.toLowerCase())) return;
+              if (/[bcdfghjklmnpqrstvwxyz]{6,}/i.test(val.replace(/[\s0-9]/g, ''))) return;
+              val = val.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase());
+            }
+            onChange(val);
             setShowDropdown(true);
             setActiveIndex(-1);
           }}
@@ -1185,7 +1197,13 @@ function SmartStudyField({ label, value, degreeValue, onChange, placeholder }) {
           placeholder={placeholder}
           value={value || ''}
           onChange={(e) => {
-            onChange(e.target.value);
+            let val = e.target.value;
+            if (val) {
+              if (/([a-zA-Z])\1{3,}/.test(val.toLowerCase())) return;
+              if (/[bcdfghjklmnpqrstvwxyz]{6,}/i.test(val.replace(/[\s0-9]/g, ''))) return;
+              val = val.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase());
+            }
+            onChange(val);
             setShowDropdown(true);
             setActiveIndex(-1);
           }}
@@ -1347,7 +1365,13 @@ function SmartSchoolField({ label, value, onChange, placeholder }) {
           placeholder={placeholder}
           value={value || ''}
           onChange={(e) => {
-            onChange(e.target.value);
+            let val = e.target.value;
+            if (val) {
+              if (/([a-zA-Z])\1{3,}/.test(val.toLowerCase())) return;
+              if (/[bcdfghjklmnpqrstvwxyz]{6,}/i.test(val.replace(/[\s0-9]/g, ''))) return;
+              val = val.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase());
+            }
+            onChange(val);
             setShowDropdown(true);
             setActiveIndex(-1);
           }}
@@ -1608,7 +1632,14 @@ export function WizardForm() {
                   maxLength={500}
                   placeholder="Brief professional overview highlighting your top skills and career goals..."
                   value={personal.summary || ''}
-                  onChange={(e) => updatePersonal('summary', e.target.value)}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val) {
+                      if (/([a-zA-Z])\1{3,}/.test(val.toLowerCase())) return;
+                      if (/[bcdfghjklmnpqrstvwxyz]{6,}/i.test(val.replace(/[\s0-9]/g, ''))) return;
+                    }
+                    updatePersonal('summary', val);
+                  }}
                   style={{
                     width: '100%', padding: '10px 12px', paddingBottom: '24px', resize: 'none',
                     border: (personal.summary || '').length >= 500 ? "1.5px solid #EF4444" : "1.5px solid rgba(0,0,0,0.1)", 
@@ -1675,7 +1706,14 @@ export function WizardForm() {
                       <input
                         placeholder={`Achievement ${i + 1}: Describe impact...`} value={b}
                         maxLength={150}
-                        onChange={(e) => updateExpBullet(exp.id, i, e.target.value)}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val) {
+                            if (/([a-zA-Z])\1{3,}/.test(val.toLowerCase())) return;
+                            if (/[bcdfghjklmnpqrstvwxyz]{6,}/i.test(val.replace(/[\s0-9]/g, ''))) return;
+                          }
+                          updateExpBullet(exp.id, i, val);
+                        }}
                         style={{
                           flex: 1, padding: '8px 12px',
                           border: b.length >= 150 ? '1.5px solid #EF4444' : '1.5px solid rgba(0,0,0,0.1)',
@@ -1801,7 +1839,16 @@ export function WizardForm() {
                 id="skill-input"
                 placeholder="React, Python, Figma..."
                 value={skillInput}
-                onChange={(e) => setSkillInput(e.target.value)}
+                onChange={(e) => {
+                  let val = e.target.value;
+                  if (val) {
+                    if (/([a-zA-Z])\1{3,}/.test(val.toLowerCase())) return;
+                    if (/[bcdfghjklmnpqrstvwxyz]{6,}/i.test(val.replace(/[\s0-9]/g, ''))) return;
+                    // Auto Title Case for skills
+                    val = val.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase());
+                  }
+                  setSkillInput(val);
+                }}
                 onKeyDown={handleSkillKey}
                 style={{
                   width: '100%', padding: '12px 14px',
@@ -1889,7 +1936,14 @@ export function WizardForm() {
                       maxLength={500}
                       placeholder="Brief project description..."
                       value={proj.description || ''}
-                      onChange={(e) => updateProject(proj.id, 'description', e.target.value)}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (val) {
+                          if (/([a-zA-Z])\1{3,}/.test(val.toLowerCase())) return;
+                          if (/[bcdfghjklmnpqrstvwxyz]{6,}/i.test(val.replace(/[\s0-9]/g, ''))) return;
+                        }
+                        updateProject(proj.id, 'description', val);
+                      }}
                       style={{
                         width: '100%', padding: '10px 12px', paddingBottom: '24px', resize: 'none',
                         border: (proj.description || '').length >= 500 ? "1.5px solid #EF4444" : "1.5px solid rgba(0,0,0,0.1)",
