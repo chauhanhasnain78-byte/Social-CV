@@ -162,94 +162,121 @@ function CandidateCard({ candidate, hrUser, onPass, totalCount, currentIndex }) 
     }
   };
 
+  const education = resume?.education?.[0];
+
   return (
     <motion.div
       key={candidate.uid}
       initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -40 }}
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-      style={{ width: '100%', maxWidth: 480, background: '#fff', borderRadius: 28, boxShadow: '0 24px 64px rgba(0,0,0,0.14)', overflow: 'hidden', position: 'relative' }}
+      style={{
+        width: '100%', maxWidth: 420, height: '80vh', maxHeight: 800, aspectRatio: '9/16',
+        background: '#fff', borderRadius: 28, boxShadow: '0 24px 64px rgba(0,0,0,0.14)', 
+        position: 'relative', display: 'flex', flexDirection: 'column',
+        border: `1.5px solid ${themeColor || '#6C47FF'}30`, overflow: 'hidden'
+      }}
     >
-      {/* Top gradient strip */}
-      <div style={{ background: `linear-gradient(135deg, ${themeColor || '#6C47FF'}22, ${themeColor || '#6C47FF'}08)`, borderBottom: `3px solid ${themeColor || '#6C47FF'}30`, padding: '28px 28px 20px' }}>
-        {/* Counter dots */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-          <div style={{ fontSize: '0.72rem', fontWeight: 600, color: '#9CA3AF' }}>{currentIndex + 1} / {totalCount} candidates</div>
-          <div style={{ display: 'flex', gap: 4 }}>
-            {Array.from({ length: Math.min(totalCount, 5) }).map((_, i) => (
-              <div key={i} style={{ width: i === currentIndex % 5 ? 20 : 6, height: 6, borderRadius: 999, background: i === currentIndex % 5 ? (themeColor || '#6C47FF') : '#E5E7EB', transition: 'all 0.3s' }} />
-            ))}
-          </div>
-        </div>
-
-        {/* Avatar + Name */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16 }}>
-          <div style={{ width: 60, height: 60, borderRadius: '50%', flexShrink: 0, background: `linear-gradient(135deg, ${themeColor || '#6C47FF'}, ${themeColor || '#6C47FF'}88)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', fontWeight: 800, color: '#fff', boxShadow: `0 6px 20px ${themeColor || '#6C47FF'}40` }}>
-            {name.charAt(0).toUpperCase()}
-          </div>
-          <div>
-            <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0D0D0F', letterSpacing: '-0.03em' }}>{name}</div>
-            <div style={{ fontSize: '0.88rem', color: themeColor || '#6C47FF', fontWeight: 600 }}>{headline}</div>
-            {resume?.personalInfo?.city && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.75rem', color: '#9CA3AF', marginTop: 2 }}>
-                <MapPin size={11} /> {resume.personalInfo.city}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Skills */}
-        {skills.length > 0 && (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-            {skills.map((s, i) => (
-              <span key={i} style={{ padding: '4px 10px', borderRadius: 999, background: `${themeColor || '#6C47FF'}15`, border: `1px solid ${themeColor || '#6C47FF'}30`, fontSize: '0.72rem', fontWeight: 600, color: themeColor || '#6C47FF' }}>
-                {s.name}
-              </span>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Latest experience */}
-      {latestExp && (
-        <div style={{ padding: '16px 28px', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
-          <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Latest Experience</div>
-          <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#0D0D0F' }}>{latestExp.role || 'Role'}</div>
-          <div style={{ fontSize: '0.8rem', color: '#6B7280' }}>{latestExp.company || ''}</div>
-          {latestExp.bullets?.[0] && (
-            <div style={{ fontSize: '0.78rem', color: '#6B7280', marginTop: 6, lineHeight: 1.5 }}>
-              • {latestExp.bullets[0].substring(0, 100)}{latestExp.bullets[0].length > 100 ? '…' : ''}
-            </div>
+      {/* ── Background decoration ── */}
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '40%', background: `linear-gradient(135deg, ${themeColor || '#6C47FF'}15, ${themeColor || '#6C47FF'}03)`, zIndex: 0 }} />
+      
+      {/* ── Main content (The 3 Sections) ── */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '24px 80px 16px 24px', zIndex: 1, gap: 16 }}>
+        
+        {/* Top: Education */}
+        <div style={{ flex: 1, background: '#fff', borderRadius: 16, padding: '16px 20px', border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 4px 20px rgba(0,0,0,0.03)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Education</div>
+          {education ? (
+            <>
+              <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0D0D0F', lineHeight: 1.2 }}>{education.degree || 'Degree'}</div>
+              <div style={{ fontSize: '0.85rem', color: '#6B7280', marginTop: 4 }}>{education.school || 'School'}</div>
+            </>
+          ) : (
+            <div style={{ fontSize: '0.85rem', color: '#9CA3AF', fontStyle: 'italic' }}>No education listed</div>
           )}
         </div>
-      )}
 
-      {/* Action buttons */}
-      <div style={{ padding: '16px 28px', display: 'flex', gap: 8, alignItems: 'center' }}>
-        {/* ❌ Pass */}
-        <motion.button whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.94 }} onClick={onPass}
-          style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '12px', borderRadius: 14, border: '1.5px solid rgba(0,0,0,0.1)', cursor: 'pointer', background: '#F9FAFB', color: '#6B7280', fontWeight: 700, fontSize: '0.82rem' }}
-        >
-          <X size={14} /> Pass
-        </motion.button>
-        {/* ❤️ Like */}
-        <motion.button whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.94 }} onClick={handleLike}
-          style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '12px', borderRadius: 14, border: 'none', cursor: 'pointer', background: liked ? 'linear-gradient(135deg,#FF6B6B,#FF4444)' : '#FFF0F0', color: liked ? '#fff' : '#EF4444', fontWeight: 700, fontSize: '0.82rem', transition: 'all 0.2s' }}
-        >
-          <Heart size={15} fill={liked ? '#fff' : 'none'} />
-          {liked ? 'Liked' : 'Like'}{likeCount > 0 ? ` (${likeCount})` : ''}
-        </motion.button>
-        {/* 💬 Feedback */}
-        <motion.button whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.94 }} onClick={() => setShowComments(true)}
-          style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '12px', borderRadius: 14, border: 'none', cursor: 'pointer', background: '#F0F4FF', color: '#6C47FF', fontWeight: 700, fontSize: '0.82rem' }}
-        >
-          <MessageSquare size={15} /> Feedback
-        </motion.button>
-        {/* 👁️ Full CV */}
-        <motion.button whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.94 }} onClick={() => setShowFullCV(true)}
-          style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '12px', borderRadius: 14, border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg,#6C47FF,#4A2FD9)', color: '#fff', fontWeight: 700, fontSize: '0.82rem' }}
-        >
-          <Eye size={15} /> Full CV
-        </motion.button>
+        {/* Middle: Skills */}
+        <div style={{ flex: 1, background: '#fff', borderRadius: 16, padding: '16px 20px', border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 4px 20px rgba(0,0,0,0.03)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Skills</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+            {skills.length > 0 ? skills.map((s, i) => (
+              <span key={i} style={{ padding: '6px 12px', borderRadius: 999, background: `${themeColor || '#6C47FF'}15`, color: themeColor || '#6C47FF', fontSize: '0.8rem', fontWeight: 700 }}>{s.name}</span>
+            )) : <div style={{ fontSize: '0.85rem', color: '#9CA3AF', fontStyle: 'italic' }}>No skills listed</div>}
+          </div>
+        </div>
+
+        {/* Bottom: Experience */}
+        <div style={{ flex: 1, background: '#fff', borderRadius: 16, padding: '16px 20px', border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 4px 20px rgba(0,0,0,0.03)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Experience</div>
+          {latestExp ? (
+            <>
+              <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0D0D0F', lineHeight: 1.2 }}>{latestExp.role || 'Role'}</div>
+              <div style={{ fontSize: '0.85rem', color: themeColor || '#6C47FF', fontWeight: 700, marginTop: 4, marginBottom: 8 }}>{latestExp.company || 'Company'}</div>
+              {latestExp.bullets?.[0] && (
+                <div style={{ fontSize: '0.82rem', color: '#6B7280', lineHeight: 1.5 }}>
+                  • {latestExp.bullets[0].substring(0, 75)}{latestExp.bullets[0].length > 75 ? '…' : ''}
+                </div>
+              )}
+            </>
+          ) : (
+            <div style={{ fontSize: '0.85rem', color: '#9CA3AF', fontStyle: 'italic' }}>No experience listed</div>
+          )}
+        </div>
+      </div>
+
+      {/* ── Bottom Info: Avatar & Name ── */}
+      <div style={{ padding: '0 24px 24px', zIndex: 1, display: 'flex', alignItems: 'center', gap: 14 }}>
+        <div style={{ width: 52, height: 52, borderRadius: '50%', flexShrink: 0, background: `linear-gradient(135deg, ${themeColor || '#6C47FF'}, ${themeColor || '#6C47FF'}88)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem', fontWeight: 800, color: '#fff', boxShadow: `0 8px 24px ${themeColor || '#6C47FF'}50` }}>
+          {name.charAt(0).toUpperCase()}
+        </div>
+        <div style={{ flex: 1, paddingRight: 60 }}>
+          <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0D0D0F', letterSpacing: '-0.02em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</div>
+          <div style={{ fontSize: '0.9rem', color: '#6B7280', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{headline}</div>
+        </div>
+      </div>
+
+      {/* ── Floating Action Buttons (Right Side) ── */}
+      <div style={{ position: 'absolute', right: 16, bottom: 24, display: 'flex', flexDirection: 'column', gap: 16, zIndex: 2, alignItems: 'center' }}>
+        
+        {/* Like */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+          <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={handleLike}
+            style={{ width: 48, height: 48, borderRadius: '50%', border: 'none', background: liked ? '#EF4444' : '#F3F4F6', color: liked ? '#fff' : '#4B5563', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 8px 20px rgba(0,0,0,0.1)' }}
+          >
+            <Heart size={22} fill={liked ? '#fff' : 'none'} />
+          </motion.button>
+          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#6B7280' }}>{likeCount}</span>
+        </div>
+
+        {/* Comment */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+          <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => setShowComments(true)}
+            style={{ width: 48, height: 48, borderRadius: '50%', border: 'none', background: '#F3F4F6', color: '#4B5563', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 8px 20px rgba(0,0,0,0.1)' }}
+          >
+            <MessageSquare size={22} />
+          </motion.button>
+          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#6B7280' }}>Feed</span>
+        </div>
+
+        {/* Full CV */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+          <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => setShowFullCV(true)}
+            style={{ width: 48, height: 48, borderRadius: '50%', border: 'none', background: '#F3F4F6', color: '#4B5563', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 8px 20px rgba(0,0,0,0.1)' }}
+          >
+            <Eye size={22} />
+          </motion.button>
+          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#6B7280' }}>CV</span>
+        </div>
+
+        {/* Pass (X) */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, marginTop: 12 }}>
+          <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={onPass}
+            style={{ width: 36, height: 36, borderRadius: '50%', border: '1px solid rgba(0,0,0,0.1)', background: '#fff', color: '#9CA3AF', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
+          >
+            <X size={16} />
+          </motion.button>
+        </div>
+
       </div>
 
       <AnimatePresence>
