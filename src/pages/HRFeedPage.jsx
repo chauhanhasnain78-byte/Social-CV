@@ -334,19 +334,19 @@ export default function HRFeedPage() {
   const currentCandidate = filtered[currentIndex];
 
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg, #0A0A10 0%, #0F0F1A 50%, #0A0A10 100%)', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #FFFBEB 0%, #FDFCFF 60%, #FFF8F0 100%)', display: 'flex', flexDirection: 'column' }}>
       {/* ── Navbar ── */}
-      <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(10,10,16,0.85)', backdropFilter: 'blur(24px)', borderBottom: '1px solid rgba(255,255,255,0.08)', padding: '0 40px', height: 72, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(253,252,255,0.85)', backdropFilter: 'blur(24px)', borderBottom: '1px solid rgba(0,0,0,0.08)', padding: '0 40px', height: 72, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }} onClick={() => navigate('/')}>
             <img src="/logo.png" alt="Social-CV" style={{ height: 42, objectFit: 'contain' }} />
-            <span className="font-display" style={{ fontSize: '1.2rem', fontWeight: 800, color: '#F0F0FF', letterSpacing: '-0.01em' }}>
+            <span className="font-display" style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0D0D0F', letterSpacing: '-0.01em' }}>
               Social<span style={{ color: '#6C47FF' }}>-CV</span>
             </span>
           </div>
-          <div style={{ height: 24, width: 1, background: 'rgba(255,255,255,0.1)' }} />
+          <div style={{ height: 24, width: 1, background: 'rgba(0,0,0,0.1)' }} />
           <div>
-            <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#F0F0FF', letterSpacing: '-0.01em' }}>Talent Feed</div>
+            <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#0D0D0F', letterSpacing: '-0.01em' }}>Talent Feed</div>
             {user?.company && (
               <div style={{ fontSize: '0.72rem', color: '#9CA3AF', display: 'flex', alignItems: 'center', gap: 4, marginTop: 2 }}>
                 <Briefcase size={12} /> {user.company} · {user.hiringFor || 'Recruiter'}
@@ -361,31 +361,31 @@ export default function HRFeedPage() {
           <input
             type="text" placeholder="Search by name, role, or skill…"
             value={searchTerm} onChange={e => { setSearchTerm(e.target.value); setCurrentIndex(0); }}
-            style={{ width: '100%', padding: '10px 16px 10px 44px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 999, color: '#F0F0FF', fontSize: '0.88rem', outline: 'none', fontFamily: 'Inter', transition: 'all 0.2s' }}
-            onFocus={e => { e.target.style.background = 'rgba(255,255,255,0.08)'; e.target.style.borderColor = 'rgba(108,71,255,0.5)'; }}
-            onBlur={e => { e.target.style.background = 'rgba(255,255,255,0.05)'; e.target.style.borderColor = 'rgba(255,255,255,0.1)'; }}
+            style={{ width: '100%', padding: '10px 16px 10px 44px', background: '#fff', border: '1.5px solid rgba(0,0,0,0.08)', borderRadius: 999, color: '#0D0D0F', fontSize: '0.88rem', outline: 'none', fontFamily: 'Inter', transition: 'all 0.2s', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}
+            onFocus={e => { e.target.style.borderColor = 'rgba(108,71,255,0.4)'; e.target.style.boxShadow = '0 4px 12px rgba(108,71,255,0.08)'; }}
+            onBlur={e => { e.target.style.borderColor = 'rgba(0,0,0,0.08)'; e.target.style.boxShadow = '0 2px 8px rgba(0,0,0,0.02)'; }}
           />
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button onClick={() => navigate('/hr-setup')} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 10, background: 'rgba(255,255,255,0.08)', border: '1.5px solid rgba(255,255,255,0.1)', color: '#F0F0FF', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}
-            onMouseOver={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.12)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)' }}
-            onMouseOut={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)' }}>
+          <button onClick={() => navigate('/hr-setup')} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 10, background: '#fff', border: '1.5px solid rgba(0,0,0,0.08)', color: '#374151', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
+            onMouseOver={e => { e.currentTarget.style.background = '#F9FAFB'; e.currentTarget.style.color = '#6C47FF'; e.currentTarget.style.borderColor = 'rgba(108,71,255,0.2)' }}
+            onMouseOut={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.color = '#374151'; e.currentTarget.style.borderColor = 'rgba(0,0,0,0.08)' }}>
             <Settings size={14} /> Edit Job
           </button>
-          <ProfileDropdown user={user} logout={handleLogout} theme="dark" />
+          <ProfileDropdown user={user} logout={handleLogout} theme="light" />
         </div>
       </nav>
 
       {/* ── Main content ── */}
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '32px 24px' }}>
         {loading ? (
-          <div style={{ textAlign: 'center', color: '#F0F0FF' }}>
+          <div style={{ textAlign: 'center', color: '#0D0D0F' }}>
             <div className="animate-spin" style={{ width: 48, height: 48, borderRadius: '50%', border: '4px solid rgba(108,71,255,0.2)', borderTopColor: '#6C47FF', margin: '0 auto 16px' }} />
             <div style={{ fontSize: '1rem', fontWeight: 600 }}>Loading talent pool…</div>
           </div>
         ) : filtered.length === 0 ? (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ textAlign: 'center', maxWidth: 400, color: '#F0F0FF' }}>
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ textAlign: 'center', maxWidth: 400, color: '#0D0D0F' }}>
             <div style={{ fontSize: '4rem', marginBottom: 16 }}>
               {passedUids.size > 0 && candidates.length > 0 ? '✅' : '🔍'}
             </div>
@@ -422,9 +422,9 @@ export default function HRFeedPage() {
 
       {/* ── Bottom stats ── */}
       {!loading && filtered.length > 0 && (
-        <div style={{ padding: '12px 24px', textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.05)', color: '#6B7280', fontSize: '0.78rem' }}>
+        <div style={{ padding: '12px 24px', textAlign: 'center', borderTop: '1px solid rgba(0,0,0,0.05)', color: '#6B7280', fontSize: '0.78rem' }}>
           👔 Hiring for <strong style={{ color: '#F59E0B' }}>{user?.hiringFor || 'Open Role'}</strong>
-          {user?.company && <> at <strong style={{ color: '#F0F0FF' }}>{user.company}</strong></>}
+          {user?.company && <> at <strong style={{ color: '#0D0D0F' }}>{user.company}</strong></>}
           &nbsp;·&nbsp; {filtered.length} candidate{filtered.length !== 1 ? 's' : ''} in queue
           {passedUids.size > 0 && <> · <span style={{ color: '#6C47FF' }}>{passedUids.size} passed</span></>}
         </div>
@@ -434,8 +434,8 @@ export default function HRFeedPage() {
       <motion.button
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
         onClick={() => navigate('/auth?role=seeker')}
-        style={{ position: 'fixed', bottom: 28, right: 28, zIndex: 100, display: 'flex', alignItems: 'center', gap: 8, padding: '12px 20px', borderRadius: 999, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: '#F0F0FF', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer', boxShadow: '0 8px 32px rgba(0,0,0,0.4)', fontFamily: 'Inter' }}
-        whileHover={{ scale: 1.04, background: 'rgba(255,255,255,0.12)' }}
+        style={{ position: 'fixed', bottom: 28, right: 28, zIndex: 100, display: 'flex', alignItems: 'center', gap: 8, padding: '12px 20px', borderRadius: 999, background: '#fff', border: '1px solid rgba(0,0,0,0.1)', color: '#374151', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer', boxShadow: '0 8px 32px rgba(0,0,0,0.08)', fontFamily: 'Inter' }}
+        whileHover={{ scale: 1.04, background: '#F9FAFB', color: '#6C47FF' }}
         whileTap={{ scale: 0.97 }}
       >
         <Repeat2 size={15} /> Switch to Seeker Mode
