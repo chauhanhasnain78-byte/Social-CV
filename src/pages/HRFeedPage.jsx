@@ -298,7 +298,21 @@ export default function HRFeedPage() {
         query(collection(db, 'users'), where('role', '==', 'SEEKER'), where('allowRecruiterView', '==', true))
       );
       const seekerUids = usersSnap.docs.map(d => d.id);
-      if (seekerUids.length === 0) { setLoading(false); return; }
+      if (seekerUids.length === 0) {
+        // Fallback to dummy candidate so user can see how it looks
+        setCandidates([{
+          uid: 'dummy_preview',
+          resume: {
+            personalInfo: { firstName: 'Sarah', lastName: 'Jenkins', jobTitle: 'Senior UI/UX Engineer', city: 'San Francisco, CA', email: 'sarah@example.com' },
+            skills: [{name: 'React'}, {name: 'TypeScript'}, {name: 'Framer Motion'}, {name: 'UI Design'}],
+            experience: [{ role: 'Lead Frontend Engineer', company: 'TechCorp', bullets: ['Led the redesign of the main dashboard, improving load times by 40% and increasing user engagement by 25%.'] }]
+          },
+          templateId: 'minimal-pro',
+          themeColor: '#6C47FF'
+        }]);
+        setLoading(false);
+        return;
+      }
 
       const resumes = (await Promise.all(
         seekerUids.map(uid => getDoc(doc(db, 'resumes', uid)).then(snap => snap.exists() ? { uid, ...snap.data() } : null))
