@@ -204,9 +204,18 @@ export default function DashboardPage() {
           </span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span style={{ fontSize: '0.85rem', color: '#6B7280', fontWeight: 500 }}>
-            Hi, <strong style={{ color: '#0D0D0F' }}>{user?.displayName?.split(' ')[0] || 'there'}</strong> 👋
-          </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {user?.photoURL ? (
+              <img src={user.photoURL} alt="Profile" style={{ width: 30, height: 30, borderRadius: '50%', objectFit: 'cover', border: '1.5px solid rgba(0,0,0,0.08)' }} />
+            ) : (
+              <div style={{ width: 30, height: 30, borderRadius: '50%', background: '#6C47FF', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.8rem' }}>
+                {user?.displayName?.charAt(0)?.toUpperCase() || 'U'}
+              </div>
+            )}
+            <span style={{ fontSize: '0.85rem', color: '#6B7280', fontWeight: 500 }}>
+              Hi, <strong style={{ color: '#0D0D0F' }}>{user?.displayName?.split(' ')[0] || 'there'}</strong> 👋
+            </span>
+          </div>
           <button
             onClick={() => setShowCoverLetter(true)}
             style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 10, background: 'linear-gradient(135deg, rgba(108,71,255,0.1), rgba(74,47,217,0.08))', border: '1.5px solid rgba(108,71,255,0.25)', color: '#6C47FF', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter', transition: 'all 0.2s' }}

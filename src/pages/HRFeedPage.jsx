@@ -367,9 +367,18 @@ export default function HRFeedPage() {
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span style={{ fontSize: '0.85rem', color: '#9CA3AF', fontWeight: 500, marginRight: 8 }}>
-            Hi, <strong style={{ color: '#F0F0FF' }}>{user?.displayName?.split(' ')[0] || 'there'}</strong> 👋
-          </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginRight: 8 }}>
+            {user?.photoURL ? (
+              <img src={user.photoURL} alt="Profile" style={{ width: 30, height: 30, borderRadius: '50%', objectFit: 'cover', border: '1.5px solid rgba(255,255,255,0.15)' }} />
+            ) : (
+              <div style={{ width: 30, height: 30, borderRadius: '50%', background: '#6C47FF', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.8rem' }}>
+                {user?.displayName?.charAt(0)?.toUpperCase() || 'U'}
+              </div>
+            )}
+            <span style={{ fontSize: '0.85rem', color: '#9CA3AF', fontWeight: 500 }}>
+              Hi, <strong style={{ color: '#F0F0FF' }}>{user?.displayName?.split(' ')[0] || 'there'}</strong> 👋
+            </span>
+          </div>
           <button onClick={() => navigate('/hr-setup')} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 10, background: 'rgba(255,255,255,0.08)', border: '1.5px solid rgba(255,255,255,0.1)', color: '#F0F0FF', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}
             onMouseOver={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.12)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)' }}
             onMouseOut={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)' }}>
