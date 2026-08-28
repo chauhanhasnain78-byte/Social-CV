@@ -1469,36 +1469,36 @@ const getBulletSuggestions = (role) => {
   const r = (role || '').toLowerCase();
   if (r.includes('develop') || r.includes('engineer') || r.includes('program')) {
     return [
-      "Engineered scalable solutions resulting in a 30% increase in system efficiency.",
-      "Resolved critical bugs and improved code test coverage by over 25%.",
-      "Collaborated with cross-functional teams to deliver features 2 weeks ahead of schedule."
+      "Designed and implemented robust, scalable system architectures to support core business operations.",
+      "Optimized existing codebases for performance, significantly reducing system latency and load times.",
+      "Collaborated closely with product and design teams to translate requirements into technical deliverables."
     ];
   }
   if (r.includes('design') || r.includes('ui') || r.includes('ux')) {
     return [
-      "Designed intuitive user interfaces that increased user retention by 20%.",
-      "Conducted user research and usability testing to drive data-informed decisions.",
-      "Redesigned the onboarding flow, boosting initial conversion rates by 15%."
+      "Created user-centric interfaces and interactive prototypes that enhanced overall user experience.",
+      "Conducted comprehensive user research to identify pain points and drive iterative design improvements.",
+      "Maintained and expanded the design system to ensure visual consistency across all digital touchpoints."
     ];
   }
   if (r.includes('market') || r.includes('seo') || r.includes('sales')) {
     return [
-      "Spearheaded a marketing campaign that generated a 40% increase in inbound leads.",
-      "Analyzed market trends to optimize SEO strategy, increasing organic traffic by 50%.",
-      "Cultivated relationships with key stakeholders to close 5 major enterprise accounts."
+      "Developed and executed targeted marketing strategies that successfully expanded market reach.",
+      "Managed end-to-end campaign lifecycles, from market research and ideation to post-launch analysis.",
+      "Fostered strategic partnerships and client relationships to drive sustained business growth."
     ];
   }
   if (r.includes('manag') || r.includes('lead')) {
     return [
-      "Led a cross-functional team to successfully deliver 3 major product launches.",
-      "Streamlined operational workflows, reducing overhead costs by 15% annually.",
-      "Mentored and developed staff, improving overall team productivity by 25%."
+      "Directed cross-functional teams to successfully deliver complex projects within strict timelines.",
+      "Identified operational inefficiencies and implemented strategic process improvements across departments.",
+      "Mentored junior team members and cultivated a culture of continuous learning and accountability."
     ];
   }
   return [
-    "Spearheaded key initiatives that resulted in a 20% increase in overall productivity.",
-    "Identified process bottlenecks and implemented solutions to streamline operations.",
-    "Collaborated effectively with stakeholders to align project goals and deliverables."
+    "Took ownership of critical project deliverables, consistently meeting high quality standards.",
+    "Proactively identified bottlenecks in daily operations and proposed effective, scalable solutions.",
+    "Collaborated with key stakeholders to align daily workflows with broader organizational goals."
   ];
 };
 
