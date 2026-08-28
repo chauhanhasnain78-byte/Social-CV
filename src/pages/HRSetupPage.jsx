@@ -355,14 +355,42 @@ export default function HRSetupPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
-    company: '',
-    yourTitle: '',
-    hiringFor: '',
-    customRole: '',
-    jobDescription: '',
-    location: '',
-    employmentType: 'Full-time',
+    company: user?.company || '',
+    yourTitle: user?.yourTitle || '',
+    hiringFor: JOB_ROLES.includes(user?.hiringFor) ? user?.hiringFor : (user?.hiringFor ? 'Other' : ''),
+    customRole: !JOB_ROLES.includes(user?.hiringFor) && user?.hiringFor ? user?.hiringFor : '',
+    jobDescription: user?.jobDescription || '',
+    location: user?.location || '',
+    employmentType: user?.employmentType || 'Full-time',
   });
+  const isInitialMount = useRef(true);
+
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    if (!user) return;
+    
+    const timeout = setTimeout(async () => {
+      try {
+        const finalRole = form.hiringFor === 'Other' ? form.customRole : form.hiringFor;
+        await updateDoc(doc(db, 'users', user.uid), {
+          company: form.company.trim(),
+          yourTitle: form.yourTitle.trim(),
+          hiringFor: finalRole,
+          jobDescription: form.jobDescription.trim(),
+          location: form.location.trim(),
+          employmentType: form.employmentType,
+          hrSetupDone: !!(form.company.trim() && form.hiringFor && form.jobDescription.trim().length >= 30),
+        });
+        await refreshUserProfile();
+      } catch (err) {
+        console.error("Auto save failed", err);
+      }
+    }, 1000);
+    return () => clearTimeout(timeout);
+  }, [form]); // removed user to prevent infinite loop on refreshUserProfile
 
   const handleSubmit = async (e) => {
     e.preventDefault();

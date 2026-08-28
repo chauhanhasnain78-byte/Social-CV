@@ -63,7 +63,11 @@ export function AuthProvider({ children }) {
           displayName: firebaseUser.displayName,
           role: profile.role || pendingRole,         // 'SEEKER' | 'HR'
           company: profile.company || '',
-          jobTitle: profile.jobTitle || '',
+          yourTitle: profile.yourTitle || '',
+          hiringFor: profile.hiringFor || '',
+          jobDescription: profile.jobDescription || '',
+          location: profile.location || '',
+          employmentType: profile.employmentType || 'Full-time',
           hrSetupDone: profile.hrSetupDone || false,
           allowRecruiterView: profile.allowRecruiterView ?? false,
         };
@@ -128,7 +132,11 @@ export function AuthProvider({ children }) {
       displayName: userCredential.user.displayName,
       role: finalRole,
       company: profile.company || '',
-      jobTitle: profile.jobTitle || '',
+      yourTitle: profile.yourTitle || '',
+      hiringFor: profile.hiringFor || '',
+      jobDescription: profile.jobDescription || '',
+      location: profile.location || '',
+      employmentType: profile.employmentType || 'Full-time',
       hrSetupDone: finalHrSetupDone,
       allowRecruiterView: profile.allowRecruiterView ?? false,
     };
@@ -181,6 +189,11 @@ export function AuthProvider({ children }) {
       hrSetupDone,
       allowRecruiterView: profileSnap.exists() ? (profileSnap.data().allowRecruiterView ?? false) : false,
       company: profileSnap.exists() ? (profileSnap.data().company || '') : '',
+      yourTitle: profileSnap.exists() ? (profileSnap.data().yourTitle || '') : '',
+      hiringFor: profileSnap.exists() ? (profileSnap.data().hiringFor || '') : '',
+      jobDescription: profileSnap.exists() ? (profileSnap.data().jobDescription || '') : '',
+      location: profileSnap.exists() ? (profileSnap.data().location || '') : '',
+      employmentType: profileSnap.exists() ? (profileSnap.data().employmentType || 'Full-time') : 'Full-time',
     };
     setUser(sessionUser);
     if (finalRole === 'SEEKER') await syncResumeFromFirebase(uid);
