@@ -238,21 +238,7 @@ export default function EditorPage() {
         {renderAutoSaveIndicator()}
       </div>
 
-      <button
-        onClick={() => setDarkMode(!isDarkMode)}
-        title="Toggle Dark Mode"
-        style={{
-          marginLeft: 'auto', marginRight: 16,
-          background: isDarkMode ? 'rgba(255,255,255,0.1)' : '#F3F4F6',
-          border: 'none', cursor: 'pointer',
-          padding: 8, borderRadius: '50%',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: isDarkMode ? '#F0F0FF' : '#374151',
-          transition: 'all 0.2s'
-        }}
-      >
-        {isDarkMode ? <Sun size={16} /> : <Moon size={16} />}
-      </button>
+      <div style={{ marginLeft: 'auto', marginRight: 16 }} />
 
       {editorPhase === 'wizard' && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
