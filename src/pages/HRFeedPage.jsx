@@ -300,16 +300,68 @@ export default function HRFeedPage() {
       const seekerUids = usersSnap.docs.map(d => d.id);
       if (seekerUids.length === 0) {
         // Fallback to dummy candidate so user can see how it looks
-        setCandidates([{
-          uid: 'dummy_preview',
-          resume: {
-            personalInfo: { firstName: 'Sarah', lastName: 'Jenkins', jobTitle: 'Senior UI/UX Engineer', city: 'San Francisco, CA', email: 'sarah@example.com' },
-            skills: [{name: 'React'}, {name: 'TypeScript'}, {name: 'Framer Motion'}, {name: 'UI Design'}],
-            experience: [{ role: 'Lead Frontend Engineer', company: 'TechCorp', bullets: ['Led the redesign of the main dashboard, improving load times by 40% and increasing user engagement by 25%.'] }]
+        setCandidates([
+          {
+            uid: 'dummy_1',
+            resume: {
+              personalInfo: { firstName: 'Sarah', lastName: 'Jenkins', jobTitle: 'Senior UI/UX Engineer', city: 'San Francisco, CA', email: 'sarah@example.com' },
+              skills: [{name: 'React'}, {name: 'TypeScript'}, {name: 'Framer Motion'}, {name: 'UI Design'}],
+              experience: [{ role: 'Lead Frontend Engineer', company: 'TechCorp', bullets: ['Led the redesign of the main dashboard, improving load times by 40% and increasing user engagement by 25%.'] }]
+            },
+            templateId: 'minimal-pro',
+            themeColor: '#6C47FF'
           },
-          templateId: 'minimal-pro',
-          themeColor: '#6C47FF'
-        }]);
+          {
+            uid: 'dummy_2',
+            resume: {
+              personalInfo: { firstName: 'Michael', lastName: 'Chen', jobTitle: 'Full Stack Developer', city: 'Remote', email: 'michael.c@example.com' },
+              skills: [{name: 'Node.js'}, {name: 'Express'}, {name: 'MongoDB'}, {name: 'React'}, {name: 'AWS'}],
+              experience: [{ role: 'Backend Developer', company: 'CloudSync Inc.', bullets: ['Architected scalable microservices handling 1M+ daily requests. Reduced server costs by 30%.'] }]
+            },
+            templateId: 'modern-split',
+            themeColor: '#3B82F6'
+          },
+          {
+            uid: 'dummy_3',
+            resume: {
+              personalInfo: { firstName: 'Aisha', lastName: 'Patel', jobTitle: 'Product Manager', city: 'New York, NY', email: 'apatel@example.com' },
+              skills: [{name: 'Agile'}, {name: 'Scrum'}, {name: 'Jira'}, {name: 'Data Analysis'}, {name: 'Roadmapping'}],
+              experience: [{ role: 'Senior Product Manager', company: 'FinTech Solutions', bullets: ['Launched 3 major features resulting in $2M+ ARR increase within the first year of release.'] }]
+            },
+            templateId: 'classic-elegant',
+            themeColor: '#10B981'
+          },
+          {
+            uid: 'dummy_4',
+            resume: {
+              personalInfo: { firstName: 'David', lastName: 'Kim', jobTitle: 'Data Scientist', city: 'Seattle, WA', email: 'dkim.data@example.com' },
+              skills: [{name: 'Python'}, {name: 'Machine Learning'}, {name: 'SQL'}, {name: 'TensorFlow'}, {name: 'Pandas'}],
+              experience: [{ role: 'Data Scientist', company: 'Retail AI', bullets: ['Built recommendation engine that improved cross-sell conversion by 18% across 5M+ users.'] }]
+            },
+            templateId: 'minimal-pro',
+            themeColor: '#F59E0B'
+          },
+          {
+            uid: 'dummy_5',
+            resume: {
+              personalInfo: { firstName: 'Elena', lastName: 'Rodriguez', jobTitle: 'Marketing Director', city: 'Austin, TX', email: 'elena.marketing@example.com' },
+              skills: [{name: 'SEO/SEM'}, {name: 'Content Strategy'}, {name: 'Google Analytics'}, {name: 'Brand Management'}],
+              experience: [{ role: 'Head of Marketing', company: 'GrowthX', bullets: ['Grew organic traffic by 150% in 12 months. Managed a team of 12 marketers and $5M ad budget.'] }]
+            },
+            templateId: 'modern-split',
+            themeColor: '#EC4899'
+          },
+          {
+            uid: 'dummy_6',
+            resume: {
+              personalInfo: { firstName: 'James', lastName: 'Wilson', jobTitle: 'DevOps Engineer', city: 'Chicago, IL', email: 'j.wilson.ops@example.com' },
+              skills: [{name: 'Kubernetes'}, {name: 'Docker'}, {name: 'CI/CD'}, {name: 'Terraform'}, {name: 'AWS'}],
+              experience: [{ role: 'DevOps Lead', company: 'SecureNet', bullets: ['Automated deployment pipelines reducing release time from 4 hours to 15 minutes with zero downtime.'] }]
+            },
+            templateId: 'minimal-pro',
+            themeColor: '#6366F1'
+          }
+        ]);
         setLoading(false);
         return;
       }
