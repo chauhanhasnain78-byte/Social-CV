@@ -146,7 +146,10 @@ export default function HRSetupPage() {
               <input
                 type="text" required placeholder="e.g. Google, Infosys, Startup XYZ"
                 value={form.company}
-                onChange={e => setForm({ ...form, company: e.target.value })}
+                onChange={e => {
+                  const val = e.target.value.replace(/[^a-zA-Z0-9\s.&-]/g, '');
+                  setForm({ ...form, company: val });
+                }}
                 className="glass-input"
                 style={{ paddingLeft: 42, width: '100%' }}
               />
@@ -163,7 +166,10 @@ export default function HRSetupPage() {
               <input
                 type="text" placeholder="e.g. Senior HR Manager, Talent Acquisition Lead"
                 value={form.yourTitle}
-                onChange={e => setForm({ ...form, yourTitle: e.target.value })}
+                onChange={e => {
+                  const val = e.target.value.replace(/[^a-zA-Z\s.-]/g, '');
+                  setForm({ ...form, yourTitle: val });
+                }}
                 className="glass-input"
                 style={{ paddingLeft: 42, width: '100%' }}
               />
@@ -196,7 +202,10 @@ export default function HRSetupPage() {
               <input
                 type="text" required placeholder="e.g. Blockchain Developer"
                 value={form.customRole}
-                onChange={e => setForm({ ...form, customRole: e.target.value })}
+                onChange={e => {
+                  const val = e.target.value.replace(/[^a-zA-Z\s.-]/g, '');
+                  setForm({ ...form, customRole: val });
+                }}
                 className="glass-input"
                 style={{ width: '100%' }}
               />
@@ -209,13 +218,23 @@ export default function HRSetupPage() {
               <label style={{ fontSize: '0.82rem', fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>
                 Location
               </label>
-              <input
-                type="text" placeholder="Bengaluru / Remote"
+              <select
                 value={form.location}
                 onChange={e => setForm({ ...form, location: e.target.value })}
                 className="glass-input"
-                style={{ width: '100%' }}
-              />
+                style={{ width: '100%', cursor: 'pointer' }}
+              >
+                <option value="">Select location…</option>
+                <option value="Remote">Remote</option>
+                <option value="Hybrid">Hybrid</option>
+                <option value="Bengaluru, India">Bengaluru, India</option>
+                <option value="Mumbai, India">Mumbai, India</option>
+                <option value="Delhi NCR, India">Delhi NCR, India</option>
+                <option value="Pune, India">Pune, India</option>
+                <option value="Hyderabad, India">Hyderabad, India</option>
+                <option value="Chennai, India">Chennai, India</option>
+                <option value="On-site (Other)">On-site (Other)</option>
+              </select>
             </div>
             <div>
               <label style={{ fontSize: '0.82rem', fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>
