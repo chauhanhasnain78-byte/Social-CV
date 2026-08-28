@@ -149,6 +149,101 @@ function SmartLocationField({ value, onChange }) {
   );
 }
 
+const POPULAR_COMPANIES = [
+  "Google", "Microsoft", "Amazon", "Apple", "Meta", "Netflix", "Tesla",
+  "Adobe", "Salesforce", "Uber", "Airbnb", "Spotify", "Stripe",
+  "TCS", "Infosys", "Wipro", "HCL Technologies", "Tech Mahindra",
+  "IBM", "Oracle", "Cisco", "Intel", "Cognizant", "Accenture", "Capgemini",
+  "Deloitte", "PwC", "EY", "KPMG", "Goldman Sachs", "JPMorgan Chase", "Morgan Stanley",
+  "Paytm", "Flipkart", "Zomato", "Swiggy", "Ola", "Razorpay", "Cred", "Zerodha"
+];
+
+function SmartCompanyField({ value, onChange }) {
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const wrapperRef = useRef(null);
+
+  const toTitleCase = (str) => str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase());
+
+  const handleChange = (e) => {
+    // Keep user's alphanumeric validation mask
+    let val = e.target.value.replace(/[^a-zA-Z0-9\s.&-]/g, '');
+    val = toTitleCase(val);
+    onChange(val);
+    setActiveIndex(-1);
+    setShowDropdown(val.trim() !== '');
+  };
+
+  const handleSelect = (suggestion) => {
+    onChange(suggestion);
+    setShowDropdown(false);
+    setActiveIndex(-1);
+  };
+
+  const handleBlur = () => {
+    setTimeout(() => { setShowDropdown(false); setActiveIndex(-1); }, 200);
+  };
+
+  // Filter based on input, hide if exact match
+  const displaySuggestions = POPULAR_COMPANIES
+    .filter(c => c.toLowerCase().includes((value || '').toLowerCase()))
+    .filter(c => c.toLowerCase() !== (value || '').trim().toLowerCase())
+    .slice(0, 5);
+
+  const handleKeyDown = (e) => {
+    if (!showDropdown || displaySuggestions.length === 0) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActiveIndex(prev => (prev < displaySuggestions.length - 1 ? prev + 1 : prev));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActiveIndex(prev => (prev > 0 ? prev - 1 : -1));
+    } else if (e.key === 'Enter' || e.key === 'Tab') {
+      if (activeIndex >= 0 && activeIndex < displaySuggestions.length) {
+        e.preventDefault();
+        handleSelect(displaySuggestions[activeIndex]);
+      }
+    } else if (e.key === 'Escape') {
+      setShowDropdown(false);
+      setActiveIndex(-1);
+    }
+  };
+
+  return (
+    <div style={{ position: 'relative' }} ref={wrapperRef}>
+      <label style={{ fontSize: '0.82rem', fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>Company Name *</label>
+      <div style={{ position: 'relative' }}>
+        <Building2 size={17} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} />
+        <input
+          type="text" required placeholder="e.g. Google, Infosys, Startup XYZ"
+          value={value || ''}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          onFocus={() => setShowDropdown(true)}
+          onBlur={handleBlur}
+          className="glass-input"
+          style={{ width: '100%', paddingLeft: 42 }}
+        />
+      </div>
+      {showDropdown && displaySuggestions.length > 0 && (
+        <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4, background: '#fff', border: '1px solid rgba(0,0,0,0.08)', borderRadius: 12, boxShadow: '0 12px 30px rgba(0,0,0,0.12)', zIndex: 50, overflow: 'hidden', padding: 4 }}>
+          {displaySuggestions.map((sugg, i) => (
+            <div
+              key={i} id={'comp-sugg-' + i}
+              onMouseDown={(e) => { e.preventDefault(); handleSelect(sugg); }}
+              onMouseEnter={() => setActiveIndex(i)}
+              style={{ padding: '10px 14px', borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, background: activeIndex === i ? 'rgba(108,71,255,0.08)' : 'transparent', transition: 'background 0.1s' }}
+            >
+              <Building2 size={14} color={activeIndex === i ? '#6C47FF' : '#9CA3AF'} />
+              <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#0D0D0F' }}>{sugg}</div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function HRSetupPage() {
   const { user, logout, refreshUserProfile } = useAuth();
   const navigate = useNavigate();
@@ -270,24 +365,7 @@ export default function HRSetupPage() {
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           {/* Company Name */}
-          <div>
-            <label style={{ fontSize: '0.82rem', fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>
-              Company Name *
-            </label>
-            <div style={{ position: 'relative' }}>
-              <Building2 size={17} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} />
-              <input
-                type="text" required placeholder="e.g. Google, Infosys, Startup XYZ"
-                value={form.company}
-                onChange={e => {
-                  const val = e.target.value.replace(/[^a-zA-Z0-9\s.&-]/g, '');
-                  setForm({ ...form, company: val });
-                }}
-                className="glass-input"
-                style={{ paddingLeft: 42, width: '100%' }}
-              />
-            </div>
-          </div>
+          <SmartCompanyField value={form.company} onChange={val => setForm({ ...form, company: val })} />
 
           {/* Your Title */}
           <div>
