@@ -131,7 +131,7 @@ function CommentDrawer({ candidateId, hrUser, onClose }) {
 }
 
 // ── Candidate Card ────────────────────────────────────────────────────────────
-function CandidateCard({ candidate, hrUser, onPass }) {
+function CandidateCard({ candidate, hrUser, onPass, totalCount, currentIndex }) {
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [showComments, setShowComments] = useState(false);
@@ -380,7 +380,6 @@ export default function HRFeedPage() {
     return name.includes(s) || title.includes(s) || skills.includes(s);
   });
 
-  const currentCandidate = filtered[currentIndex];
 
   return (
     <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #FFFBEB 0%, #FDFCFF 60%, #FFF8F0 100%)', display: 'flex', flexDirection: 'column' }}>
@@ -465,6 +464,8 @@ export default function HRFeedPage() {
                 candidate={candidate}
                 hrUser={user}
                 onPass={() => handlePass(candidate.uid)}
+                currentIndex={i}
+                totalCount={filtered.length}
               />
             </div>
           ))
