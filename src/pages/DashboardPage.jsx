@@ -232,14 +232,7 @@ export default function DashboardPage() {
           <p style={{ fontSize: '1rem', color: '#5A5A72' }}>Pick a design and start building your resume instantly. You can switch anytime.</p>
         </motion.div>
 
-        {/* ── Profile Completion Ring ── */}
-        {resume && (
-          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }}
-            style={{ background: '#fff', border: '1px solid rgba(108,71,255,0.1)', borderRadius: 18, padding: '20px 26px', marginBottom: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}
-          >
-            <CompletionRing resume={resume} />
-          </motion.div>
-        )}
+
 
         {/* ── Public link panel ── */}
         {publicData && (
