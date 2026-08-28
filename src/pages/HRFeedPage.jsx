@@ -131,7 +131,7 @@ function CommentDrawer({ candidateId, hrUser, onClose }) {
 }
 
 // ── Candidate Card ────────────────────────────────────────────────────────────
-function CandidateCard({ candidate, hrUser, onNext, onPrev, onPass, totalCount, currentIndex }) {
+function CandidateCard({ candidate, hrUser, onPass }) {
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [showComments, setShowComments] = useState(false);
@@ -252,20 +252,6 @@ function CandidateCard({ candidate, hrUser, onNext, onPrev, onPass, totalCount, 
         </motion.button>
       </div>
 
-      {/* Prev/Next navigation */}
-      <div style={{ padding: '0 28px 20px', display: 'flex', gap: 8 }}>
-        <button onClick={onPrev} disabled={currentIndex === 0}
-          style={{ flex: 1, padding: '10px', borderRadius: 12, border: '1.5px solid rgba(0,0,0,0.1)', background: '#fff', cursor: currentIndex === 0 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, opacity: currentIndex === 0 ? 0.4 : 1, fontWeight: 600, fontSize: '0.8rem', color: '#374151' }}
-        >
-          <ChevronUp size={16} /> Previous
-        </button>
-        <button onClick={onNext} disabled={currentIndex === totalCount - 1}
-          style={{ flex: 1, padding: '10px', borderRadius: 12, border: 'none', background: 'linear-gradient(135deg,#F59E0B,#EF4444)', cursor: currentIndex === totalCount - 1 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, opacity: currentIndex === totalCount - 1 ? 0.5 : 1, fontWeight: 700, fontSize: '0.8rem', color: '#fff' }}
-        >
-          Next <ChevronDown size={16} />
-        </button>
-      </div>
-
       <AnimatePresence>
         {showFullCV && <FullCVModal candidateId={candidate.uid} candidateResume={resume} templateId={templateId} themeColor={themeColor} fontFamily={fontFamily} hrUser={hrUser} onClose={() => setShowFullCV(false)} />}
       </AnimatePresence>
@@ -282,7 +268,6 @@ export default function HRFeedPage() {
   const navigate = useNavigate();
   const [candidates, setCandidates] = useState([]);
   const [passedUids, setPassedUids] = useState(new Set()); // ← tracks passed candidates
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -382,8 +367,6 @@ export default function HRFeedPage() {
 
   const handlePass = (uid) => {
     setPassedUids(prev => new Set([...prev, uid]));
-    // Move to next without incrementing if last
-    setCurrentIndex(i => Math.min(filtered.length - 2, i));
   };
 
   // Filter: exclude passed candidates + search
@@ -426,7 +409,7 @@ export default function HRFeedPage() {
           <Search size={16} style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} />
           <input
             type="text" placeholder="Search by name, role, or skill…"
-            value={searchTerm} onChange={e => { setSearchTerm(e.target.value); setCurrentIndex(0); }}
+            value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
             style={{ width: '100%', padding: '10px 16px 10px 44px', background: '#fff', border: '1.5px solid rgba(0,0,0,0.08)', borderRadius: 999, color: '#0D0D0F', fontSize: '0.88rem', outline: 'none', fontFamily: 'Inter', transition: 'all 0.2s', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}
             onFocus={e => { e.target.style.borderColor = 'rgba(108,71,255,0.4)'; e.target.style.boxShadow = '0 4px 12px rgba(108,71,255,0.08)'; }}
             onBlur={e => { e.target.style.borderColor = 'rgba(0,0,0,0.08)'; e.target.style.boxShadow = '0 2px 8px rgba(0,0,0,0.02)'; }}
@@ -444,45 +427,47 @@ export default function HRFeedPage() {
       </nav>
 
       {/* ── Main content ── */}
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '32px 24px' }}>
+      <div style={{ flex: 1, overflowY: 'auto', scrollSnapType: 'y mandatory', display: 'flex', flexDirection: 'column' }}>
         {loading ? (
-          <div style={{ textAlign: 'center', color: '#0D0D0F' }}>
-            <div className="animate-spin" style={{ width: 48, height: 48, borderRadius: '50%', border: '4px solid rgba(108,71,255,0.2)', borderTopColor: '#6C47FF', margin: '0 auto 16px' }} />
-            <div style={{ fontSize: '1rem', fontWeight: 600 }}>Loading talent pool…</div>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0D0D0F' }}>
+            <div style={{ textAlign: 'center' }}>
+              <div className="animate-spin" style={{ width: 48, height: 48, borderRadius: '50%', border: '4px solid rgba(108,71,255,0.2)', borderTopColor: '#6C47FF', margin: '0 auto 16px' }} />
+              <div style={{ fontSize: '1rem', fontWeight: 600 }}>Loading talent pool…</div>
+            </div>
           </div>
         ) : filtered.length === 0 ? (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ textAlign: 'center', maxWidth: 400, color: '#0D0D0F' }}>
-            <div style={{ fontSize: '4rem', marginBottom: 16 }}>
-              {passedUids.size > 0 && candidates.length > 0 ? '✅' : '🔍'}
-            </div>
-            <div style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: 8 }}>
-              {passedUids.size > 0 && candidates.length > 0 ? "You've reviewed everyone!" : searchTerm ? 'No matching candidates' : 'No candidates yet'}
-            </div>
-            <div style={{ fontSize: '0.9rem', color: '#6B7280', lineHeight: 1.6 }}>
-              {passedUids.size > 0 && candidates.length > 0
-                ? 'Check back later for new talent.'
-                : searchTerm
-                ? 'Try a different skill or name.'
-                : 'Job seekers who enable "Recruiter View" will appear here. Check back soon!'}
-            </div>
-          </motion.div>
-        ) : (
-          <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-            <AnimatePresence mode="wait">
-              {currentCandidate && (
-                <CandidateCard
-                  key={currentCandidate.uid}
-                  candidate={currentCandidate}
-                  hrUser={user}
-                  currentIndex={currentIndex}
-                  totalCount={filtered.length}
-                  onNext={() => setCurrentIndex(i => Math.min(filtered.length - 1, i + 1))}
-                  onPrev={() => setCurrentIndex(i => Math.max(0, i - 1))}
-                  onPass={() => handlePass(currentCandidate.uid)}
-                />
-              )}
-            </AnimatePresence>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '32px 24px' }}>
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ textAlign: 'center', maxWidth: 400, color: '#0D0D0F' }}>
+              <div style={{ fontSize: '4rem', marginBottom: 16 }}>
+                {passedUids.size > 0 && candidates.length > 0 ? '✅' : '🔍'}
+              </div>
+              <div style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: 8 }}>
+                {passedUids.size > 0 && candidates.length > 0 ? "You've reviewed everyone!" : searchTerm ? 'No matching candidates' : 'No candidates yet'}
+              </div>
+              <div style={{ fontSize: '0.9rem', color: '#6B7280', lineHeight: 1.6 }}>
+                {passedUids.size > 0 && candidates.length > 0
+                  ? 'Check back later for new talent.'
+                  : searchTerm
+                  ? 'Try a different skill or name.'
+                  : 'Job seekers who enable "Recruiter View" will appear here. Check back soon!'}
+              </div>
+            </motion.div>
           </div>
+        ) : (
+          filtered.map((candidate, i) => (
+            <div key={candidate.uid} style={{ 
+              scrollSnapAlign: 'start', scrollSnapStop: 'always',
+              minHeight: 'calc(100vh - 72px)', /* 72px is navbar height */
+              display: 'flex', alignItems: 'center', justifyContent: 'center', 
+              padding: '32px 24px'
+            }}>
+              <CandidateCard
+                candidate={candidate}
+                hrUser={user}
+                onPass={() => handlePass(candidate.uid)}
+              />
+            </div>
+          ))
         )}
       </div>
 
