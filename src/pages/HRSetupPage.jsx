@@ -166,8 +166,14 @@ function SmartCompanyField({ value, onChange }) {
   const toTitleCase = (str) => str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase());
 
   const handleChange = (e) => {
-    // Keep user's alphanumeric validation mask
     let val = e.target.value.replace(/[^a-zA-Z0-9\s.&-]/g, '');
+    
+    // Gibberish guard
+    if (val) {
+      if (/(.)\1{3,}/.test(val.toLowerCase())) return;
+      if (/[bcdfghjklmnpqrstvwxyz]{6,}/i.test(val.replace(/\s/g, ''))) return;
+    }
+
     val = toTitleCase(val);
     onChange(val);
     setActiveIndex(-1);
@@ -259,8 +265,14 @@ function SmartTitleField({ value, onChange }) {
   const toTitleCase = (str) => str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase());
 
   const handleChange = (e) => {
-    // Keep user's letters validation mask
     let val = e.target.value.replace(/[^a-zA-Z\s.-]/g, '');
+
+    // Gibberish guard
+    if (val) {
+      if (/(.)\1{3,}/.test(val.toLowerCase())) return;
+      if (/[bcdfghjklmnpqrstvwxyz]{6,}/i.test(val.replace(/\s/g, ''))) return;
+    }
+
     val = toTitleCase(val);
     onChange(val);
     setActiveIndex(-1);
@@ -356,6 +368,17 @@ export default function HRSetupPage() {
     if (!form.company.trim()) { toast.error('Company name required'); return; }
     if (!form.hiringFor) { toast.error('Select the role you are hiring for'); return; }
     if (form.jobDescription.trim().length < 30) { toast.error('Job description too short (min 30 characters)'); return; }
+
+    const isGibberish = (text) => {
+      if (!text) return false;
+      if (/(.)\1{3,}/.test(text.toLowerCase())) return true; // 4+ repeating chars
+      if (/[bcdfghjklmnpqrstvwxyz]{6,}/i.test(text.replace(/\s/g, ''))) return true; // 6+ consonants in a row
+      return false;
+    };
+
+    if (isGibberish(form.company)) { toast.error('Please enter a proper Company Name'); return; }
+    if (isGibberish(form.yourTitle)) { toast.error('Please enter a proper Job Title'); return; }
+    if (form.hiringFor === 'Other' && isGibberish(form.customRole)) { toast.error('Please enter a proper Role'); return; }
 
     setLoading(true);
     try {
@@ -490,7 +513,11 @@ export default function HRSetupPage() {
                 type="text" required placeholder="e.g. Blockchain Developer"
                 value={form.customRole}
                 onChange={e => {
-                  const val = e.target.value.replace(/[^a-zA-Z\s.-]/g, '');
+                  let val = e.target.value.replace(/[^a-zA-Z\s.-]/g, '');
+                  if (val) {
+                    if (/(.)\1{3,}/.test(val.toLowerCase())) return;
+                    if (/[bcdfghjklmnpqrstvwxyz]{6,}/i.test(val.replace(/\s/g, ''))) return;
+                  }
                   setForm({ ...form, customRole: val });
                 }}
                 className="glass-input"
