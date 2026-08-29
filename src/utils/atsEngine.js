@@ -17,7 +17,7 @@ const TECH_KEYWORDS = [
   'deep learning','tensorflow','pytorch','data science','analytics','tableau',
   'power bi','excel','communication','leadership','teamwork','problem solving',
   'collaboration','project management','cross-functional','stakeholder',
-  'metrics','performance','optimization','figma','adobe','photoshop','illustrator',
+  'metrics','performance','optimization','adobe','photoshop','illustrator',
 ];
 
 const ACTION_VERBS = [

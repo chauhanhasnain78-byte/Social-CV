@@ -85,33 +85,30 @@ export async function exportResumePDF(filename = 'resume') {
   // Chrome doesn't reliably fire `onafterprint`, so we use a multi-strategy approach:
   await new Promise((resolve) => {
     let resolved = false;
-    const done = () => {
+    let safetyTimer = null;
+
+    const focusListener = () => setTimeout(cleanup, 300);
+
+    const cleanup = () => {
       if (resolved) return;
       resolved = true;
+      // ✅ Clean up ALL listeners to prevent memory leaks
+      clearTimeout(safetyTimer);
+      window.removeEventListener('focus', focusListener);
+      try { printWindow.removeEventListener('afterprint', cleanup); } catch (_) {}
       resolve();
     };
 
     // Strategy A: standard afterprint event
-    printWindow.addEventListener('afterprint', done);
+    printWindow.addEventListener('afterprint', cleanup);
 
-    // Strategy B: poll for window focus returning to main window
-    // (user closed print dialog → focus returns here)
-    const focusListener = () => {
-      setTimeout(done, 300); // slight delay to ensure dialog fully closed
-    };
+    // Strategy B: focus returns to main window when print dialog closes
     window.addEventListener('focus', focusListener, { once: true });
 
     // Strategy C: safety timeout (2 minutes)
-    const safetyTimer = setTimeout(done, 120_000);
+    safetyTimer = setTimeout(cleanup, 120_000);
 
     printWindow.print();
-
-    // Cleanup
-    Promise.resolve().then(() => {
-      // Remove focus listener after done fires
-      const origDone = done;
-      // already wrapped above
-    });
   });
 
   try { printWindow.close(); } catch (_) { /* ignore cross-origin errors */ }

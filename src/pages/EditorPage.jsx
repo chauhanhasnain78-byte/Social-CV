@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -44,7 +44,7 @@ function calcCompleteness(resume) {
 
 // ── Progress Bar Widget (top of wizard) ──────────────────────────────────────
 function CompletenessBar({ resume }) {
-  const pct = calcCompleteness(resume);
+  const pct = useMemo(() => calcCompleteness(resume), [resume]);
   const color = pct >= 80 ? '#10b981' : pct >= 50 ? '#6C47FF' : '#eab308';
 
   return (
@@ -110,7 +110,7 @@ export default function EditorPage() {
     else setAutoSaveStatus('saving');
 
     try {
-      const payload = { resume, templateId: selectedTemplate, themeColor, fontFamily, sectionOrder, updatedAt: Date.now() };
+      const payload = { resume, templateId: selectedTemplate, themeColor, fontFamily, fontSize, textAlignment, sectionOrder, updatedAt: Date.now() };
       localStorage.setItem(`social-cv-resume-${user.uid}`, JSON.stringify(payload));
 
       try {
@@ -159,6 +159,18 @@ export default function EditorPage() {
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
   }, [saveResume]);
+
+  // ── Warn user about unsaved changes before navigating/closing ─────────────
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (isDirty) {
+        e.preventDefault();
+        e.returnValue = ''; // Required for Chrome to show the dialog
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isDirty]);
 
   const renderAutoSaveIndicator = () => {
     if (autoSaveStatus === 'saving') return (
@@ -243,7 +255,7 @@ export default function EditorPage() {
 
       {editorPhase === 'wizard' && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontSize: '0.65rem', color: 'var(--dm-muted-light, #9CA3AF)', display: 'none' }} className="editor-shortcut-hint">Ctrl+S to save</span>
+          <span style={{ fontSize: '0.65rem', color: 'var(--dm-muted-light, #9CA3AF)' }} className="editor-shortcut-hint">Ctrl+S to save</span>
           <button
             onClick={() => saveResume(false)}
             disabled={saving}

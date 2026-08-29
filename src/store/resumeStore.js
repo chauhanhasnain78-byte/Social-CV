@@ -65,8 +65,8 @@ export const useResumeStore = create(
           set((s) => ({ resume: { ...s.resume, personal: { ...s.resume.personal, photo: '' } }, isDirty: true }));
           return;
         }
-        // Compress before storing to avoid localStorage overflow
-        const compressed = await compressImage(base64);
+        // ✅ Skip compression if image is already small (< 40KB in base64 ≈ ~30KB file)
+        const compressed = base64.length < 55000 ? base64 : await compressImage(base64);
         set((s) => ({ resume: { ...s.resume, personal: { ...s.resume.personal, photo: compressed } }, isDirty: true }));
       },
 
@@ -181,9 +181,8 @@ export const useResumeStore = create(
         fontFamily:       s.fontFamily,
         fontSize:         s.fontSize,
         textAlignment:    s.textAlignment,
-        wizardStep:       s.wizardStep,
-        editorPhase:      s.editorPhase,
         sectionOrder:     s.sectionOrder,
+        // NOTE: wizardStep & editorPhase intentionally NOT persisted — always start fresh
         // NOTE: atsResult is intentionally NOT persisted (it's large & stale)
       }),
     }

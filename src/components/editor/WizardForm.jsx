@@ -26,8 +26,8 @@ function Field({ label, icon: Icon, value, onChange, placeholder, type = 'text',
     if (val) {
       // Only block 4+ repeating identical LETTERS (numbers can legitimately repeat, e.g. 5555)
       if (/([a-zA-Z])\1{3,}/.test(val.toLowerCase())) return; 
-      // Block 6+ consecutive consonants (ignoring spaces and numbers)
-      if (/[bcdfghjklmnpqrstvwxyz]{6,}/i.test(val.replace(/[\s0-9]/g, ''))) return; 
+      // Block 8+ consecutive consonants (ignoring spaces and numbers) — prevents nonsense like "fghjklmn"
+      if (/[bcdfghjklmnpqrstvwxyz]{8,}/i.test(val.replace(/[\s0-9]/g, ''))) return; 
     }
 
     e.target.value = val;

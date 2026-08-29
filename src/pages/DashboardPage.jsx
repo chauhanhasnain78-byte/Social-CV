@@ -200,7 +200,7 @@ export default function DashboardPage() {
       <nav className="dashboard-nav" style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(253,252,255,0.9)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(0,0,0,0.07)', padding: '0 40px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           <button
-            onClick={() => navigate('/auth?role=seeker')}
+            onClick={() => navigate('/')}
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               width: 36, height: 36, borderRadius: '50%',
