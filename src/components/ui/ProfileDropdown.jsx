@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { LogOut, Settings, Briefcase, FileText } from 'lucide-react';
+import { LogOut, Settings, Briefcase, FileText, UserCog } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import SettingsModal from '@/components/ui/SettingsModal';
 
 export default function ProfileDropdown({ user, logout, theme = 'light' }) {
   const [open, setOpen] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
   const ref = useRef(null);
   const navigate = useNavigate();
 
@@ -113,6 +115,20 @@ export default function ProfileDropdown({ user, logout, theme = 'light' }) {
 
           <div style={{ padding: '8px', borderTop: `1px solid ${borderColor}` }}>
             <div 
+              onClick={() => { setOpen(false); setShowSettingsModal(true); }}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px',
+                borderRadius: 8, cursor: 'pointer', fontSize: '0.85rem', color: textColor,
+                transition: 'all 0.2s'
+              }}
+              onMouseOver={e => e.currentTarget.style.background = bgHover}
+              onMouseOut={e => e.currentTarget.style.background = 'transparent'}
+            >
+              <UserCog size={16} color={mutedColor} />
+              Account Settings
+            </div>
+            
+            <div 
               onClick={() => { setOpen(false); logout(); }}
               style={{
                 display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px',
@@ -128,6 +144,11 @@ export default function ProfileDropdown({ user, logout, theme = 'light' }) {
           </div>
         </div>
       )}
+      
+      {showSettingsModal && (
+        <SettingsModal onClose={() => setShowSettingsModal(false)} />
+      )}
+      
       <style>{`
         @keyframes fadeInDown {
           from { opacity: 0; transform: scale(0.95) translateY(-5px); }

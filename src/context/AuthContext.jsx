@@ -7,8 +7,10 @@ import {
   onAuthStateChanged,
   updateProfile,
   signInWithPopup,
+  sendPasswordResetEmail,
+  deleteUser,
 } from 'firebase/auth';
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { useResumeStore } from '@/store/resumeStore';
 
 const AuthContext = createContext(null);
@@ -216,8 +218,27 @@ export function AuthProvider({ children }) {
     }));
   };
 
+  const resetPassword = async (email) => {
+    return sendPasswordResetEmail(auth, email);
+  };
+
+  const deleteAccount = async () => {
+    if (!auth.currentUser) return;
+    const uid = auth.currentUser.uid;
+    // Delete Firestore data
+    try {
+      await deleteDoc(doc(db, 'users', uid));
+      await deleteDoc(doc(db, 'resumes', uid));
+    } catch (e) {
+      console.warn("Failed to delete user documents:", e);
+    }
+    // Delete auth user
+    await deleteUser(auth.currentUser);
+    setUser(null);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, signup, login, loginWithGoogle, logout, refreshUserProfile }}>
+    <AuthContext.Provider value={{ user, loading, signup, login, loginWithGoogle, logout, refreshUserProfile, resetPassword, deleteAccount }}>
       {!loading && children}
     </AuthContext.Provider>
   );

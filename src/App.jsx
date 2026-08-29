@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AuthProvider } from '@/context/AuthContext';
 import { ToastContainer } from '@/components/ui/Toast';
@@ -8,6 +8,7 @@ import AuthPage      from '@/pages/AuthPage';
 import DashboardPage from '@/pages/DashboardPage';
 import EditorPage    from '@/pages/EditorPage';
 import LandingPage   from '@/pages/LandingPage';
+import WelcomePage   from '@/pages/WelcomePage';
 import PublicResume  from '@/pages/PublicResume';
 import HRSetupPage   from '@/pages/HRSetupPage';
 import HRFeedPage    from '@/pages/HRFeedPage';
@@ -31,10 +32,11 @@ const slideVariants = {
 // ── Inner shell: reads location INSIDE BrowserRouter (no flash bug) ──────────
 function AppShell() {
   const location = useLocation();
+  const navigate = useNavigate();
   const isRoot = location.pathname === '/';
 
-  // showLogin: false = show landing, true = show app routes
-  const [showLogin, setShowLogin] = useState(!isRoot);
+  // view: 'welcome', 'landing', or 'app'
+  const [view, setView] = useState(isRoot ? 'welcome' : 'app');
 
   // Splash only on root path, skip everywhere else
   const [isSplashDone, setIsSplashDone] = useState(!isRoot);
@@ -45,9 +47,12 @@ function AppShell() {
     return () => clearTimeout(timer);
   }, [isRoot]);
 
-  // If user navigates away from root (e.g. via back button), keep shell visible
   useEffect(() => {
-    if (!isRoot) setShowLogin(true);
+    if (!isRoot) {
+      setView('app');
+    } else {
+      setView('welcome');
+    }
   }, [isRoot]);
 
   return (
@@ -83,16 +88,33 @@ function AppShell() {
                 style={{ border: '3px solid rgba(108,71,255,0.15)', borderTopColor: '#6C47FF' }} />
             </motion.div>
           </motion.div>
-        ) : !showLogin ? (
-          /* ─── Landing Page ─── exits LEFT */
+        ) : view === 'welcome' ? (
+          /* ─── Welcome Page ─── */
           <motion.div
-            key="landing"
+            key="welcome"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1, transition: { duration: 0.6 } }}
             exit={slideVariants.exitToLeft.exit}
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100vh', overflowY: 'auto', overflowX: 'hidden', background: '#FDFCFF' }}
           >
-            <LandingPage onGetStarted={() => setShowLogin(true)} />
+            <WelcomePage 
+              onSelectSeeker={() => setView('landing')} 
+              onSelectHR={() => { 
+                setView('app');
+                navigate('/auth?role=hr');
+              }} 
+            />
+          </motion.div>
+        ) : view === 'landing' ? (
+          /* ─── Landing Page ─── */
+          <motion.div
+            key="landing"
+            initial={slideVariants.enterFromRight.initial}
+            animate={slideVariants.enterFromRight.animate}
+            exit={slideVariants.exitToLeft.exit}
+            style={{ position: 'absolute', inset: 0, width: '100%', height: '100vh', overflowY: 'auto', overflowX: 'hidden', background: '#FDFCFF' }}
+          >
+            <LandingPage onGetStarted={() => setView('app')} />
           </motion.div>
         ) : (
           /* ─── App Shell ─── enters RIGHT */
@@ -104,12 +126,12 @@ function AppShell() {
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100vh', overflowY: 'auto', overflowX: 'hidden', background: '#FDFCFF' }}
           >
             <Routes>
-              <Route path="/auth"      element={<AuthPage onBack={() => setShowLogin(false)} />} />
+              <Route path="/auth"      element={<AuthPage onBack={() => { setView('welcome'); navigate('/'); }} />} />
               <Route path="/p/:id"     element={<PublicResume />} />
-              <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
-              <Route path="/editor"    element={<ProtectedRoute><EditorPage /></ProtectedRoute>} />
-              <Route path="/hr-setup"  element={<ProtectedRoute><HRSetupPage /></ProtectedRoute>} />
-              <Route path="/hr-feed"   element={<ProtectedRoute><HRFeedPage /></ProtectedRoute>} />
+              <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['SEEKER']}><DashboardPage /></ProtectedRoute>} />
+              <Route path="/editor"    element={<ProtectedRoute allowedRoles={['SEEKER']}><EditorPage /></ProtectedRoute>} />
+              <Route path="/hr-setup"  element={<ProtectedRoute allowedRoles={['HR']}><HRSetupPage /></ProtectedRoute>} />
+              <Route path="/hr-feed"   element={<ProtectedRoute allowedRoles={['HR']}><HRFeedPage /></ProtectedRoute>} />
               <Route path="*"          element={<Navigate to="/auth" replace />} />
             </Routes>
           </motion.div>

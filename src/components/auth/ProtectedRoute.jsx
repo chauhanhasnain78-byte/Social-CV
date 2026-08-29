@@ -1,8 +1,9 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 
-export function ProtectedRoute({ children }) {
+export function ProtectedRoute({ children, allowedRoles }) {
   const { user, loading } = useAuth();
+  
   if (loading) {
     return (
       <div className="mesh-bg min-h-screen flex items-center justify-center">
@@ -18,5 +19,18 @@ export function ProtectedRoute({ children }) {
       </div>
     );
   }
-  return user ? children : <Navigate to="/auth" replace />;
+  
+  if (!user) {
+    return <Navigate to="/auth" replace />;
+  }
+
+  if (allowedRoles && !allowedRoles.includes(user.role)) {
+    // Redirect to their respective home page if they try to access a route they shouldn't
+    const redirectPath = user.role === 'HR' 
+      ? (user.hrSetupDone ? '/hr-feed' : '/hr-setup') 
+      : '/dashboard';
+    return <Navigate to={redirectPath} replace />;
+  }
+
+  return children;
 }

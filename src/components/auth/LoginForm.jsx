@@ -35,11 +35,45 @@ export function LoginForm({ onSwitchTab, targetRole = null }) {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
+  const [isResetting, setIsResetting] = useState(false);
+
   const routeAfterLogin = (loggedUser) => {
     if (loggedUser.role === 'HR') {
       navigate(loggedUser.hrSetupDone ? '/hr-feed' : '/hr-setup');
     } else {
       navigate('/dashboard');
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!form.email) {
+      toast.error('Please enter your email address first.');
+      document.getElementById('login-email').focus();
+      return;
+    }
+    
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email)) {
+      toast.error('Please enter a valid email address.');
+      return;
+    }
+    
+    setIsResetting(true);
+    try {
+      // Use the auth context or Firebase directly
+      const { sendPasswordResetEmail } = await import('firebase/auth');
+      const { auth } = await import('@/services/firebase');
+      await sendPasswordResetEmail(auth, form.email);
+      toast.success('Password reset link sent! Check your inbox. 📧', { title: '✅ Email Sent' });
+    } catch (err) {
+      const errorMap = {
+        'auth/user-not-found': 'No account found with this email.',
+        'auth/invalid-email': 'Invalid email address format.',
+      };
+      toast.error(errorMap[err.code] || 'Failed to send reset email. Try again later.', { title: '❌ Reset Failed' });
+    } finally {
+      setIsResetting(false);
     }
   };
 
@@ -137,6 +171,21 @@ export function LoginForm({ onSwitchTab, targetRole = null }) {
           <button type="button" onClick={() => setShowPwd(!showPwd)}
             className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
             {showPwd ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
+          <button 
+            type="button" 
+            onClick={handleForgotPassword}
+            disabled={isResetting}
+            style={{ 
+              background: 'none', border: 'none', padding: 0, 
+              color: '#6C47FF', fontSize: '0.8rem', fontWeight: 600, 
+              cursor: isResetting ? 'not-allowed' : 'pointer',
+              opacity: isResetting ? 0.6 : 1
+            }}
+          >
+            {isResetting ? 'Sending...' : 'Forgot password?'}
           </button>
         </div>
       </div>
