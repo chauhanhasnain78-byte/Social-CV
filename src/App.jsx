@@ -51,7 +51,7 @@ function AppShell() {
     if (!isRoot) {
       setView('app');
     } else {
-      setView('welcome');
+      setView(prev => prev === 'app' ? 'welcome' : prev);
     }
   }, [isRoot]);
 
@@ -114,7 +114,7 @@ function AppShell() {
             exit={slideVariants.exitToLeft.exit}
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100vh', overflowY: 'auto', overflowX: 'hidden', background: '#FDFCFF' }}
           >
-            <LandingPage onGetStarted={() => setView('app')} />
+            <LandingPage onGetStarted={() => setView('app')} onBack={() => setView('welcome')} />
           </motion.div>
         ) : (
           /* ─── App Shell ─── enters RIGHT */
@@ -126,7 +126,7 @@ function AppShell() {
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100vh', overflowY: 'auto', overflowX: 'hidden', background: '#FDFCFF' }}
           >
             <Routes>
-              <Route path="/auth"      element={<AuthPage onBack={() => { setView('welcome'); navigate('/'); }} />} />
+              <Route path="/auth"      element={<AuthPage onBack={() => { setView('landing'); navigate('/'); }} />} />
               <Route path="/p/:id"     element={<PublicResume />} />
               <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['SEEKER']}><DashboardPage /></ProtectedRoute>} />
               <Route path="/editor"    element={<ProtectedRoute allowedRoles={['SEEKER']}><EditorPage /></ProtectedRoute>} />

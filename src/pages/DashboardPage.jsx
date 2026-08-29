@@ -198,11 +198,28 @@ export default function DashboardPage() {
 
       {/* ── Navbar ── */}
       <nav className="dashboard-nav" style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(253,252,255,0.9)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(0,0,0,0.07)', padding: '0 40px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <img src="/logo.png" alt="Social-CV" style={{ height: 44, width: 'auto', objectFit: 'contain' }} />
-          <span className="font-display" style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0D0D0F', letterSpacing: '-0.01em' }}>
-            Social<span style={{ color: '#6C47FF' }}>-CV</span>
-          </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <button
+            onClick={() => navigate('/auth?role=seeker')}
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              width: 36, height: 36, borderRadius: '50%',
+              background: '#F3F4F6', border: 'none', cursor: 'pointer',
+              color: '#374151', transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = '#E5E7EB'; e.currentTarget.style.color = '#000'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = '#F3F4F6'; e.currentTarget.style.color = '#374151'; }}
+            aria-label="Go Back"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <img src="/logo.png" alt="Social-CV" style={{ height: 44, width: 'auto', objectFit: 'contain' }} />
+            <span className="font-display" style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0D0D0F', letterSpacing: '-0.01em' }}>
+              Social<span style={{ color: '#6C47FF' }}>-CV</span>
+            </span>
+          </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <button

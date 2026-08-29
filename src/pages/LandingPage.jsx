@@ -205,7 +205,7 @@ const Reveal = ({ children, delay = 0, style = {} }) => (
 );
 
 // ── Main Landing Page ────────────────────────────────────────────────────────
-export default function LandingPage({ onGetStarted }) {
+export default function LandingPage({ onGetStarted, onBack }) {
   const [activeIdx, setActiveIdx] = useState(0);
   const [stats, setStats] = useState({ totalResumes: 0, highestAtsScore: 0, ratingSum: 0, totalRatings: 0 });
   const [showPrivacy, setShowPrivacy] = useState(false);
@@ -230,18 +230,18 @@ export default function LandingPage({ onGetStarted }) {
     onGetStarted();
   };
 
-
-
   // Keep backward-compat for navbar buttons
   const handleActionClick = handleSeekerClick;
 
   // Auto-advance carousel
   useEffect(() => {
-    const t = setInterval(() => setActiveIdx((i) => (i + 1) % TEMPLATES.length), 2800);
+    const t = setInterval(() => {
+      setActiveIdx((prev) => (prev + 1) % TEMPLATES.length);
+    }, 4500);
     return () => clearInterval(t);
   }, []);
 
-  // Fetch real-time stats
+  // Fetch real stats
   useEffect(() => {
     const unsubscribe = subscribeToStats((newStats) => {
       setStats(newStats);
@@ -272,16 +272,34 @@ export default function LandingPage({ onGetStarted }) {
         padding: '0 40px', height: 64,
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
-        {/* Logo */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <img
-            src="/logo.png"
-            alt="Social-CV"
-            style={{ height: 52, width: 'auto', objectFit: 'contain' }}
-          />
-          <span className="font-display" style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0D0D0F', letterSpacing: '-0.01em' }}>
-            Social<span style={{ color: '#6C47FF' }}>-CV</span>
-          </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          {onBack && (
+            <button
+              onClick={onBack}
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                width: 36, height: 36, borderRadius: '50%',
+                background: '#F3F4F6', border: 'none', cursor: 'pointer',
+                color: '#374151', transition: 'all 0.2s'
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = '#E5E7EB'; e.currentTarget.style.color = '#000'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = '#F3F4F6'; e.currentTarget.style.color = '#374151'; }}
+              aria-label="Go Back"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
+          )}
+          {/* Logo */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <img
+              src="/logo.png"
+              alt="Social-CV"
+              style={{ height: 52, width: 'auto', objectFit: 'contain' }}
+            />
+            <span className="font-display" style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0D0D0F', letterSpacing: '-0.01em' }}>
+              Social<span style={{ color: '#6C47FF' }}>-CV</span>
+            </span>
+          </div>
         </div>
 
         {/* Nav links */}
