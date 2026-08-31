@@ -44,7 +44,7 @@ function FullCVModal({ candidateId, candidateResume, templateId, themeColor, fon
           <X size={18} />
         </button>
         <div style={{ clear: 'both' }} />
-        <ResumePreview resume={candidateResume} templateId={templateId || 'minimal-pro'} themeColor={themeColor || '#6C47FF'} fontFamily={fontFamily || 'inter'} />
+        <ResumePreview resume={candidateResume} templateId={templateId || 'minimal-pro'} themeColor={themeColor || '#6C47FF'} fontFamily={fontFamily || 'inter'} candidateUid={candidateId} />
       </motion.div>
     </motion.div>
   );
