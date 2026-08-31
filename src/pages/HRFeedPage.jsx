@@ -130,6 +130,40 @@ function CommentDrawer({ candidateId, hrUser, onClose }) {
   );
 }
 
+// ── Job Match % Calculator (pure client-side, no API) ────────────────────────
+function calcMatchScore(resume, hrUser) {
+  // 1. Build a set of HR keywords from job description + role title
+  const raw = `${hrUser?.hiringFor || ''} ${hrUser?.jobDescription || ''}`.toLowerCase();
+  const stopwords = new Set(['and','or','the','a','an','with','for','of','in','to','is','are','be','we','you','that','this','will','have','has','our','your','their','as','at','by','from','on','per','via','who','can','able']);
+  const hrKeywords = new Set(
+    raw.match(/[a-z][a-z0-9.#+\-]*/g)
+      ?.filter(w => w.length > 2 && !stopwords.has(w)) || []
+  );
+  if (hrKeywords.size === 0) return null; // HR hasn't set up JD yet
+
+  // 2. Build candidate's keyword pool (skills + job title + experience roles)
+  const candidatePool = [
+    ...(resume?.skills?.map(s => s.name?.toLowerCase() || '') || []),
+    (resume?.personalInfo?.jobTitle || '').toLowerCase(),
+    ...(resume?.experience?.map(e => `${e.role || ''} ${e.company || ''} ${(e.bullets || []).join(' ')}`.toLowerCase()) || []),
+  ].join(' ');
+
+  // 3. Count keyword matches
+  let matched = 0;
+  hrKeywords.forEach(kw => {
+    if (candidatePool.includes(kw)) matched++;
+  });
+
+  const score = Math.min(100, Math.round((matched / hrKeywords.size) * 100));
+  return score;
+}
+
+function matchColor(score) {
+  if (score >= 75) return { bg: 'rgba(16,185,129,0.12)', text: '#059669', border: 'rgba(16,185,129,0.3)', label: 'Strong Match' };
+  if (score >= 45) return { bg: 'rgba(245,158,11,0.12)', text: '#D97706', border: 'rgba(245,158,11,0.3)', label: 'Partial Match' };
+  return { bg: 'rgba(239,68,68,0.1)', text: '#DC2626', border: 'rgba(239,68,68,0.25)', label: 'Low Match' };
+}
+
 // ── Candidate Card ────────────────────────────────────────────────────────────
 function CandidateCard({ candidate, hrUser, onPass, totalCount, currentIndex }) {
   const [liked, setLiked] = useState(false);
@@ -141,6 +175,10 @@ function CandidateCard({ candidate, hrUser, onPass, totalCount, currentIndex }) 
   const headline = resume?.personalInfo?.jobTitle || 'Professional';
   const skills = resume?.skills?.filter(s => s.name)?.slice(0, 4) || [];
   const latestExp = resume?.experience?.[0];
+
+  // ── Job Match Score ──
+  const matchScore = calcMatchScore(resume, hrUser);
+  const mc = matchScore !== null ? matchColor(matchScore) : null;
 
   useEffect(() => {
     if (!candidate.uid) return;
@@ -173,14 +211,47 @@ function CandidateCard({ candidate, hrUser, onPass, totalCount, currentIndex }) 
         width: '100%', maxWidth: 420, height: '80vh', maxHeight: 800, aspectRatio: '9/16',
         background: '#fff', borderRadius: 28, boxShadow: '0 24px 64px rgba(0,0,0,0.14)', 
         position: 'relative', display: 'flex', flexDirection: 'column',
-        border: `1.5px solid ${themeColor || '#6C47FF'}30`, overflow: 'hidden'
+        border: `1.5px solid ${mc ? mc.border : `${themeColor || '#6C47FF'}30`}`, overflow: 'hidden'
       }}
     >
+      {/* ── Match progress bar at very top ── */}
+      {mc && (
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: 'rgba(0,0,0,0.04)', zIndex: 10 }}>
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: `${matchScore}%` }}
+            transition={{ delay: 0.3, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            style={{ height: '100%', background: mc.text, borderRadius: '0 4px 4px 0' }}
+          />
+        </div>
+      )}
+
       {/* ── Background decoration ── */}
       <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '40%', background: `linear-gradient(135deg, ${themeColor || '#6C47FF'}15, ${themeColor || '#6C47FF'}03)`, zIndex: 0 }} />
-      
+
+      {/* ── Match % Badge (top-left) ── */}
+      {mc && (
+        <motion.div
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.4, type: 'spring', stiffness: 300 }}
+          style={{
+            position: 'absolute', top: 14, left: 16, zIndex: 10,
+            display: 'flex', alignItems: 'center', gap: 5,
+            background: mc.bg, border: `1px solid ${mc.border}`,
+            borderRadius: 999, padding: '4px 10px',
+          }}
+        >
+          <div style={{ width: 6, height: 6, borderRadius: '50%', background: mc.text, flexShrink: 0 }} />
+          <span style={{ fontSize: '0.72rem', fontWeight: 800, color: mc.text, letterSpacing: '0.03em' }}>
+            {matchScore}% Match
+          </span>
+          <span style={{ fontSize: '0.65rem', color: mc.text, opacity: 0.7 }}>· {mc.label}</span>
+        </motion.div>
+      )}
+
       {/* ── Main content (The 3 Sections) ── */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '24px 80px 16px 24px', zIndex: 1, gap: 16 }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: mc ? '52px 80px 16px 24px' : '24px 80px 16px 24px', zIndex: 1, gap: 16 }}>
         
         {/* Top: Education */}
         <div style={{ flex: 1, background: '#fff', borderRadius: 16, padding: '16px 20px', border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 4px 20px rgba(0,0,0,0.03)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
@@ -195,13 +266,26 @@ function CandidateCard({ candidate, hrUser, onPass, totalCount, currentIndex }) 
           )}
         </div>
 
-        {/* Middle: Skills */}
+        {/* Middle: Skills — matched ones glow green */}
         <div style={{ flex: 1, background: '#fff', borderRadius: 16, padding: '16px 20px', border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 4px 20px rgba(0,0,0,0.03)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Skills</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-            {skills.length > 0 ? skills.map((s, i) => (
-              <span key={i} style={{ padding: '6px 12px', borderRadius: 999, background: `${themeColor || '#6C47FF'}15`, color: themeColor || '#6C47FF', fontSize: '0.8rem', fontWeight: 700 }}>{s.name}</span>
-            )) : <div style={{ fontSize: '0.85rem', color: '#9CA3AF', fontStyle: 'italic' }}>No skills listed</div>}
+            {skills.length > 0 ? skills.map((s, i) => {
+              // Check if this skill is a keyword match
+              const jdText = `${hrUser?.hiringFor || ''} ${hrUser?.jobDescription || ''}`.toLowerCase();
+              const isMatch = jdText.length > 5 && jdText.includes(s.name?.toLowerCase() || '');
+              return (
+                <span key={i} style={{
+                  padding: '6px 12px', borderRadius: 999, fontSize: '0.8rem', fontWeight: 700,
+                  background: isMatch ? 'rgba(16,185,129,0.12)' : `${themeColor || '#6C47FF'}15`,
+                  color: isMatch ? '#059669' : (themeColor || '#6C47FF'),
+                  border: isMatch ? '1px solid rgba(16,185,129,0.3)' : '1px solid transparent',
+                  transition: 'all 0.2s',
+                }}>
+                  {isMatch ? '✓ ' : ''}{s.name}
+                </span>
+              );
+            }) : <div style={{ fontSize: '0.85rem', color: '#9CA3AF', fontStyle: 'italic' }}>No skills listed</div>}
           </div>
         </div>
 
