@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { LogOut, Settings, Briefcase, FileText, UserCog } from 'lucide-react';
+import { LogOut, Settings, Briefcase, LayoutDashboard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import SettingsModal from '@/components/ui/SettingsModal';
 
@@ -98,36 +98,18 @@ export default function ProfileDropdown({ user, logout, theme = 'light' }) {
               </>
             )}
 
-            {user?.role !== 'HR' && (
-              <>
-                <div 
-                  onClick={() => { setOpen(false); navigate('/dashboard'); }}
-                  style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', borderRadius: 8, cursor: 'pointer', fontSize: '0.85rem', color: textColor, transition: 'all 0.2s' }}
-                  onMouseOver={e => e.currentTarget.style.background = bgHover}
-                  onMouseOut={e => e.currentTarget.style.background = 'transparent'}
-                >
-                  <FileText size={16} color={mutedColor} />
-                  My Resumes
-                </div>
-              </>
-            )}
-          </div>
-
-          <div style={{ padding: '8px', borderTop: `1px solid ${borderColor}` }}>
             <div 
-              onClick={() => { setOpen(false); setShowSettingsModal(true); }}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px',
-                borderRadius: 8, cursor: 'pointer', fontSize: '0.85rem', color: textColor,
-                transition: 'all 0.2s'
-              }}
+              onClick={() => { setOpen(false); navigate('/dashboard'); }}
+              style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', borderRadius: 8, cursor: 'pointer', fontSize: '0.85rem', color: textColor, transition: 'all 0.2s' }}
               onMouseOver={e => e.currentTarget.style.background = bgHover}
               onMouseOut={e => e.currentTarget.style.background = 'transparent'}
             >
-              <UserCog size={16} color={mutedColor} />
-              Account Settings
+              <LayoutDashboard size={16} color={mutedColor} />
+              Dashboard
             </div>
-            
+          </div>
+
+          <div style={{ padding: '8px', borderTop: `1px solid ${borderColor}` }}>
             <div 
               onClick={() => { setOpen(false); logout(); }}
               style={{
