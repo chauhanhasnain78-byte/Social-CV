@@ -2,9 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useResumeStore } from '@/store/resumeStore';
 import { useAuth } from '@/context/AuthContext';
-import { useTheme } from '@/context/ThemeContext';
 import { TEMPLATES } from '@/templates/templateMeta';
-import { LogOut, FileText, CheckCircle, Share2, Copy, Eye, ExternalLink, Image, AlignLeft, Mail, Repeat2, Bell, Moon, Sun } from 'lucide-react';
+import { LogOut, FileText, CheckCircle, Share2, Copy, Eye, ExternalLink, Image, AlignLeft, Mail, Repeat2, Bell } from 'lucide-react';
 import { doc, onSnapshot, collection, updateDoc } from 'firebase/firestore';
 import { db } from '@/services/firebase';
 import { useState, useEffect, useRef } from 'react';
@@ -119,7 +118,6 @@ function TemplateCard({ tmpl, isSelected, onClick, idx }) {
 export default function DashboardPage() {
   const navigate = useNavigate();
   const { user, logout, login } = useAuth();
-  const { isDark, toggleTheme } = useTheme();
   const { selectedTemplate, setTemplate, resume } = useResumeStore();
   const [publicData, setPublicData]       = useState(null);
   const [activeFilter, setActiveFilter]   = useState('all');
@@ -196,21 +194,21 @@ export default function DashboardPage() {
     : TEMPLATES.filter(t => !t.hasPhoto);
 
   return (
-    <div style={{ minHeight: '100vh', background: isDark ? '#0A0A10' : '#FDFCFF', transition: 'background 0.3s ease' }}>
+    <div style={{ minHeight: '100vh', background: '#FDFCFF' }}>
 
       {/* ── Navbar ── */}
-      <nav className="dashboard-nav" style={{ position: 'sticky', top: 0, zIndex: 50, background: isDark ? 'rgba(10,10,16,0.95)' : 'rgba(253,252,255,0.9)', backdropFilter: 'blur(20px)', borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.07)'}`, padding: '0 40px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <nav className="dashboard-nav" style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(253,252,255,0.9)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(0,0,0,0.07)', padding: '0 40px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           <button
             onClick={() => navigate('/')}
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               width: 36, height: 36, borderRadius: '50%',
-              background: isDark ? 'rgba(255,255,255,0.06)' : '#F3F4F6', border: 'none', cursor: 'pointer',
-              color: isDark ? '#A1A1BB' : '#374151', transition: 'all 0.2s'
+              background: '#F3F4F6', border: 'none', cursor: 'pointer',
+              color: '#374151', transition: 'all 0.2s'
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.1)' : '#E5E7EB'; e.currentTarget.style.color = isDark ? '#F0F0FF' : '#000'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.06)' : '#F3F4F6'; e.currentTarget.style.color = isDark ? '#A1A1BB' : '#374151'; }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = '#E5E7EB'; e.currentTarget.style.color = '#000'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = '#F3F4F6'; e.currentTarget.style.color = '#374151'; }}
             aria-label="Go Back"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
@@ -218,7 +216,7 @@ export default function DashboardPage() {
           
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <img src="/logo.png" alt="Social-CV" style={{ height: 44, width: 'auto', objectFit: 'contain' }} />
-            <span className="font-display" style={{ fontSize: '1.1rem', fontWeight: 800, color: isDark ? '#F0F0FF' : '#0D0D0F', letterSpacing: '-0.01em' }}>
+            <span className="font-display" style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0D0D0F', letterSpacing: '-0.01em' }}>
               Social<span style={{ color: '#6C47FF' }}>-CV</span>
             </span>
           </div>
@@ -230,36 +228,7 @@ export default function DashboardPage() {
           >
             <Mail size={14} /> Cover Letter
           </button>
-
-          {/* ── Dark Mode Toggle ── */}
-          <motion.button
-            onClick={toggleTheme}
-            whileHover={{ scale: 1.08 }}
-            whileTap={{ scale: 0.93 }}
-            title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-            style={{
-              width: 38, height: 38, borderRadius: '50%', border: 'none', cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: isDark ? 'rgba(108,71,255,0.15)' : '#F3F4F6',
-              color: isDark ? '#A78BFA' : '#6B7280',
-              transition: 'all 0.25s ease',
-              boxShadow: isDark ? '0 0 0 1px rgba(108,71,255,0.3)' : 'none',
-            }}
-          >
-            <AnimatePresence mode="wait">
-              {isDark ? (
-                <motion.span key="sun" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.2 }}>
-                  <Sun size={17} />
-                </motion.span>
-              ) : (
-                <motion.span key="moon" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }}>
-                  <Moon size={17} />
-                </motion.span>
-              )}
-            </AnimatePresence>
-          </motion.button>
-
-          <ProfileDropdown user={user} logout={logout} theme={isDark ? 'dark' : 'light'} />
+          <ProfileDropdown user={user} logout={logout} theme="light" />
         </div>
       </nav>
 
@@ -270,10 +239,10 @@ export default function DashboardPage() {
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 14px', background: 'rgba(108,71,255,0.08)', borderRadius: 999, border: '1px solid rgba(108,71,255,0.18)', marginBottom: 16 }}>
             <span style={{ fontSize: '0.72rem', fontWeight: 600, color: '#6C47FF' }}>✦ 6 TEMPLATES AVAILABLE</span>
           </div>
-          <h1 className="font-display" style={{ fontSize: '2.2rem', fontWeight: 800, color: isDark ? '#F0F0FF' : '#0D0D0F', letterSpacing: '-0.04em', marginBottom: 10 }}>
+          <h1 className="font-display" style={{ fontSize: '2.2rem', fontWeight: 800, color: '#0D0D0F', letterSpacing: '-0.04em', marginBottom: 10 }}>
             Choose your template
           </h1>
-          <p style={{ fontSize: '1rem', color: isDark ? '#A1A1BB' : '#5A5A72' }}>Pick a design and start building your resume instantly. You can switch anytime.</p>
+          <p style={{ fontSize: '1rem', color: '#5A5A72' }}>Pick a design and start building your resume instantly. You can switch anytime.</p>
         </motion.div>
 
 
@@ -281,32 +250,32 @@ export default function DashboardPage() {
         {/* ── Public link panel ── */}
         {publicData && (
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}
-            style={{ background: isDark ? '#111118' : '#fff', border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`, borderRadius: 18, padding: '22px 26px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24, flexWrap: 'wrap', marginBottom: 24 }}
+            style={{ background: '#fff', border: '1px solid rgba(0,0,0,0.08)', borderRadius: 18, padding: '22px 26px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24, flexWrap: 'wrap', marginBottom: 24 }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
               <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(108,71,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Share2 size={20} style={{ color: '#6C47FF' }} />
               </div>
               <div>
-                <p style={{ fontSize: '0.95rem', fontWeight: 700, color: isDark ? '#F0F0FF' : '#0D0D0F', marginBottom: 2 }}>Your Public Link is Live!</p>
-                <p style={{ fontSize: '0.8rem', color: isDark ? '#A1A1BB' : '#6B7280' }}>Share with recruiters and on your LinkedIn profile.</p>
+                <p style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0D0D0F', marginBottom: 2 }}>Your Public Link is Live!</p>
+                <p style={{ fontSize: '0.8rem', color: '#6B7280' }}>Share with recruiters and on your LinkedIn profile.</p>
               </div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, maxWidth: 420 }}>
-              <div style={{ flex: 1, padding: '9px 14px', background: isDark ? '#0A0A10' : '#F8F8FC', borderRadius: 10, border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`, overflow: 'hidden' }}>
-                <span style={{ fontSize: '0.78rem', color: isDark ? '#A1A1BB' : '#5A5A72', whiteSpace: 'nowrap', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis' }}>{publicUrl}</span>
+              <div style={{ flex: 1, padding: '9px 14px', background: '#F8F8FC', borderRadius: 10, border: '1px solid rgba(0,0,0,0.08)', overflow: 'hidden' }}>
+                <span style={{ fontSize: '0.78rem', color: '#5A5A72', whiteSpace: 'nowrap', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis' }}>{publicUrl}</span>
               </div>
               <button onClick={handleCopyLink} style={{ width: 38, height: 38, borderRadius: 10, background: 'rgba(108,71,255,0.1)', border: '1px solid rgba(108,71,255,0.2)', color: '#6C47FF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Copy size={15} />
               </button>
-              <a href={publicUrl} target="_blank" rel="noreferrer" style={{ width: 38, height: 38, borderRadius: 10, background: isDark ? 'rgba(255,255,255,0.06)' : '#F8F8FC', border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`, color: isDark ? '#A1A1BB' : '#6B7280', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }}>
+              <a href={publicUrl} target="_blank" rel="noreferrer" style={{ width: 38, height: 38, borderRadius: 10, background: '#F8F8FC', border: '1px solid rgba(0,0,0,0.08)', color: '#6B7280', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }}>
                 <ExternalLink size={15} />
               </a>
             </div>
             <div style={{ textAlign: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
                 <Eye size={16} style={{ color: '#6C47FF' }} />
-                <span style={{ fontSize: '1.4rem', fontWeight: 800, color: isDark ? '#F0F0FF' : '#0D0D0F' }}>{publicData.views || 0}</span>
+                <span style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0D0D0F' }}>{publicData.views || 0}</span>
               </div>
               <span style={{ fontSize: '0.7rem', color: '#9CA3AF', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Link Views</span>
             </div>
@@ -372,11 +341,11 @@ export default function DashboardPage() {
             <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0D0D0F', marginBottom: 16 }}>💬 Feedback from Recruiters</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {interactions.comments.map((c, i) => (
-                <div key={c.id || i} style={{ background: isDark ? '#1A1A24' : '#F8F8FC', borderRadius: 12, padding: '16px 20px', border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)'}` }}>
+                <div key={c.id || i} style={{ background: '#F8F8FC', borderRadius: 12, padding: '16px 20px', border: '1px solid rgba(0,0,0,0.05)' }}>
                   <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#6C47FF', marginBottom: 6 }}>
                     {c.hrName || 'Anonymous HR'}{c.hrCompany ? ` · ${c.hrCompany}` : ''}
                   </div>
-                  <div style={{ fontSize: '0.9rem', color: isDark ? '#D1D1E0' : '#374151', lineHeight: 1.5 }}>{c.text}</div>
+                  <div style={{ fontSize: '0.9rem', color: '#374151', lineHeight: 1.5 }}>{c.text}</div>
                 </div>
               ))}
             </div>
@@ -391,7 +360,7 @@ export default function DashboardPage() {
             { key: 'photo',    label: '📷 With Photo' },
           ].map(({ key, label }) => (
             <button key={key} onClick={() => setActiveFilter(key)}
-              style={{ padding: '8px 18px', borderRadius: 999, border: `1.5px solid ${activeFilter === key ? '#6C47FF' : isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)'}`, background: activeFilter === key ? 'rgba(108,71,255,0.08)' : isDark ? 'rgba(255,255,255,0.04)' : '#fff', color: activeFilter === key ? '#6C47FF' : isDark ? '#A1A1BB' : '#6B7280', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter', transition: 'all 0.18s ease' }}
+              style={{ padding: '8px 18px', borderRadius: 999, border: `1.5px solid ${activeFilter === key ? '#6C47FF' : 'rgba(0,0,0,0.12)'}`, background: activeFilter === key ? 'rgba(108,71,255,0.08)' : '#fff', color: activeFilter === key ? '#6C47FF' : '#6B7280', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter', transition: 'all 0.18s ease' }}
             >
               {label}
             </button>

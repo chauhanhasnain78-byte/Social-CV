@@ -46,23 +46,6 @@
   --shadow-brand: 0 8px 32px rgba(108,71,255,0.25);
 }
 
-/* ── Dark Theme Variables ── */
-[data-theme="dark"] {
-  --surface:        #111118;
-  --surface-subtle: #0A0A10;
-  --surface-raised: #1A1A24;
-  --border:         rgba(255,255,255,0.08);
-  --border-strong:  rgba(255,255,255,0.15);
-  --text-primary:   #F0F0FF;
-  --text-secondary: #A1A1BB;
-  --text-muted:     #6B6B88;
-  color-scheme: dark;
-}
-
-[data-theme="dark"] body {
-  background: #0A0A10;
-}
-
 /* ── Reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; scroll-behavior: smooth; }
