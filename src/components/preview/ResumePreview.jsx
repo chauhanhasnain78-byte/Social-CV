@@ -1,5 +1,4 @@
-import { Component, useEffect, useState } from 'react';
-import QRCode from 'qrcode';
+import { Component } from 'react';
 import { MinimalProTemplate } from './MinimalProTemplate';
 import { BoldEdgeTemplate   } from './BoldEdgeTemplate';
 import { NordicTemplate      } from './NordicTemplate';
@@ -71,45 +70,22 @@ class PreviewErrorBoundary extends Component {
   }
 }
 
-export function ResumePreview({ resume, templateId, themeColor, fontFamily, fontSize, textAlignment, candidateUid }) {
+export function ResumePreview({ resume, templateId, themeColor, fontFamily, fontSize, textAlignment }) {
   const Template     = TEMPLATE_MAP[templateId] || MinimalProTemplate;
   const sectionOrder = useResumeStore((state) => state.sectionOrder);
 
   const sizeMap  = { sm: '14px', md: '16px', lg: '18px' };
   const baseSize = sizeMap[fontSize] || (fontSize ? `${fontSize}px` : '16px');
 
-  const [qrDataUrl, setQrDataUrl] = useState('');
-
-  useEffect(() => {
-    if (candidateUid) {
-      const publicLink = `${window.location.origin}/p/${candidateUid}`;
-      QRCode.toDataURL(publicLink, { margin: 1, width: 64, color: { dark: '#0D0D0F', light: '#FFFFFF' } })
-        .then(setQrDataUrl)
-        .catch(err => console.error('QR Gen error:', err));
-    }
-  }, [candidateUid]);
-
   return (
     <PreviewErrorBoundary>
-      <div id="resume-preview" className="a4-page" style={{ fontSize: baseSize, textAlign: textAlignment || 'left', position: 'relative' }}>
+      <div id="resume-preview" className="a4-page" style={{ fontSize: baseSize, textAlign: textAlignment || 'left' }}>
         <Template
           resume={resume}
           themeColor={themeColor  || '#6C47FF'}
           fontFamily={fontFamily  || 'sans-serif'}
           sectionOrder={sectionOrder}
         />
-        {/* ── QR Code Overlay ── */}
-        {qrDataUrl && (
-          <div style={{
-            position: 'absolute', bottom: '20px', right: '20px',
-            background: '#fff', padding: '6px', borderRadius: '8px',
-            boxShadow: '0 4px 14px rgba(0,0,0,0.06)', border: '1px solid rgba(0,0,0,0.04)',
-            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', zIndex: 100
-          }}>
-            <img src={qrDataUrl} alt="Public CV Link" style={{ width: 50, height: 50, display: 'block' }} />
-            <span style={{ fontSize: '0.45rem', fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Scan to View</span>
-          </div>
-        )}
       </div>
     </PreviewErrorBoundary>
   );

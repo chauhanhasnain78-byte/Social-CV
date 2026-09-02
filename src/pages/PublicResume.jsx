@@ -79,7 +79,7 @@ export default function PublicResume() {
       <div className="w-full max-w-5xl overflow-x-auto flex justify-center px-4">
         {/* We use scale down on smaller screens for mobile viewing */}
         <div className="transform origin-top-left md:origin-top scale-[0.6] sm:scale-75 md:scale-100 transition-transform duration-300">
-          <ResumePreview resume={data.resume} templateId={data.templateId} themeColor={data.themeColor} fontFamily={data.fontFamily} candidateUid={id} />
+          <ResumePreview resume={data.resume} templateId={data.templateId} themeColor={data.themeColor} fontFamily={data.fontFamily} />
         </div>
       </div>
       

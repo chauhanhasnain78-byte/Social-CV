@@ -387,7 +387,6 @@ export default function EditorPage() {
                   fontFamily={fontFamily}
                   fontSize={fontSize}
                   textAlignment={textAlignment}
-                  candidateUid={user?.uid}
                 />
               </div>
             </div>
