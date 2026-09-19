@@ -192,7 +192,8 @@ async function scoreWithGemini(resume) {
   if (!apiKey) throw new Error('No API key');
 
   const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  // Using gemini-1.5-flash-latest as a safer fallback if standard flash throws 404
+  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
 
   const resumeText = buildPrivacySafeText(resume);
 
