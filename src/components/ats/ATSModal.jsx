@@ -139,7 +139,9 @@ export function ATSModal({ result, onClose }) {
             <div style={{ width:36, height:36, borderRadius:10, display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(90,79,255,0.15)' }}><Target size={16} style={{ color:'#a78bfa' }} /></div>
             <div>
               <h2 style={{ fontWeight:700, color:'#fff', fontSize:'0.95rem' }}>ATS Score Report</h2>
-              <p style={{ fontSize:'0.68rem', color:'#475569' }}>Powered by Social-CV engine</p>
+              <p style={{ fontSize:'0.68rem', color:'#475569' }}>
+                {result?.aiPowered ? '🤖 Powered by Gemini AI' : 'Powered by Social-CV engine'}
+              </p>
             </div>
           </div>
           <button onClick={onClose} className="btn-ghost" style={{ padding:6 }}><X size={16} /></button>
@@ -153,11 +155,23 @@ export function ATSModal({ result, onClose }) {
             <p style={{ fontSize:'0.78rem', color:'#64748b', marginTop:4 }}>Your resume scored <strong style={{color:'#fff'}}>{score}/100</strong> on ATS compatibility</p>
           </div>
 
+          {/* AI Summary (only shown if Gemini powered) */}
+          {result?.aiPowered && result?.aiSummary && (
+            <div style={{ borderRadius:16, padding:16, background:'rgba(16,185,129,0.08)', border:'1px solid rgba(16,185,129,0.25)' }}>
+              <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:8 }}>
+                <span style={{ fontSize:'0.85rem' }}>🤖</span>
+                <h3 style={{ fontWeight:600, fontSize:'0.83rem', color:'#10b981' }}>AI Verdict</h3>
+              </div>
+              <p style={{ fontSize:'0.77rem', color:'#94a3b8', lineHeight:1.7 }}>{result.aiSummary}</p>
+            </div>
+          )}
+
           {/* How ATS Works */}
           <div style={{ borderRadius:16, padding:16, background:'rgba(90,79,255,0.08)', border:'1px solid rgba(90,79,255,0.2)' }}>
             <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:8 }}><Info size={14} style={{color:'#a78bfa'}} /><h3 style={{ fontWeight:600, fontSize:'0.83rem', color:'#fff' }}>How ATS Works</h3></div>
             <p style={{ fontSize:'0.77rem', color:'#94a3b8', lineHeight:1.7 }}>Applicant Tracking Systems scan resumes for keywords and structure. <strong style={{color:'#fff'}}>75% of resumes</strong> are rejected before a human reads them. Our engine checks 5 key dimensions.</p>
           </div>
+
 
           {/* Score Breakdown */}
           <div>

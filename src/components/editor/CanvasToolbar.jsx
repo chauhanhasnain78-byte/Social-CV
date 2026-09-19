@@ -104,16 +104,20 @@ export function CanvasToolbar() {
     }
   };
 
-  const handleATSScan = () => {
+  const handleATSScan = async () => {
     setScanning(true);
-    setTimeout(() => {
-      const result = scoreResume(resume);
+    try {
+      const result = await scoreResume(resume);
       setAtsResult(result);
       setShowATS(true);
-      setScanning(false);
       updateHighestAtsScore(result.score);
-      toast.info(`ATS Score: ${result.score}/100 — ${result.grade}`, { title: '📊 Scan Complete' });
-    }, 900);
+      const badge = result.aiPowered ? '🤖 AI-Powered' : '📊';
+      toast.info(`ATS Score: ${result.score}/100 — ${result.grade}`, { title: `${badge} Scan Complete` });
+    } catch {
+      toast.error('ATS scan failed. Please try again.');
+    } finally {
+      setScanning(false);
+    }
   };
 
   const handleExport = async () => {
