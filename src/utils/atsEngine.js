@@ -11,7 +11,7 @@
  *   before sending to Gemini. Only professional content is analyzed.
  */
 
-import { GoogleGenAI } from '@google/genai';
+// No SDK needed — using Gemini REST API v1 directly via fetch()
 
 // ─── LOCAL ENGINE DATA ────────────────────────────────────────────────────────
 
@@ -191,7 +191,6 @@ async function scoreWithGemini(resume) {
   const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
   if (!apiKey) throw new Error('No API key');
 
-  const ai = new GoogleGenAI({ apiKey });
   const resumeText = buildPrivacySafeText(resume);
 
   const prompt = `
@@ -232,8 +231,24 @@ Rules:
 - aiSummary should be honest and specific to this resume
 `;
 
-  const result   = await ai.models.generateContent({ model: 'gemini-2.0-flash-lite', contents: prompt });
-  const text     = result.text.trim();
+  // Direct REST API call — v1 endpoint, no SDK needed
+  const endpoint = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: prompt }] }]
+    }),
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(`Gemini API error ${response.status}: ${err?.error?.message || 'unknown'}`);
+  }
+
+  const data   = await response.json();
+  const text   = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? '';
 
   // Strip markdown code fences if Gemini wraps in ```json ... ```
   const cleaned  = text.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim();
