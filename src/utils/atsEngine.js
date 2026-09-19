@@ -11,7 +11,7 @@
  *   before sending to Gemini. Only professional content is analyzed.
  */
 
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenAI } from '@google/genai';
 
 // ─── LOCAL ENGINE DATA ────────────────────────────────────────────────────────
 
@@ -191,10 +191,7 @@ async function scoreWithGemini(resume) {
   const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
   if (!apiKey) throw new Error('No API key');
 
-  const genAI = new GoogleGenerativeAI(apiKey);
-  // Using gemini-1.5-flash-latest as a safer fallback if standard flash throws 404
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
-
+  const ai = new GoogleGenAI({ apiKey });
   const resumeText = buildPrivacySafeText(resume);
 
   const prompt = `
@@ -235,8 +232,8 @@ Rules:
 - aiSummary should be honest and specific to this resume
 `;
 
-  const result   = await model.generateContent(prompt);
-  const text     = result.response.text().trim();
+  const result   = await ai.models.generateContent({ model: 'gemini-1.5-flash', contents: prompt });
+  const text     = result.text.trim();
 
   // Strip markdown code fences if Gemini wraps in ```json ... ```
   const cleaned  = text.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim();
