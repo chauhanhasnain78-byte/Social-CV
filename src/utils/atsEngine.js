@@ -231,16 +231,36 @@ Rules:
 - aiSummary should be honest and specific to this resume
 `;
 
-  // Direct REST API call — v1 endpoint, no SDK needed
-  const endpoint = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+  // Auto-detect which model is available for this API key
+  const CANDIDATE_MODELS = [
+    'gemini-2.0-flash-lite',
+    'gemini-2.0-flash',
+    'gemini-1.5-flash',
+    'gemini-1.5-flash-latest',
+    'gemini-1.0-pro',
+    'gemini-pro',
+  ];
 
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }]
-    }),
-  });
+  let modelName = null;
+  for (const candidate of CANDIDATE_MODELS) {
+    const testRes = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${candidate}?key=${apiKey}`
+    );
+    if (testRes.ok) { modelName = candidate; break; }
+  }
+  if (!modelName) throw new Error('No supported Gemini model found for this API key');
+
+  // Call Gemini — try v1 first, fall back to v1beta
+  let response;
+  for (const ver of ['v1', 'v1beta']) {
+    const endpoint = `https://generativelanguage.googleapis.com/${ver}/models/${modelName}:generateContent?key=${apiKey}`;
+    response = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+    });
+    if (response.ok) break;
+  }
 
   if (!response.ok) {
     const err = await response.json().catch(() => ({}));
