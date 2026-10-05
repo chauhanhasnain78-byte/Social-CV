@@ -4,7 +4,7 @@ import { useResumeStore } from '@/store/resumeStore';
 import { useAuth } from '@/context/AuthContext';
 import { TEMPLATES } from '@/templates/templateMeta';
 import { LogOut, FileText, CheckCircle, Share2, Copy, Eye, ExternalLink, Image, AlignLeft, Mail, Repeat2, Bell } from 'lucide-react';
-import { doc, onSnapshot, collection, updateDoc } from 'firebase/firestore';
+import { doc, onSnapshot, collection, updateDoc, setDoc } from 'firebase/firestore';
 import { db } from '@/services/firebase';
 import { useState, useEffect, useRef } from 'react';
 import { toast } from '@/components/ui/Toast';
@@ -171,7 +171,10 @@ export default function DashboardPage() {
     const newVal = !allowRecruiterView;
     setAllowRecruiterView(newVal);
     try {
-      await updateDoc(doc(db, 'users', user.uid), { allowRecruiterView: newVal });
+      // Update in users collection
+      await setDoc(doc(db, 'users', user.uid), { allowRecruiterView: newVal }, { merge: true });
+      // Update in resumes collection so PublicResume page can read it
+      await setDoc(doc(db, 'resumes', user.uid), { allowRecruiterView: newVal }, { merge: true });
       toast.success(newVal ? 'Your CV is now visible to HRs! 🚀' : 'Your CV is now private. 🔒');
     } catch (err) {
       console.error(err);
